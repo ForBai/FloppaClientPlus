@@ -14,29 +14,29 @@ object ColorUtil {
         get() = ClickGui.color.value
 
     val elementColor: Int
-     get() = if (ClickGui.design.isSelected("New"))
-             newColor
-         else if (ClickGui.design.isSelected("JellyLike"))
-             jellyColor
-         else
-             0
+        get() = if (ClickGui.design.isSelected("New"))
+            newColor
+        else if (ClickGui.design.isSelected("JellyLike"))
+            jellyColor
+        else
+            0
 
     val bgColor: Int
         get() = if (ClickGui.design.isSelected("New"))
             newColor
         else if (ClickGui.design.isSelected("JellyLike"))
-            Color(255,255,255,50).rgb
+            Color(255, 255, 255, 50).rgb
         else
             0
 
-    val outlineColor : Int
+    val outlineColor: Int
         get() = clickGUIColor.darker().rgb
 
     val hoverColor: Int
         get() {
             val temp = clickGUIColor.darker()
             val scale = 0.5
-            return Color(((temp.red*scale).toInt()), (temp.green*scale).toInt(), (temp.blue*scale).toInt()).rgb
+            return Color(((temp.red * scale).toInt()), (temp.green * scale).toInt(), (temp.blue * scale).toInt()).rgb
         }
 
     val tabColor: Int
@@ -45,7 +45,6 @@ object ColorUtil {
     fun sliderColor(dragging: Boolean): Int = clickGUIColor.withAlpha(if (dragging) 250 else 200).rgb
 
     fun sliderKnobColor(dragging: Boolean): Int = clickGUIColor.withAlpha(if (dragging) 255 else 230).rgb
-
 
 
     const val jellyColor = -0x44eaeaeb

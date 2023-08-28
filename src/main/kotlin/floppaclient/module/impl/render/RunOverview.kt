@@ -29,8 +29,16 @@ object RunOverview : Module(
 ) {
 
     private val showHud = BooleanSetting("Show HUD", default = true, description = "Render the splits in a hud.")
-    private val chatMessage = BooleanSetting("Chat Message", default = false, description = "Shows a message of whenever a phase is completed.")
-    private val floorSevenSplits = BooleanSetting("Custom F7 Splits", default = true, description = "Show Custom splits for Floor 7 and Master Floor 7.")
+    private val chatMessage = BooleanSetting(
+        "Chat Message",
+        default = false,
+        description = "Shows a message of whenever a phase is completed."
+    )
+    private val floorSevenSplits = BooleanSetting(
+        "Custom F7 Splits",
+        default = true,
+        description = "Show Custom splits for Floor 7 and Master Floor 7."
+    )
 
     private val xHud = NumberSetting("x", default = 3.0, visibility = Visibility.HIDDEN)
     private val yHud = NumberSetting("y", default = 150.0, visibility = Visibility.HIDDEN)
@@ -79,7 +87,9 @@ object RunOverview : Module(
                 if (chatMessage.enabled) modMessage("Watcher cleared at§c ${timeFormat(bloodClearTime - bloodOpenTime)}")
             }
 
-            text.startsWith("[BOSS]") && !text.startsWith("[BOSS] The Watcher:") && (!text.startsWith("[BOSS] Scarf") && !RunInformation.isInFloor(2))
+            text.startsWith("[BOSS]") && !text.startsWith("[BOSS] The Watcher:") && (!text.startsWith("[BOSS] Scarf") && !RunInformation.isInFloor(
+                2
+            ))
                     && (!text.startsWith("[BOSS] Bonzo") && !RunInformation.isInFloor(1)) && bossEnterTime == -1L -> {
                 bossEnterTime = System.currentTimeMillis()
                 if (chatMessage.enabled) modMessage("Portal entered at §c${timeFormat(bossEnterTime - bloodClearTime)}")

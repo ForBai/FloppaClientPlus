@@ -14,7 +14,7 @@ import java.awt.Color
  *
  * @author Aton
  */
-abstract class AdvancedElement<S: Setting<*>>(
+abstract class AdvancedElement<S : Setting<*>>(
     val parent: AdvancedMenu,
     val module: Module,
     val setting: S,
@@ -22,12 +22,16 @@ abstract class AdvancedElement<S: Setting<*>>(
 ) {
     var x = 0
     var y = 0
+
     /** Width of the entire element consisting of the setting and description. */
     var width = 150
+
     /** Height of the entire element consisting of the setting and description. Essentially the height of the higher one of the two */
     var height = 15
+
     /** Width of the Setting without the description text. */
     var settingWidth = 116
+
     /** Height of the Setting without the description text. */
     var settingHeight = 15
 
@@ -43,7 +47,7 @@ abstract class AdvancedElement<S: Setting<*>>(
         val temp = ColorUtil.clickGUIColor
         val color = if (listening) {
             Color(temp.red, temp.green, temp.blue, 200).rgb
-        }else {
+        } else {
             Color(ColorUtil.elementColor, true).darker().rgb
         }
         Gui.drawRect(0, 0, width, height, Color(ColorUtil.bgColor, true).brighter().rgb)
@@ -60,7 +64,9 @@ abstract class AdvancedElement<S: Setting<*>>(
         GlStateManager.popMatrix()
     }
 
-    open fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int{ return settingHeight }
+    open fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
+        return settingHeight
+    }
 
     open fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
         return false
@@ -71,9 +77,11 @@ abstract class AdvancedElement<S: Setting<*>>(
     /**
      * Overridden in the elements to enable key detection. Returns true when an action was taken.
      */
-    open fun keyTyped(typedChar: Char, keyCode: Int): Boolean { return false }
+    open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
+        return false
+    }
 
-    fun renderDescription() : Int{
+    fun renderDescription(): Int {
         var descriptionHeight = 0
         setting.description?.let {
             FontUtil.drawSplitString(
@@ -85,14 +93,14 @@ abstract class AdvancedElement<S: Setting<*>>(
         return descriptionHeight + 4
     }
 
-    fun setDimensions(x: Int, y: Int, width: Int, height: Int){
+    fun setDimensions(x: Int, y: Int, width: Int, height: Int) {
         this.x = x
         this.y = y
         this.width = width
         this.height = height
     }
 
-    fun setPosition(x: Int, y: Int){
+    fun setPosition(x: Int, y: Int) {
         this.x = x
         this.y = y
     }

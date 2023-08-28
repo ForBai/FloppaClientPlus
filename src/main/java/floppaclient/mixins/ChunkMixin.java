@@ -13,7 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Chunk.class)
 abstract class ChunkMixin {
-    @Shadow public abstract IBlockState getBlockState(BlockPos pos);
+    @Shadow
+    public abstract IBlockState getBlockState(BlockPos pos);
 
     @Inject(method = "setBlockState", at = @At("HEAD"), cancellable = true)
     public void onBlockSet(BlockPos pos, IBlockState state, CallbackInfoReturnable<IBlockState> cir) {

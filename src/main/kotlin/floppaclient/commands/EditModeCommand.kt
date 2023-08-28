@@ -23,37 +23,115 @@ class EditModeCommand : CommandBase() {
      */
     private val shortcuts = mapOf<String, Int>(
         "glass" to Block.getIdFromBlock(Blocks.glass),
-        "wall"  to Block.getIdFromBlock(Blocks.cobblestone_wall),
-        "bars"  to Block.getIdFromBlock((Blocks.iron_bars)),
-        "brick"  to Block.getIdFromBlock((Blocks.brick_block)),
+        "wall" to Block.getIdFromBlock(Blocks.cobblestone_wall),
+        "bars" to Block.getIdFromBlock((Blocks.iron_bars)),
+        "brick" to Block.getIdFromBlock((Blocks.brick_block)),
 
         //Stained Glass
-        "wg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE)),
-        "og"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.ORANGE)),
-        "mg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.MAGENTA)),
-        "lbg"   to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE)),
-        "yg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.YELLOW)),
-        "lg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIME)),
-        "pig"   to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.PINK)),
-        "sg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)),
-        "lsg"   to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.SILVER)),
-        "cg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.CYAN)),
-        "pug"   to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.PURPLE)),
-        "bg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE)),
-        "brg"   to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BROWN)),
-        "gg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GREEN)),
-        "rg"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.RED)),
-        "ng"    to Block.getStateId(Blocks.stained_glass.defaultState.withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLACK)),
+        "wg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.WHITE
+            )
+        ),
+        "og" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.ORANGE
+            )
+        ),
+        "mg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.MAGENTA
+            )
+        ),
+        "lbg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.LIGHT_BLUE
+            )
+        ),
+        "yg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.YELLOW
+            )
+        ),
+        "lg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.LIME
+            )
+        ),
+        "pig" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.PINK
+            )
+        ),
+        "sg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.GRAY
+            )
+        ),
+        "lsg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.SILVER
+            )
+        ),
+        "cg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.CYAN
+            )
+        ),
+        "pug" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.PURPLE
+            )
+        ),
+        "bg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.BLUE
+            )
+        ),
+        "brg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.BROWN
+            )
+        ),
+        "gg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.GREEN
+            )
+        ),
+        "rg" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.RED
+            )
+        ),
+        "ng" to Block.getStateId(
+            Blocks.stained_glass.defaultState.withProperty(
+                BlockStainedGlass.COLOR,
+                EnumDyeColor.BLACK
+            )
+        ),
 
         //Ore Blocks
-        "gb"    to Block.getIdFromBlock((Blocks.gold_block)),
-        "db"    to Block.getIdFromBlock((Blocks.diamond_block)),
-        "ib"    to Block.getIdFromBlock((Blocks.iron_block)),
-        "cb"    to Block.getIdFromBlock((Blocks.coal_block)),
-        "eb"    to Block.getIdFromBlock((Blocks.emerald_block)),
+        "gb" to Block.getIdFromBlock((Blocks.gold_block)),
+        "db" to Block.getIdFromBlock((Blocks.diamond_block)),
+        "ib" to Block.getIdFromBlock((Blocks.iron_block)),
+        "cb" to Block.getIdFromBlock((Blocks.coal_block)),
+        "eb" to Block.getIdFromBlock((Blocks.emerald_block)),
     )
-
-
 
 
     private val fences = listOf(
@@ -117,7 +195,7 @@ class EditModeCommand : CommandBase() {
                 modMessage("Enable extras before using edit mode!")
                 return
             }
-            if (args.isEmpty())return
+            if (args.isEmpty()) return
         }
         // First check for matches in the static shortcuts
         var id = shortcuts[args[0].lowercase()]
@@ -128,7 +206,7 @@ class EditModeCommand : CommandBase() {
         }
 
         // now check the customizable shortcuts
-        id = when (args[0].lowercase()){
+        id = when (args[0].lowercase()) {
             "stair", "stairs" -> Block.getIdFromBlock(stairs[ExtraBlocks.defaultStairs.index])
             "fence" -> Block.getIdFromBlock(fences[ExtraBlocks.defaultFence.index])
             "slab" -> Block.getIdFromBlock(slabs[ExtraBlocks.defaultSlab.index])

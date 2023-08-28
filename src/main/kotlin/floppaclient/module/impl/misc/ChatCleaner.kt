@@ -21,14 +21,21 @@ object ChatCleaner : Module(
 ) {
     private val dungeon = BooleanSetting("Dungeon Messages", true, description = "Hides useless messages in dungeons.")
     private val dungPot = BooleanSetting("Dungeon potion", true, description = "Hides dungeon potion messages")
-    private val milestones = BooleanSetting("Milestone Messages", true, description = "Hides Milestone messages in dungeons.")
+    private val milestones =
+        BooleanSetting("Milestone Messages", true, description = "Hides Milestone messages in dungeons.")
     private val hypixelMsgs = BooleanSetting("Useless Hypixel Msgs", true, description = "Hides useless Messages")
 
-    private val abilityHider = BooleanSetting("Hide Ability Damage", true, description = "Hides Ability Damage from chat.")
+    private val abilityHider =
+        BooleanSetting("Hide Ability Damage", true, description = "Hides Ability Damage from chat.")
     private val stashHider = BooleanSetting("Hide Stash", true, description = "Hides Stash Messages")
-    private val blocksInTheWay = BooleanSetting("Blocks in way", true, description = "Hides §c§oThere are blocks in the way!§r messages")
+    private val blocksInTheWay =
+        BooleanSetting("Blocks in way", true, description = "Hides §c§oThere are blocks in the way!§r messages")
     private val comboHider = BooleanSetting("Hide Combo", true, description = "Hides §6§l§o+50 Kill Combo§r messages.")
-    private val autoRecombHider = BooleanSetting("Hide Auto Recomb", true, description = "Hides  §e§oYour §6§oAuto Recombobulator §e§orecombobulated§r messages.")
+    private val autoRecombHider = BooleanSetting(
+        "Hide Auto Recomb",
+        true,
+        description = "Hides  §e§oYour §6§oAuto Recombobulator §e§orecombobulated§r messages."
+    )
 
     init {
         this.addSettings(
@@ -91,7 +98,9 @@ object ChatCleaner : Module(
             text.startsWith("There are blocks in the way!") && blocksInTheWay.enabled -> event.isCanceled = true
             text.startsWith("Your") && text.endsWith("damage.") && abilityHider.enabled -> event.isCanceled = true
             (text.contains("Kill Combo") && !text.contains(":") && comboHider.enabled) -> event.isCanceled = true
-            text.startsWith("Your Auto-Recombobulator recombobulated") && autoRecombHider.enabled -> event.isCanceled = true
+            text.startsWith("Your Auto-Recombobulator recombobulated") && autoRecombHider.enabled -> event.isCanceled =
+                true
+
             text.endsWith("Click here to pick it all up!") && stashHider.enabled -> event.isCanceled = true
         }
     }

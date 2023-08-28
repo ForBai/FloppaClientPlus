@@ -47,7 +47,10 @@ class ElementSelector<T>(parent: ModuleButton, setting: SelectorSetting<T>) :
                 Gui.drawRect(0, ay, width, ay + increment, ColorUtil.dropDownColor)
                 val optionName = option.displayName
                 val elementtitle =
-                    optionName.substring(0, 1).uppercase(Locale.getDefault()) + optionName.substring(1, optionName.length)
+                    optionName.substring(0, 1).uppercase(Locale.getDefault()) + optionName.substring(
+                        1,
+                        optionName.length
+                    )
                 FontUtil.drawCenteredString(elementtitle, width / 2.0, ay + 2.0)
 
                 /** Highlight the element if it is selected */

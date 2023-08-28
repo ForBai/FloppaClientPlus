@@ -24,7 +24,7 @@ object XRay : Module(
     "XRay",
     category = Category.RENDER,
     description = "See certain Blocks through walls."
-){
+) {
     /*
      * TODO in the future replace these boolean settings with a new setting type that works as a multi select dropdown.
      *  This could be derived from the StringSelectorSetting but with mutiple selections being possible.
@@ -32,18 +32,21 @@ object XRay : Module(
      */
     private val showOres = BooleanSetting("Ores", true, description = "Makes the module show ores")
     private val showGlass = BooleanSetting("Glass", true, description = "Makes the module show glass blocks and panes")
-    private val showMithril = BooleanSetting("Mithril", true, description = "Makes the module show aquamarine and prismarine blocks.")
-    private val showFluids = BooleanSetting("Fluids", false, description = "If enabled the opacity of fluids will not be affected.")
+    private val showMithril =
+        BooleanSetting("Mithril", true, description = "Makes the module show aquamarine and prismarine blocks.")
+    private val showFluids =
+        BooleanSetting("Fluids", false, description = "If enabled the opacity of fluids will not be affected.")
 
-    private val opacity = NumberSetting("Opacity", 180.0, 0.0, 255.0, 1.0, description = "The opacity of hidden blocks.")
-        .withInputTransform { input ->
-            // store the value in an int to avoid needing a type conversion for every rendered block surface.
-            // This might help with performance, or not idk.
-            alphaInt = input.toInt()
-            alphaFloat = input.toFloat() / 255f
-            if(this@XRay.enabled) mc.renderGlobal.loadRenderers()
-            input
-        }
+    private val opacity =
+        NumberSetting("Opacity", 180.0, 0.0, 255.0, 1.0, description = "The opacity of hidden blocks.")
+            .withInputTransform { input ->
+                // store the value in an int to avoid needing a type conversion for every rendered block surface.
+                // This might help with performance, or not idk.
+                alphaInt = input.toInt()
+                alphaFloat = input.toFloat() / 255f
+                if (this@XRay.enabled) mc.renderGlobal.loadRenderers()
+                input
+            }
 
     private var alphaInt: Int = 180
     var alphaFloat: Float = 0.7f
@@ -64,7 +67,7 @@ object XRay : Module(
             showFluids
         ).forEach { setting ->
             setting.processInput = { input ->
-                if(this@XRay.enabled) mc.renderGlobal.loadRenderers()
+                if (this@XRay.enabled) mc.renderGlobal.loadRenderers()
                 input
             }
         }
@@ -94,8 +97,8 @@ object XRay : Module(
      * Reveal obstructed blocks for the XRay.
      * @see floppaclient.mixins.BlockMixin.onShouldSideBeRendered
      */
-    fun modifyRenderdSideHook(block: Block, returnValue: Boolean) : Boolean{
-        if(!returnValue && shouldBlockBeRevealed(block)) {
+    fun modifyRenderdSideHook(block: Block, returnValue: Boolean): Boolean {
+        if (!returnValue && shouldBlockBeRevealed(block)) {
             return true
         }
         return returnValue
@@ -135,5 +138,5 @@ object XRay : Module(
 
     private val mithril = arrayOf(
         Blocks.prismarine,
-        )
+    )
 }

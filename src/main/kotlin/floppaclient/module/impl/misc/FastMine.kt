@@ -17,17 +17,50 @@ object FastMine : Module(
     "Fast Mine",
     category = Category.MISC,
     description = "Breaks blocks sooner when mining them, allowing for effectively faster mining. Also has some options to reduce the delay in between block breaking."
-){
-    private val mode = StringSelectorSetting("Mode", "Vanilla", arrayListOf("Vanilla", "Skyblock", "None"), description = "Choose this according to where you are mining. In regions with custom mining like the Crystal Hollows select §oSkyblock§r everywhere else select §oVanilla§r. Select §oNone§r if you only want to use the other features in the module.")
-    private val threshold = NumberSetting("Threshold", 0.7, 0.7, 1.0, 0.01, description = "Effectively reduces the time it takes to break the block by this factor.")
+) {
+    private val mode = StringSelectorSetting(
+        "Mode",
+        "Vanilla",
+        arrayListOf("Vanilla", "Skyblock", "None"),
+        description = "Choose this according to where you are mining. In regions with custom mining like the Crystal Hollows select §oSkyblock§r everywhere else select §oVanilla§r. Select §oNone§r if you only want to use the other features in the module."
+    )
+    private val threshold = NumberSetting(
+        "Threshold",
+        0.7,
+        0.7,
+        1.0,
+        0.01,
+        description = "Effectively reduces the time it takes to break the block by this factor."
+    )
         .withDependency { this.mode.index == 0 }
-    private val ticks = NumberSetting("Ticks", 20.0, 1.0, 100.0, 1.0, description = "The amount of ticks after which the block you are mining should break.")
+    private val ticks = NumberSetting(
+        "Ticks",
+        20.0,
+        1.0,
+        100.0,
+        1.0,
+        description = "The amount of ticks after which the block you are mining should break."
+    )
         .withDependency { this.mode.index == 1 }
-    private val modifyDelay = BooleanSetting("Modify Hit Delay", false, description = "Modifies the hit delay of 5 ticks before the next block can be mined. This allows for bypassing the vanilla softcap.")
-    private val newHitDelay = NumberSetting("New Delay", 0.0, 0.0, 5.0, 1.0, description = "New delay in ticks until the next block can be broken. The vanilla value is 5.")
+    private val modifyDelay = BooleanSetting(
+        "Modify Hit Delay",
+        false,
+        description = "Modifies the hit delay of 5 ticks before the next block can be mined. This allows for bypassing the vanilla softcap."
+    )
+    private val newHitDelay = NumberSetting(
+        "New Delay",
+        0.0,
+        0.0,
+        5.0,
+        1.0,
+        description = "New delay in ticks until the next block can be broken. The vanilla value is 5."
+    )
         .withDependency { this.modifyDelay.enabled }
-    private val noReset = BooleanSetting("No Reset", false, description = "Prevents the block breaking progress from resetting when the NBT data of the held item gets updated. This can happen because of the Compact enchant or drill fuel updating.")
-
+    private val noReset = BooleanSetting(
+        "No Reset",
+        false,
+        description = "Prevents the block breaking progress from resetting when the NBT data of the held item gets updated. This can happen because of the Compact enchant or drill fuel updating."
+    )
 
 
     init {
@@ -44,7 +77,7 @@ object FastMine : Module(
     /**
      * @see floppaclient.mixins.PlayerControllerMixin.tweakBlockDamage
      */
-    fun getThreshold(): Float{
+    fun getThreshold(): Float {
         return threshold.value.toFloat()
     }
 
@@ -58,21 +91,21 @@ object FastMine : Module(
     /**
      * @see floppaclient.mixins.PlayerControllerMixin.preBreakBlock
      */
-    fun shouldPreBreakBlock(miningTicks: Float, blockDamage: Float) : Boolean {
+    fun shouldPreBreakBlock(miningTicks: Float, blockDamage: Float): Boolean {
         return this.enabled && mode.isSelected("Skyblock") && blockDamage < 1f && miningTicks >= ticks.value.toFloat()
     }
 
     /**
      * @see floppaclient.mixins.PlayerControllerMixin.tweakHitDelay
      */
-    fun shouldRemoveHitDelay(hitDelay: Int) : Boolean {
+    fun shouldRemoveHitDelay(hitDelay: Int): Boolean {
         return this.enabled && modifyDelay.enabled && hitDelay <= (5.0 - this.newHitDelay.value)
     }
 
     /**
      * @see floppaclient.mixins.PlayerControllerMixin.shouldTagsBeEqual
      */
-    fun shouldPreventReset() : Boolean {
+    fun shouldPreventReset(): Boolean {
         return this.enabled && noReset.enabled
     }
 }

@@ -18,10 +18,21 @@ object Camera : Module(
     "Camera",
     category = Category.RENDER,
     description = "Modifies the behaviour of the Camera."
-){
-    private val thirdPDist by NumberSetting("Distance", 4.0, 1.0,10.0,0.1, description = "Distance of the third person view camera.")
+) {
+    private val thirdPDist by NumberSetting(
+        "Distance",
+        4.0,
+        1.0,
+        10.0,
+        0.1,
+        description = "Distance of the third person view camera."
+    )
     private val clip by BooleanSetting("Camera Clip", true, description = "Lets the camera clip through blocks.")
-    private val noFrontView by BooleanSetting("No Front View", false, description = "Skips the front view when toggling perspective.")
+    private val noFrontView by BooleanSetting(
+        "No Front View",
+        false,
+        description = "Skips the front view when toggling perspective."
+    )
 
     /**
      * Called by the EntityRendererMixin when it checks the thirdPersonDistance.
@@ -50,7 +61,7 @@ object Camera : Module(
         /** adds +1 tp the perspective setting to skip front view, does not override the vanilla toggle
          * isKeyDown has to be used here instead of isKeyPressed because the vanilla function is called first.*/
         if (FloppaClient.mc.gameSettings.keyBindTogglePerspective.isKeyDown) {
-            if(FloppaClient.mc.gameSettings.thirdPersonView >= 2) { //front view
+            if (FloppaClient.mc.gameSettings.thirdPersonView >= 2) { //front view
                 FloppaClient.mc.gameSettings.thirdPersonView = 0
             }
         }

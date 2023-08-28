@@ -13,7 +13,7 @@ object EditHud : Module(
     "Edit Hud",
     category = Category.RENDER,
     description = "Opens the eidt hud gui."
-){
+) {
 
     /**
      * Overridden to prevent the chat message from being sent.

@@ -191,7 +191,7 @@ object TicTacToeSolver : Module(
         if (bestMove != null) {
             WorldRenderUtils.drawBoxAtBlock(
                 bestMove!!,
-                Color(0,255,0),
+                Color(0, 255, 0),
                 3f
             )
         }
@@ -514,7 +514,13 @@ object TicTacToeSolver : Module(
          * @param currentPly    the current depth
          * @return              the index of the move to make
          */
-        private fun alphaBetaPruning(player: Board.State, board: Board, alpha: Double, beta: Double, currentPly: Int): Int {
+        private fun alphaBetaPruning(
+            player: Board.State,
+            board: Board,
+            alpha: Double,
+            beta: Double,
+            currentPly: Int
+        ): Int {
             var cp = currentPly
             if (cp++.toDouble() == maxPly || board.isGameOver) {
                 return score(player, board, cp)

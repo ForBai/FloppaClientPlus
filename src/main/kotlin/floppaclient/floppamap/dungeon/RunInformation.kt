@@ -56,12 +56,13 @@ object RunInformation {
     var score = 0
         private set
 
-    fun inF7Boss() : Boolean{
+    fun inF7Boss(): Boolean {
         if (!FloppaClient.inDungeons) return false
-        if(currentFloor?.floorNumber == 7) { // check whether floor is 7
-            if(FloppaClient.mc.thePlayer.posZ > 0 ) { //check whether in boss room
+        if (currentFloor?.floorNumber == 7) { // check whether floor is 7
+            if (FloppaClient.mc.thePlayer.posZ > 0) { //check whether in boss room
                 return true
-            }}
+            }
+        }
         return false
     }
 
@@ -91,19 +92,22 @@ object RunInformation {
                             "✖" -> false
                             else -> null
                         }
-                        if (state != true) tempUncompletedPuzz ++
-                        if (!name.contains("???")) puzzles.add(Pair(name,state))
+                        if (state != true) tempUncompletedPuzz++
+                        if (!name.contains("???")) puzzles.add(Pair(name, state))
                     }
                 }
+
                 text.contains("Deaths: ") -> {
                     val matcher = deathsPattern.find(text) ?: return@forEach
                     deathCount = matcher.groups["deaths"]?.value?.toIntOrNull() ?: deathCount
                 }
+
                 text.contains("Secrets Found: ") -> {
                     if (text.contains("%")) {
                         val matcher = secretsFoundPercentagePattern.find(text) ?: return@forEach
                         secretPercentage = (matcher.groups["percentage"]?.value?.toDoubleOrNull() ?: 0.0)
-                        totalSecrets = if (secretCount > 0 && secretPercentage > 0) floor(100f / secretPercentage * secretCount + 0.5).toInt() else null
+                        totalSecrets =
+                            if (secretCount > 0 && secretPercentage > 0) floor(100f / secretPercentage * secretCount + 0.5).toInt() else null
                     } else {
                         val matcher = secretsFoundPattern.find(text) ?: return@forEach
                         secretCount = matcher.groups["secrets"]?.value?.toIntOrNull() ?: secretCount
@@ -111,10 +115,12 @@ object RunInformation {
                     val matcher = secretsFoundPattern.find(text) ?: return@forEach
                     secretCount = matcher.groups["secrets"]?.value?.toIntOrNull() ?: secretCount
                 }
+
                 text.contains("Crypts: ") -> {
                     val matcher = cryptsPattern.find(text) ?: return@forEach
                     cryptsCount = matcher.groups["crypts"]?.value?.toIntOrNull() ?: cryptsCount
                 }
+
                 text.contains("Puzzles: ") -> {
                     readingPuzzles = true
                     puzzles.clear()
@@ -126,7 +132,7 @@ object RunInformation {
         score = skillScore + exploreScore + speedScore + bonusScore
     }
 
-    private fun updateFromScoreboard(){
+    private fun updateFromScoreboard() {
         ScoreboardUtils.sidebarLines.forEach {
             val line = ScoreboardUtils.cleanSB(it)
             when {
@@ -136,6 +142,7 @@ object RunInformation {
                         clearedPercentage = matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0
                     }
                 }
+
                 line.startsWith("Time Elapsed:") -> {
                     val matcher = timeElapsedPattern.find(line)
                     if (matcher != null) {
@@ -145,10 +152,13 @@ object RunInformation {
                         secondsElapsed = (hours * 3600 + minutes * 60 + seconds)
                     }
                 }
+
                 currentFloor == null && line.contains("The Catacombs (") -> {
                     currentFloor = try {
                         Floor.valueOf(line.substringAfter("(").substringBefore(")"))
-                    }catch (_ : IllegalArgumentException) { null }
+                    } catch (_: IllegalArgumentException) {
+                        null
+                    }
                 }
             }
         }
@@ -171,20 +181,21 @@ object RunInformation {
     private val skillScore: Int
         get() {
             // 20 + floor( 80 * clearRatio ) - 10 * uncompletedPuzzles - (2*Deaths - 1).coerceAtLeast(0)
-            val cleared = (clearedPercentage + if(Dungeon.inBoss) 0 else 5).coerceAtMost(100)
-            return  20 + (
+            val cleared = (clearedPercentage + if (Dungeon.inBoss) 0 else 5).coerceAtMost(100)
+            return 20 + (
                     (0.8 * cleared).toInt()
                             - 10 * uncompletedPuzzles
-                            - (2* deathCount - 1).coerceAtLeast(0)
+                            - (2 * deathCount - 1).coerceAtLeast(0)
                     ).coerceAtLeast(0)
         }
 
     private val exploreScore: Int
         get() {
             // floor( 60 * clearRatio ) + floor( 40 * (secretFound / secretNeeded).coerceAtMost(1) )
-            val cleared = (clearedPercentage + if(Dungeon.inBoss) 0 else 5).coerceAtMost(100)
+            val cleared = (clearedPercentage + if (Dungeon.inBoss) 0 else 5).coerceAtMost(100)
             return (0.6 * cleared).toInt() + (
-                    40 * (secretPercentage / (requiredSecretPercentage[currentFloor] ?: 100.0)).coerceAtMost(1.0)).toInt()
+                    40 * (secretPercentage / (requiredSecretPercentage[currentFloor]
+                        ?: 100.0)).coerceAtMost(1.0)).toInt()
         }
 
     /**
@@ -203,7 +214,7 @@ object RunInformation {
         }
 
     private val requiredSecretPercentage: Map<Floor, Double> = mapOf(
-        Floor.E  to 30.0,
+        Floor.E to 30.0,
         Floor.F1 to 30.0,
         Floor.F2 to 40.0,
         Floor.F3 to 50.0,
@@ -221,7 +232,7 @@ object RunInformation {
     )
 
     private val timeLimit: Map<Floor, Int> = mapOf(
-        Floor.E  to 600,
+        Floor.E to 600,
         Floor.F1 to 600,
         Floor.F2 to 600,
         Floor.F3 to 600,
@@ -238,12 +249,12 @@ object RunInformation {
         Floor.M7 to 900,
     )
 
-    enum class Floor{
+    enum class Floor {
         E, F1, F2, F3, F4, F5, F6, F7, M1, M2, M3, M4, M5, M6, M7;
 
         val isMasterMode: Boolean
             get() {
-                return when(this) {
+                return when (this) {
                     M1, M2, M3, M4, M5, M6, M7 -> true
                     else -> false
                 }
@@ -254,7 +265,7 @@ object RunInformation {
          */
         val floorNumber: Int
             get() {
-                return when(this) {
+                return when (this) {
                     E -> 0
                     F1, M1 -> 1
                     F2, M2 -> 2

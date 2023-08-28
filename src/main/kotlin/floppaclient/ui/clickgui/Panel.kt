@@ -28,8 +28,10 @@ class Panel(
 
     val width = ClickGui.panelWidth.value.toInt()
     val height = ClickGui.panelHeight.value.toInt()
+
     /** Absolute position of the panel on the screen. */
     var x = ClickGui.panelX[category]!!.value.toInt()
+
     /** Absolute position of the panel on the screen. */
     var y = ClickGui.panelY[category]!!.value.toInt()
     var extended: Boolean = ClickGui.panelExtended[category]!!.enabled
@@ -38,8 +40,10 @@ class Panel(
 
     /** The length of the extended panel */
     private var length = 0
+
     /** Used as temporary reference for dragging the panel. */
     private var x2 = 0
+
     /** Used as temporary reference for dragging the panel. */
     private var y2 = 0
 
@@ -51,9 +55,9 @@ class Panel(
     }
 
     /**
-	 * Renders the panel and dispatches the rendering of its [moduleButtons].
+     * Renders the panel and dispatches the rendering of its [moduleButtons].
      * @see ModuleButton.drawScreen
-	 */
+     */
     fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (!visible) return
         if (dragging) {
@@ -66,7 +70,7 @@ class Panel(
         GlStateManager.translate(x.toFloat(), y.toFloat(), 0f)
 
         // Set up the Scissor Box
-        HUDRenderUtils.setUpScissorAbsolute(x-2, y + height, x + width+1, y + height + 4000)
+        HUDRenderUtils.setUpScissorAbsolute(x - 2, y + height, x + width + 1, y + height + 4000)
 
         /** Render the module buttons and the Settings elements */
         var startY = height
@@ -78,7 +82,7 @@ class Panel(
 
                 startY += moduleButton.drawScreen(mouseX, mouseY, partialTicks)
             }
-            length = startY+5
+            length = startY + 5
         }
 
         // Resetting the scissor
@@ -90,8 +94,8 @@ class Panel(
 
         // Render decor
         if (ClickGui.design.isSelected("New")) {
-            Gui.drawRect(0, 0,  2, height, ColorUtil.outlineColor)
-            Gui.drawRect(0, startY,  2, startY+5, ColorUtil.outlineColor)
+            Gui.drawRect(0, 0, 2, height, ColorUtil.outlineColor)
+            Gui.drawRect(0, startY, 2, startY + 5, ColorUtil.outlineColor)
             FontUtil.drawStringWithShadow(title, 4.0, height / 2.0 - FontUtil.fontHeight / 2.0)
         } else if (ClickGui.design.isSelected("JellyLike")) {
             Gui.drawRect(4, 2, 5, height - 2, ColorUtil.jellyPanelColor)
@@ -103,9 +107,9 @@ class Panel(
     }
 
     /**
-	 * Handles clicks on the panel and disptaches the click to its [moduleButtons].
+     * Handles clicks on the panel and disptaches the click to its [moduleButtons].
      * @see ModuleButton.mouseClicked
-	 */
+     */
     fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
         if (!visible) {
             return false
@@ -116,11 +120,11 @@ class Panel(
                 y2 = y - mouseY
                 dragging = true
                 return true
-            } else if (mouseButton == 1 ) {
+            } else if (mouseButton == 1) {
                 extended = !extended
                 return true
             }
-        }else if (isMouseOverExtended(mouseX, mouseY)) {
+        } else if (isMouseOverExtended(mouseX, mouseY)) {
             for (moduleButton in moduleButtons.reversed()) {
                 if (moduleButton.mouseClicked(mouseX, mouseY, mouseButton)) {
                     return true
@@ -131,12 +135,12 @@ class Panel(
     }
 
     /**
-	 * Handles mouse release for the panel and dispatches it to its [moduleButtons].
+     * Handles mouse release for the panel and dispatches it to its [moduleButtons].
      *
      * Also takes care of updating the state of the panel to [ClickGui].
      *
      * @see ModuleButton.mouseReleased
-	 */
+     */
     fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         if (!visible) {
             return
@@ -162,7 +166,7 @@ class Panel(
      * @return true if any of the modules used the input.
      * @see ModuleButton.keyTyped
      */
-    fun keyTyped(typedChar: Char, keyCode: Int): Boolean{
+    fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
         if (extended && visible) {
             for (moduleButton in moduleButtons.reversed()) {
                 if (moduleButton.keyTyped(typedChar, keyCode)) return true
@@ -192,8 +196,8 @@ class Panel(
     }
 
     /**
-	 * Returns true when the mouse is hovering the top Panel Button.
-	 */
+     * Returns true when the mouse is hovering the top Panel Button.
+     */
     private fun isHovered(mouseX: Int, mouseY: Int): Boolean {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
     }

@@ -59,16 +59,16 @@ object EditHudGUI : GuiScreen() {
         // Note: if you change these values they also have to be changed in isCursorOnReset
         val textWidth = FontUtil.getStringWidth(resetText)
         val textHeight = FontUtil.fontHeight.toDouble()
-        val textX = -textWidth/2.0
-        val textY = -textHeight -25
-        val boxX = textX -20
-        val boxY = textY -5
+        val textX = -textWidth / 2.0
+        val textY = -textHeight - 25
+        val boxX = textX - 20
+        val boxY = textY - 5
         val boxHeight = textHeight + 10
         val boxWidth = textWidth + 40.0
 
         val buttonColor = if (isCursorOnReset(mouseX, mouseY)) {
             Color(-0x00000000, false)
-        }else {
+        } else {
             Color(-0x44eaeaeb, true).darker()
         }
         HUDRenderUtils.renderRect(boxX, boxY, boxWidth, boxHeight, buttonColor)
@@ -113,7 +113,7 @@ object EditHudGUI : GuiScreen() {
                 for (element in hudElements.reversed()) {
                     element.resetElement()
                 }
-            }else
+            } else
                 for (element in hudElements.reversed()) {
                     if (isCursorOnElement(mouseX, mouseY, element)) {
                         draggingElement = element
@@ -145,19 +145,19 @@ object EditHudGUI : GuiScreen() {
 
     private fun isCursorOnElement(mouseX: Int, mouseY: Int, element: HudElement): Boolean {
         return mouseX > element.x && mouseX < (element.x + element.width * element.scale.value)
-                && mouseY > element.y&& mouseY< (element.y + element.height * element.scale.value)
+                && mouseY > element.y && mouseY < (element.y + element.height * element.scale.value)
     }
 
-    private fun isCursorOnReset(mouseX: Int, mouseY: Int) : Boolean {
+    private fun isCursorOnReset(mouseX: Int, mouseY: Int): Boolean {
         val resetText = "Rest HUD"
         val scaledResolution = ScaledResolution(mc)
         // Note: if you change these values they also have to be changed in isCursorOnReset
         val textWidth = FontUtil.getStringWidth(resetText)
         val textHeight = FontUtil.fontHeight.toDouble()
-        val textX = -textWidth/2.0 + scaledResolution.scaledWidth.toDouble() / 2.0
-        val textY = -textHeight -25 + scaledResolution.scaledHeight.toDouble()
-        val boxX = textX -20
-        val boxY = textY -5
+        val textX = -textWidth / 2.0 + scaledResolution.scaledWidth.toDouble() / 2.0
+        val textY = -textHeight - 25 + scaledResolution.scaledHeight.toDouble()
+        val boxX = textX - 20
+        val boxY = textY - 5
         val boxHeight = textHeight + 10
         val boxWidth = textWidth + 40.0
         return mouseX >= boxX && mouseX < (boxX + boxWidth) && mouseY >= boxY && mouseY < (boxY + boxHeight)

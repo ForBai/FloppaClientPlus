@@ -20,9 +20,17 @@ object StonkDelay : Module(
     "Stonk Delay",
     category = Category.MISC,
     description = "Delays mined blocks being placed back."
-){
-    private val delay = NumberSetting("Delay", 500.0, 0.0, 2000.0, 10.0, description = "The minimum delay in ms before mined blocks can be placed back.")
-    private val ghost = BooleanSetting("Ghost", false, description = "Will create ghost blocks instead of actually mining the block.")
+) {
+    private val delay = NumberSetting(
+        "Delay",
+        500.0,
+        0.0,
+        2000.0,
+        10.0,
+        description = "The minimum delay in ms before mined blocks can be placed back."
+    )
+    private val ghost =
+        BooleanSetting("Ghost", false, description = "Will create ghost blocks instead of actually mining the block.")
 
     init {
         this.addSettings(
@@ -31,7 +39,7 @@ object StonkDelay : Module(
         )
     }
 
-    private val buffer = mutableMapOf<BlockPos,BrokenBlock>()
+    private val buffer = mutableMapOf<BlockPos, BrokenBlock>()
 
     @SubscribeEvent
     fun onBlockDestroyed(event: BlockDestroyEvent) {
@@ -53,9 +61,9 @@ object StonkDelay : Module(
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if(event.phase != TickEvent.Phase.START || buffer.isEmpty()) return
+        if (event.phase != TickEvent.Phase.START || buffer.isEmpty()) return
         val time = System.currentTimeMillis()
-        buffer.removeIf{ (_, data) ->
+        buffer.removeIf { (_, data) ->
             data.tryPlaceBack(time)
         }
     }
@@ -70,22 +78,24 @@ object StonkDelay : Module(
          * Tells the filter that this block should be allowed to be placed
          */
         var placing = false
+
         /**
          * By default, blocks will not be placed back, only if they actually get replaced.
          */
         var shouldPutBack = false
+
         /**
          * If enough time has passed places back the buffered Block.
          * @return True when a block was placed, or it is timed out, false otherwise.
          */
         fun tryPlaceBack(now: Long): Boolean {
-            return if (now >= breakTime +  delay.value.toLong()) {
+            return if (now >= breakTime + delay.value.toLong()) {
                 if (shouldPutBack) {
                     placing = true
                     mc.theWorld.setBlockState(pos, state)
                 }
                 true
-            }else false
+            } else false
         }
     }
 }

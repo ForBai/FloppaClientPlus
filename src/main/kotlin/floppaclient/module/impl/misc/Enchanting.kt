@@ -24,7 +24,7 @@ object Enchanting : Module(
     "Enchanting",
     category = Category.MISC,
     description = "Automatically completes the enchanting minigames."
-){
+) {
     private val sleep = NumberSetting("Sleep", 200.0, 0.0, 1000.0, 10.0, description = "Delay in between clicks.")
 
     init {
@@ -40,18 +40,18 @@ object Enchanting : Module(
     private val clickOrder: MutableList<Slot> = mutableListOf()
     private var listenTime = 0L
     private var listening = false
-     set(value) {
-         if (!field && value) {
-             clickOrder.clear()
-         }
-         field = value
-         if (value){
-             listenTime = System.currentTimeMillis() + 30
-         }
-     }
-     get() {
-         return field || System.currentTimeMillis() < listenTime
-     }
+        set(value) {
+            if (!field && value) {
+                clickOrder.clear()
+            }
+            field = value
+            if (value) {
+                listenTime = System.currentTimeMillis() + 30
+            }
+        }
+        get() {
+            return field || System.currentTimeMillis() < listenTime
+        }
 
     /**
      * Valid indices for where to check and click are: 19..25 and 37..43
@@ -71,7 +71,7 @@ object Enchanting : Module(
                 currentType = Type.CHRONO
                 lastAdded = 0
                 clickOrder.clear()
-            }else if(chestName.startsWith("Ultrasequencer (")) {
+            } else if (chestName.startsWith("Ultrasequencer (")) {
                 currentType = Type.SEQUENCE
                 lastAdded = 0
                 clickOrder.clear()
@@ -85,7 +85,7 @@ object Enchanting : Module(
         val container = mc.thePlayer.openContainer ?: return
         if (container !is ContainerChest) return
         val inventoryName = container.inventorySlots?.get(0)?.inventory?.name
-        if (inventoryName == null || !inventoryName.startsWith(if (currentType == Type.CHRONO)"Chronomatron (" else "Ultrasequencer (")) {
+        if (inventoryName == null || !inventoryName.startsWith(if (currentType == Type.CHRONO) "Chronomatron (" else "Ultrasequencer (")) {
             currentType = Type.NONE
             return
         }
@@ -94,7 +94,7 @@ object Enchanting : Module(
         listening = (container.inventorySlots[49].stack?.item as? ItemBlock)?.block === Blocks.glowstone
         if (listening) {
             if (currentType == Type.CHRONO) {
-                if (lastAdded > 0){
+                if (lastAdded > 0) {
                     if ((container.inventorySlots[lastAdded].stack?.item as? ItemBlock)?.block === Blocks.stained_hardened_clay)
                         return
                     else
@@ -108,23 +108,22 @@ object Enchanting : Module(
                         break
                     }
                 }
-            }
-            else if (currentType == Type.SEQUENCE && clickOrder.isEmpty()) {
+            } else if (currentType == Type.SEQUENCE && clickOrder.isEmpty()) {
                 clickOrder.addAll(
-                    container.inventorySlots.subList(9,45)
+                    container.inventorySlots.subList(9, 45)
                         .filter { it.stack?.item == Items.dye }
                         .sortedBy { it.stack.stackSize }
                 )
             }
-        }else {
+        } else {
             if (System.currentTimeMillis() < lastClick + sleep.value) return
             val slot = clickOrder.firstOrNull() ?: return
             lastAdded = slot.slotIndex
             mc.playerController.windowClick(
                 container.windowId,
                 slot.slotNumber,
-                2,
-                3,
+                0,
+                0,
                 mc.thePlayer
             )
             clickOrder.removeAt(0)
@@ -132,7 +131,7 @@ object Enchanting : Module(
         }
     }
 
-    private enum class Type{
+    private enum class Type {
         NONE, CHRONO, SEQUENCE
     }
 }

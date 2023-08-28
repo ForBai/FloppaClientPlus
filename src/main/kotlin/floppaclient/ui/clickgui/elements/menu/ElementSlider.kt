@@ -26,7 +26,7 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting) :
         val percentBar = (setting.value - setting.min) / (setting.max - setting.min)
 
         /** Render the text */
-        FontUtil.drawString(displayName, 1, 2, )
+        FontUtil.drawString(displayName, 1, 2)
         FontUtil.drawString(displayval, width - FontUtil.getStringWidth(displayval), 2)
 
         /** Render the slider */
@@ -40,7 +40,8 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting) :
         /** Calculate and set new value when dragging */
         if (dragging) {
             val diff = setting.max - setting.min
-            val newVal = setting.min + MathHelper.clamp_double(((mouseX - xAbsolute) / width.toDouble()), 0.0, 1.0) * diff
+            val newVal =
+                setting.min + MathHelper.clamp_double(((mouseX - xAbsolute) / width.toDouble()), 0.0, 1.0) * diff
             setting.value = newVal
         }
 
@@ -48,9 +49,9 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting) :
     }
 
     /**
-	 * Handles interaction with this element.
+     * Handles interaction with this element.
      * Returns true if interacted with the element to cancel further interactions.
-	 */
+     */
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
         if (mouseButton == 0 && isSliderHovered(mouseX, mouseY)) {
             dragging = true
@@ -60,8 +61,8 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting) :
     }
 
     /**
-	 * Stops slider action on mouse release
-	 */
+     * Stops slider action on mouse release
+     */
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         dragging = false
     }
@@ -73,12 +74,12 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting) :
         val scaledMouseX = clickgui.getScaledMouseX()
         val scaledMouseY = clickgui.getScaledMouseY()
 
-        if (isSliderHovered(scaledMouseX, scaledMouseY)){
-            if (keyCode == Keyboard.KEY_RIGHT){
+        if (isSliderHovered(scaledMouseX, scaledMouseY)) {
+            if (keyCode == Keyboard.KEY_RIGHT) {
                 setting.value += setting.increment
                 return true
             }
-            if (keyCode == Keyboard.KEY_LEFT){
+            if (keyCode == Keyboard.KEY_LEFT) {
                 setting.value -= setting.increment
                 return true
             }
@@ -87,9 +88,9 @@ class ElementSlider(parent: ModuleButton, setting: NumberSetting) :
     }
 
     /**
-	 * Checks whether the mouse is hovering the slider
-	 */
+     * Checks whether the mouse is hovering the slider
+     */
     private fun isSliderHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseX >= xAbsolute && mouseX <= xAbsolute + width && mouseY >= yAbsolute  && mouseY <= yAbsolute + height
+        return mouseX >= xAbsolute && mouseX <= xAbsolute + width && mouseY >= yAbsolute && mouseY <= yAbsolute + height
     }
 }

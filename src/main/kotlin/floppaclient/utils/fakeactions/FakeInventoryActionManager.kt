@@ -1,6 +1,7 @@
 package floppaclient.utils.fakeactions
 
 import floppaclient.FloppaClient.Companion.mc
+import floppaclient.utils.fakeactions.FakeInventoryActionManager.addAction
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.network.play.client.C16PacketClientStatus
@@ -35,7 +36,7 @@ object FakeInventoryActionManager {
                     .addToSendQueue(C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT))
                 mc.displayGuiScreen(inventory)
                 true
-            }else false
+            } else false
 
             // perform all the actions
             actions.forEach { it(inventory) }

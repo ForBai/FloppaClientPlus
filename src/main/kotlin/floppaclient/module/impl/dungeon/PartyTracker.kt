@@ -31,7 +31,8 @@ object PartyTracker : Module(
     category = Category.DUNGEON,
     description = "Tracks cleared rooms and secrets gotten by party members and displays the stats at the end of the run."
 ) {
-    private val compactMessage = BooleanSetting("Compact Message", false, description = "Shortens the message at the end of the run.")
+    private val compactMessage =
+        BooleanSetting("Compact Message", false, description = "Shortens the message at the end of the run.")
 
     init {
         this.addSettings(
@@ -55,7 +56,8 @@ object PartyTracker : Module(
         // or directly to green check without being white checked first (rooms no missing secrets cleared).
         if (event.tile !is Room) return
         if (event.newState == RoomState.CLEARED
-            || event.newState == RoomState.GREEN && event.tile.state != RoomState.CLEARED) {
+            || event.newState == RoomState.GREEN && event.tile.state != RoomState.CLEARED
+        ) {
             val playersInRoom = Dungeon.dungeonTeammates.filter { teamMate ->
                 !teamMate.dead && teamMate.currentRoom?.data == event.tile.data
             }
@@ -68,7 +70,7 @@ object PartyTracker : Module(
      * Display the overview of what party members have done when the dungeon ends.
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onDungeonEnd(event: DungeonEndEvent){
+    fun onDungeonEnd(event: DungeonEndEvent) {
         scope.launch {
             // fetch the collected secrets parallelized
             val jobMap = mutableMapOf<DungeonPlayer, Deferred<String>>()
@@ -88,7 +90,7 @@ object PartyTracker : Module(
 
                 val trapText = if (roomClearers.any { (roomData, playerList) ->
                         roomData.type == RoomType.TRAP && playerList.contains(teammate)
-                }) ", did trap " else ""
+                    }) ", did trap " else ""
                 val trapComponent: IChatComponent = ChatComponentText(trapText)
 
                 val collectedSecrets = secretsJob.await()
@@ -127,10 +129,10 @@ object PartyTracker : Module(
     /**
      * Gets the formatting Code for the Players name color from the tab list.
      */
-    private fun playerRankColor(teammate: DungeonPlayer): String{
+    private fun playerRankColor(teammate: DungeonPlayer): String {
         /** This pattern captures the formatting code for the player name color. */
         val pattern = Regex("(?i) §r§(?<color>[0-9a-f])${teammate.name} §r")
-        TabListUtils.tabList.forEach{
+        TabListUtils.tabList.forEach {
             val matcher = pattern.find(it.second) ?: return@forEach
             return matcher.groups["color"]?.value ?: "f"
         }
@@ -140,7 +142,7 @@ object PartyTracker : Module(
     /**
      * Returns the players names with the according color code from the tab list.
      */
-    private fun coloredPlayerName(teammate: DungeonPlayer): String{
+    private fun coloredPlayerName(teammate: DungeonPlayer): String {
         return "§${playerRankColor(teammate)}${teammate.name}§r"
     }
 
@@ -148,7 +150,7 @@ object PartyTracker : Module(
      * Returns the text formatting for the givern room types
      */
     private fun roomTextFormatting(roomType: RoomType): EnumChatFormatting {
-        return when(roomType) {
+        return when (roomType) {
             RoomType.UNKNOWN -> EnumChatFormatting.DARK_GRAY
             RoomType.BLOOD -> EnumChatFormatting.DARK_RED
             RoomType.CHAMPION -> EnumChatFormatting.YELLOW
@@ -164,8 +166,8 @@ object PartyTracker : Module(
      * Returns the name of the room with color depending on the room type.
      */
     private fun coloredRoomName(roomData: RoomData): String {
-        val roomName = if (roomData.name.startsWith("Unknown")){
-            when(roomData.type) {
+        val roomName = if (roomData.name.startsWith("Unknown")) {
+            when (roomData.type) {
                 RoomType.TRAP -> "Trap"
                 RoomType.BLOOD -> "Blood"
                 RoomType.CHAMPION -> "Champion"
@@ -173,7 +175,7 @@ object PartyTracker : Module(
                 RoomType.ENTRANCE -> "Entrance"
                 else -> roomData.name
             }
-        }else roomData.name
+        } else roomData.name
         return "${roomTextFormatting(roomData.type)}$roomName§r"
     }
 
@@ -216,16 +218,18 @@ object PartyTracker : Module(
     /**
      * Returns the hoverable ChatComponent for the cleared rooms of this Player.
      */
-    private fun getClearedRoomsComponent(teammate: DungeonPlayer): IChatComponent{
+    private fun getClearedRoomsComponent(teammate: DungeonPlayer): IChatComponent {
         val clearedRooms = roomClearers.filter { (roomData, playerList) ->
             playerList.contains(teammate)
                     && (roomData.type == RoomType.NORMAL || roomData.type == RoomType.RARE
                     || roomData.type == RoomType.CHAMPION || roomData.type == RoomType.BLOOD)
         }
+
         /** Number of rooms the player was in ALONE when they got cleared. */
         val minClearedRooms = clearedRooms.filter { (_, playerList) ->
             playerList.none { it.name != teammate.name }
         }.size
+
         /** Number of rooms the player was in when they got cleared. */
         val maxClearedRooms = clearedRooms.size
 
@@ -233,7 +237,8 @@ object PartyTracker : Module(
         hoverTextBuilder.append("§l${coloredPlayerName(teammate)}'s Cleared Rooms:§r")
         clearedRooms.forEach { (roomData, playerList) ->
             val additionalInfo = if (playerList.size > 1)
-                playerList.filter { it.name != teammate.name }.joinToString(", ", "§r §7with: "){ coloredPlayerName(it) }
+                playerList.filter { it.name != teammate.name }
+                    .joinToString(", ", "§r §7with: ") { coloredPlayerName(it) }
             else
                 ""
             hoverTextBuilder.append(
@@ -252,16 +257,18 @@ object PartyTracker : Module(
     /**
      * Returns the hoeverable ChatComponent for the completed Puzzles of this Player.
      */
-    private fun getCompletedPuzzlesComponent(teammate: DungeonPlayer): IChatComponent{
+    private fun getCompletedPuzzlesComponent(teammate: DungeonPlayer): IChatComponent {
         //TODO Use Tab list instead.
         val completedPuzzles = roomClearers.filter { (roomData, playerList) ->
             playerList.contains(teammate)
                     && roomData.type == RoomType.PUZZLE
         }
+
         /** Number of puzzle rooms the player was in ALONE when they got cleared. */
         val minCompletedPuzzles = completedPuzzles.filter { (_, playerList) ->
             playerList.none { it.name != teammate.name }
         }.size
+
         /** Number of puzzle rooms the player was in when they got cleared. */
         val maxCompletedPuzzles = completedPuzzles.size
 
@@ -269,7 +276,8 @@ object PartyTracker : Module(
         hoverTextBuilder.append("§l${coloredPlayerName(teammate)}'s Completed Puzzles:§r")
         completedPuzzles.forEach { (roomData, playerList) ->
             val additionalInfo = if (playerList.size > 1)
-                playerList.filter { it.name != teammate.name }.joinToString(", ", "§r §7with: "){ coloredPlayerName(it) }
+                playerList.filter { it.name != teammate.name }
+                    .joinToString(", ", "§r §7with: ") { coloredPlayerName(it) }
             else
                 ""
             hoverTextBuilder.append(

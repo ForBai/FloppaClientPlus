@@ -27,20 +27,31 @@ object ItemAnimations : Module(
 ) {
 
 
-    private val size = NumberSetting("Size", 0.0, -1.5, 1.5, 0.05, description = "Scales the size of your currently held item. Default: 0")
-    private val scaleSwing = BooleanSetting("Scale Swing", true, description = "Also scale the size of the swing animation.")
+    private val size = NumberSetting(
+        "Size",
+        0.0,
+        -1.5,
+        1.5,
+        0.05,
+        description = "Scales the size of your currently held item. Default: 0"
+    )
+    private val scaleSwing =
+        BooleanSetting("Scale Swing", true, description = "Also scale the size of the swing animation.")
     private val x = NumberSetting("X", 0.0, -2.5, 1.5, 0.05, description = "Moves the held item. Default: 0")
     private val y = NumberSetting("Y", 0.0, -1.5, 1.5, 0.05, description = "Moves the held item. Default: 0")
     private val z = NumberSetting("Z", 0.0, -1.5, 3.0, 0.05, description = "Moves the held item. Default: 0")
     private val yaw = NumberSetting("Yaw", 0.0, -180.0, 180.0, 5.0, description = "Rotates your held item. Default: 0")
-    private val pitch = NumberSetting("Pitch", 0.0, -180.0, 180.0, 5.0, description = "Rotates your held item. Default: 0")
-    private val roll = NumberSetting("Roll", 0.0, -180.0, 180.0, 5.0, description = "Rotates your held item. Default: 0")
+    private val pitch =
+        NumberSetting("Pitch", 0.0, -180.0, 180.0, 5.0, description = "Rotates your held item. Default: 0")
+    private val roll =
+        NumberSetting("Roll", 0.0, -180.0, 180.0, 5.0, description = "Rotates your held item. Default: 0")
 
     /**
      * Used in the EntitiyLivingBaseMixin
      */
     val speed = NumberSetting("Speed", 0.0, -2.0, 1.0, 0.05, description = "Speed of the swing animation.")
-    val ignoreHaste  = BooleanSetting("Ignore Haste", false, description = "Makes the chosen speed override haste modifiers.")
+    val ignoreHaste =
+        BooleanSetting("Ignore Haste", false, description = "Makes the chosen speed override haste modifiers.")
 
     init {
         this.addSettings(

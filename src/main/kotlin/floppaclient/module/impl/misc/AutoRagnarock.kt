@@ -34,7 +34,7 @@ object AutoRagnarock : Module(
         if (inDungeons || event.type.toInt() == 2) return
         when (StringUtils.stripControlCodes(event.message.unformattedText)) {
             "Creeper Veil Activated!" -> {
-                val used = FakeActionUtils.clickItem("Ragnarock Axe",true,false)
+                val used = FakeActionUtils.clickItem("Ragnarock Axe", true, false)
                 if (chatMessage.enabled && used) modMessage("Ragnarock Axe activated.")
                 return
             }

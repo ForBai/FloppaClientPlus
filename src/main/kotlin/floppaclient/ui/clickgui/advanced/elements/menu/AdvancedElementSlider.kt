@@ -27,9 +27,9 @@ class AdvancedElementSlider(
     private var dragging: Boolean = false
 
     /**
-	 * Renders the element
-	 */
-    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int{
+     * Renders the element
+     */
+    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
         val displayval = "" + (setting.value * 100.0).roundToInt() / 100.0
         val hoveredORdragged = isSliderHovered(mouseX, mouseY) || dragging
         val temp = ColorUtil.clickGUIColor
@@ -54,17 +54,21 @@ class AdvancedElementSlider(
         /** Calculate and set new value when dragging */
         if (dragging) {
             val diff = setting.max - setting.min
-            val newVal = setting.min + MathHelper.clamp_double((mouseX - parent.x - x) / settingWidth.toDouble(), 0.0, 1.0) * diff
+            val newVal = setting.min + MathHelper.clamp_double(
+                (mouseX - parent.x - x) / settingWidth.toDouble(),
+                0.0,
+                1.0
+            ) * diff
             setting.value = newVal //Die Value im Setting updaten
         }
 
-       return this.settingHeight
+        return this.settingHeight
     }
 
     /**
-	 * Handles interaction with this element.
+     * Handles interaction with this element.
      * Returns true if interacted with the element to cancel further interactions.
-	 */
+     */
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
         if (mouseButton == 0 && isSliderHovered(mouseX, mouseY)) {
             dragging = true
@@ -74,8 +78,8 @@ class AdvancedElementSlider(
     }
 
     /**
-	 * Stops slider action on mouse release
-	 */
+     * Stops slider action on mouse release
+     */
     override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
         dragging = false
     }
@@ -94,12 +98,12 @@ class AdvancedElementSlider(
         val scaledMouseX = (k1 / scale).toInt()
         val scaledMouseY = (l1 / scale).toInt()
 
-        if (isSliderHovered(scaledMouseX, scaledMouseY)){
-            if (keyCode == Keyboard.KEY_RIGHT){
+        if (isSliderHovered(scaledMouseX, scaledMouseY)) {
+            if (keyCode == Keyboard.KEY_RIGHT) {
                 setting.value += setting.increment
                 return true
             }
-            if (keyCode == Keyboard.KEY_LEFT){
+            if (keyCode == Keyboard.KEY_LEFT) {
                 setting.value -= setting.increment
                 return true
             }
@@ -108,9 +112,9 @@ class AdvancedElementSlider(
     }
 
     /**
-	 * Checks whether the mouse is hovering the slider
-	 */
+     * Checks whether the mouse is hovering the slider
+     */
     private fun isSliderHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y  && mouseY <= parent.y + y + settingHeight
+        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y && mouseY <= parent.y + y + settingHeight
     }
 }

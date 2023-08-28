@@ -19,13 +19,13 @@ object CancelChestOpen : Module(
     "Cancel Chest Open",
     category = Category.DUNGEON,
     description = "Cancels secret chests from opening."
-){
+) {
     @SubscribeEvent
-    fun onOpenWindow(event: ReceivePacketEvent){
+    fun onOpenWindow(event: ReceivePacketEvent) {
         if (!inDungeons || event.packet !is S2DPacketOpenWindow) return
-        if (event.packet.windowTitle.unformattedText.equalsOneOf("Chest", "Large Chest") ) {
+        if (event.packet.windowTitle.unformattedText.equalsOneOf("Chest", "Large Chest")) {
             event.isCanceled = true
-            mc.netHandler.networkManager.sendPacket( C0DPacketCloseWindow(event.packet.windowId))
+            mc.netHandler.networkManager.sendPacket(C0DPacketCloseWindow(event.packet.windowId))
         }
     }
 }

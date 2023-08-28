@@ -128,6 +128,7 @@ object DataHandler {
                             start.add(targets[0]).toCoords()
                         } ${start.add(targets[0]).add(targets[1]).toCoords()}"
                     )
+
                     3 -> chatMessage(
                         "/add ${start.toCoords()} ${
                             start.add(targets[0]).toCoords()
@@ -135,6 +136,7 @@ object DataHandler {
                             start.add(targets[0]).add(targets[1]).add(targets[2]).toCoords()
                         }"
                     )
+
                     4 -> chatMessage(
                         "/add ${start.toCoords()} ${
                             start.add(targets[0]).toCoords()
@@ -142,6 +144,7 @@ object DataHandler {
                             start.add(targets[0]).add(targets[1]).add(targets[2]).toCoords()
                         } ${start.add(targets[0]).add(targets[1]).add(targets[2]).add(targets[3]).toCoords()}"
                     )
+
                     5 -> chatMessage(
                         "/add ${start.toCoords()} ${
                             start.add(targets[0]).toCoords()

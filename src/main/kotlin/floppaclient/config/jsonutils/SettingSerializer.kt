@@ -1,11 +1,11 @@
 package floppaclient.config.jsonutils
 
-import floppaclient.module.settings.Setting
-import floppaclient.module.settings.impl.*
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import floppaclient.module.settings.Setting
+import floppaclient.module.settings.impl.*
 import java.lang.reflect.Type
 
 class SettingSerializer : JsonSerializer<Setting<*>> {

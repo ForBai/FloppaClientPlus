@@ -19,23 +19,19 @@ public abstract class MovementInputFromOptionsMixin extends MovementInput {
             this.moveStrafe = 0.0F;
             this.moveForward = 0.0F;
 
-            if (Keyboard.isKeyDown(Keyboard.KEY_UP))
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
                 ++this.moveForward;
             }
 
-            if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
                 --this.moveForward;
             }
 
-            if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
                 ++this.moveStrafe;
             }
 
-            if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
                 --this.moveStrafe;
             }
 

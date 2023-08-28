@@ -28,7 +28,7 @@ object MimicDetector {
         val mimicRoomData = findMimicRoom()
         if (mimicRoomData != null) {
             mimicRoomData.hasMimic = true
-            if(DungeonMap.mimicInfo.enabled && !DungeonMap.legitMode.enabled) modMessage("Mimic found in ${mimicRoomData.name}")
+            if (DungeonMap.mimicInfo.enabled && !DungeonMap.legitMode.enabled) modMessage("Mimic found in ${mimicRoomData.name}")
             Dungeon.mimicFound = true
         }
     }
@@ -42,7 +42,7 @@ object MimicDetector {
         mc.theWorld.loadedTileEntityList.filter { it is TileEntityChest && it.chestType == 1 }
             .mapNotNull { getRoomFromPos(it.pos) }.groupingBy { it.data }.eachCount()
             .forEach { (roomData, trappedChestCount) ->
-                if(roomData.trappedChests != null && roomData.trappedChests!! < trappedChestCount) {
+                if (roomData.trappedChests != null && roomData.trappedChests!! < trappedChestCount) {
                     return roomData
                 }
             }

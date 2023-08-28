@@ -21,7 +21,7 @@ import java.awt.Color
  * @author Aton
  */
 @AlwaysActive
-object ClickGui: Module(
+object ClickGui : Module(
     "ClickGUI",
     Keyboard.KEY_RSHIFT,
     category = Category.RENDER,
@@ -33,15 +33,57 @@ object ClickGui: Module(
 
     val design: StringSelectorSetting
     val blur: BooleanSetting = BooleanSetting("Blur", false, description = "Toggles the background blur for the gui.")
-    val color = ColorSetting("Color", Color(255,200,0), false, description = "Color theme in the gui.")
-    val colorSettingMode = StringSelectorSetting("Color Mode", "HSB", arrayListOf("HSB", "RGB"), description = "Mode for all color settings in the gui. Changes the way colors are put in.")
-    val clientName: StringSetting = StringSetting("Name", "Floppa Client", description = "Name that will be rendered in the gui.")
-    val prefixStyle: StringSelectorSetting = StringSelectorSetting("Prefix Style", "Long", arrayListOf("Long", "Short", "Custom"), description = "Chat prefix selection for mod messages.")
-    val customPrefix = StringSetting("Custom Prefix", "§0§l[§4§lFloppa Client§0§l]§r", 40, description = "You can set a custom chat prefix that will be used when Custom is selected in the Prefix Style dropdown.")
-    val chromaSize = NumberSetting("Chroma Size", 0.5, 0.0, 1.0, 0.01, description = "Determines how rapidly the chroma pattern changes spatially.")
-    val chromaSpeed = NumberSetting("Chroma Speed", 0.5, 0.0, 1.0, 0.01, description = "Determines how fast the chroma changes with time.")
-    val chromaAngle = NumberSetting("Chroma Angle", 45.0, 0.0, 360.0,1.0, description = "Determines the direction in which the chroma changes on your screen.")
-    val showUsageInfo = BooleanSetting("Usage Info", true, visibility = Visibility.ADVANCED_ONLY, description = "Show info on how to use the GUI.")
+    val color = ColorSetting("Color", Color(255, 200, 0), false, description = "Color theme in the gui.")
+    val colorSettingMode = StringSelectorSetting(
+        "Color Mode",
+        "HSB",
+        arrayListOf("HSB", "RGB"),
+        description = "Mode for all color settings in the gui. Changes the way colors are put in."
+    )
+    val clientName: StringSetting =
+        StringSetting("Name", "Floppa Client", description = "Name that will be rendered in the gui.")
+    val prefixStyle: StringSelectorSetting = StringSelectorSetting(
+        "Prefix Style",
+        "Long",
+        arrayListOf("Long", "Short", "Custom"),
+        description = "Chat prefix selection for mod messages."
+    )
+    val customPrefix = StringSetting(
+        "Custom Prefix",
+        "§0§l[§4§lFloppa Client§0§l]§r",
+        40,
+        description = "You can set a custom chat prefix that will be used when Custom is selected in the Prefix Style dropdown."
+    )
+    val chromaSize = NumberSetting(
+        "Chroma Size",
+        0.5,
+        0.0,
+        1.0,
+        0.01,
+        description = "Determines how rapidly the chroma pattern changes spatially."
+    )
+    val chromaSpeed = NumberSetting(
+        "Chroma Speed",
+        0.5,
+        0.0,
+        1.0,
+        0.01,
+        description = "Determines how fast the chroma changes with time."
+    )
+    val chromaAngle = NumberSetting(
+        "Chroma Angle",
+        45.0,
+        0.0,
+        360.0,
+        1.0,
+        description = "Determines the direction in which the chroma changes on your screen."
+    )
+    val showUsageInfo = BooleanSetting(
+        "Usage Info",
+        true,
+        visibility = Visibility.ADVANCED_ONLY,
+        description = "Show info on how to use the GUI."
+    )
     val apiKey = StringSetting("API Key", "", length = 100, visibility = Visibility.HIDDEN)
 
     val panelX: MutableMap<Category, NumberSetting> = mutableMapOf()
@@ -51,20 +93,34 @@ object ClickGui: Module(
     private const val pwidth = 120.0
     private const val pheight = 15.0
 
-    val panelWidth: NumberSetting  = NumberSetting("Panel width", default = pwidth, visibility = Visibility.HIDDEN)
+    val panelWidth: NumberSetting = NumberSetting("Panel width", default = pwidth, visibility = Visibility.HIDDEN)
     val panelHeight: NumberSetting = NumberSetting("Panel height", default = pheight, visibility = Visibility.HIDDEN)
 
     const val advancedRelWidth = 0.5
     const val advancedRelHeight = 0.5
 
-    val advancedRelX = NumberSetting("Advanced_RelX",(1 - advancedRelWidth)/2.0,0.0, (1- advancedRelWidth), 0.0001, visibility = Visibility.HIDDEN)
-    val advancedRelY = NumberSetting("Advanced_RelY",(1 - advancedRelHeight)/2.0,0.0, (1- advancedRelHeight), 0.0001, visibility = Visibility.HIDDEN)
+    val advancedRelX = NumberSetting(
+        "Advanced_RelX",
+        (1 - advancedRelWidth) / 2.0,
+        0.0,
+        (1 - advancedRelWidth),
+        0.0001,
+        visibility = Visibility.HIDDEN
+    )
+    val advancedRelY = NumberSetting(
+        "Advanced_RelY",
+        (1 - advancedRelHeight) / 2.0,
+        0.0,
+        (1 - advancedRelHeight),
+        0.0001,
+        visibility = Visibility.HIDDEN
+    )
 
     init {
         val options = java.util.ArrayList<String>()
         options.add("JellyLike")
         options.add("New")
-        design = StringSelectorSetting("Design","JellyLike", options, description = "Design theme of the gui.")
+        design = StringSelectorSetting("Design", "JellyLike", options, description = "Design theme of the gui.")
 
         addSettings(
             design,
@@ -93,7 +149,7 @@ object ClickGui: Module(
             panelHeight
         )
 
-        for(category in Category.values()) {
+        for (category in Category.values()) {
             addSettings(
                 panelX[category]!!,
                 panelY[category]!!,
@@ -112,10 +168,28 @@ object ClickGui: Module(
         var px = 10.0
         val py = 10.0
         val pxplus = panelWidth.value + 10
-        for(category in Category.values()) {
-            panelX.getOrPut(category) { NumberSetting(category.name + ",x", default = px, visibility = Visibility.HIDDEN) }.value = px
-            panelY.getOrPut(category) { NumberSetting(category.name + ",y", default = py, visibility = Visibility.HIDDEN) }.value = py
-            panelExtended.getOrPut(category) { BooleanSetting(category.name + ",extended", default = true, visibility = Visibility.HIDDEN) }.enabled = true
+        for (category in Category.values()) {
+            panelX.getOrPut(category) {
+                NumberSetting(
+                    category.name + ",x",
+                    default = px,
+                    visibility = Visibility.HIDDEN
+                )
+            }.value = px
+            panelY.getOrPut(category) {
+                NumberSetting(
+                    category.name + ",y",
+                    default = py,
+                    visibility = Visibility.HIDDEN
+                )
+            }.value = py
+            panelExtended.getOrPut(category) {
+                BooleanSetting(
+                    category.name + ",extended",
+                    default = true,
+                    visibility = Visibility.HIDDEN
+                )
+            }.enabled = true
             px += pxplus
         }
 

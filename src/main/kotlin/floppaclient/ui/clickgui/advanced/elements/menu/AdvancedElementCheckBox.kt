@@ -24,7 +24,7 @@ class AdvancedElementCheckBox(
     /**
      * Render the element
      */
-    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int{
+    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
         val temp = ColorUtil.clickGUIColor
         val color = Color(temp.red, temp.green, temp.blue, 200).rgb
 
@@ -35,7 +35,7 @@ class AdvancedElementCheckBox(
             if (setting.enabled) color else -0x1000000
         )
         if (isCheckHovered(mouseX, mouseY)) Gui.drawRect(
-            settingWidth - 13,  2, settingWidth -1,
+            settingWidth - 13, 2, settingWidth - 1,
             13, 0x55111111
         )
         return this.settingHeight

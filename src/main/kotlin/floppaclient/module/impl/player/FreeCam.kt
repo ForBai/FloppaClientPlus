@@ -44,14 +44,15 @@ object FreeCam : Module(
             "${ChatUtils.BOLD}${ChatUtils.BLUE}Ping Spoof${ChatUtils.RESET} Mode allows you to fly with no clip and stops sending position packets to the server. " +
             "A clone of the player character will be placed in its position. \n" +
             "${ChatUtils.RED}Ping Spoof Mode is not recommended!${ChatUtils.RESET} It does change the way the client communicates with the server."
-){
-    private val mode = StringSelectorSetting("Mode", "True Free Cam", arrayListOf("True Free Cam", "Ping Spoof"),
+) {
+    private val mode = StringSelectorSetting(
+        "Mode", "True Free Cam", arrayListOf("True Free Cam", "Ping Spoof"),
         description =
-                "${ChatUtils.BOLD}${ChatUtils.DARK_AQUA}True Free Cam${ChatUtils.RESET} Mode lets you move the camera without moving the player character. " +
+        "${ChatUtils.BOLD}${ChatUtils.DARK_AQUA}True Free Cam${ChatUtils.RESET} Mode lets you move the camera without moving the player character. " +
                 "Communication with the server is not affected and the character you see is not a clone but the actual placer character.\n" +
                 "${ChatUtils.BOLD}${ChatUtils.BLUE}Ping Spoof${ChatUtils.RESET} Mode allows you to fly with no clip and stops sending position packets to the server. " +
                 "A clone of the player character will be placed in its position."
-    ).withInputTransform {input, setting ->
+    ).withInputTransform { input, setting ->
         // Prevent the mode from being changed while free cam is active.
         if (FreeCam.enabled) setting.index
         else input
@@ -59,12 +60,17 @@ object FreeCam : Module(
     private val speed = NumberSetting("Speed", 3.0, 0.1, 5.0, 0.1, description = "Fly speed.")
     private val glide = BooleanSetting("Glide", false, description = "Lets you glide upon release movement keys.")
         .withDependency { mode.isSelected("Ping Spoof") }
-    private val tweakTarget = BooleanSetting("Use Camera Target", true, description = "Use the camera position to determine what the player is looking at. If disabled the targeted block will be determined by what your character is looking at and will not change when you move the camera.")
+    private val tweakTarget = BooleanSetting(
+        "Use Camera Target",
+        true,
+        description = "Use the camera position to determine what the player is looking at. If disabled the targeted block will be determined by what your character is looking at and will not change when you move the camera."
+    )
         .withDependency { mode.isSelected("True Free Cam") }
     private val reloadChunks = BooleanSetting("Reload Chunks", false, description = "Reloads all chunks on disable.")
 
     /** Used to clone the player for Ping Spoof Mode. This entity will be visible as the player. */
     private var fakePlayer: EntityOtherPlayerMP? = null
+
     /**
      * This entitly is used as a convenient way of storing camera position data for True Free Cam Mode.
      * It replaces the [renderViewEntity][net.minecraft.client.Minecraft.renderViewEntity] in some places.
@@ -85,12 +91,12 @@ object FreeCam : Module(
     }
 
     override fun onEnable() {
-        if(mc.thePlayer == null || mc.theWorld == null) {
+        if (mc.thePlayer == null || mc.theWorld == null) {
             toggle()
             return
         }
         super.onEnable()
-        when(mode.selected) {
+        when (mode.selected) {
             "True Free Cam" -> setupViewEntity()
             "Ping Spoof" -> clonePlayer()
         }
@@ -99,7 +105,7 @@ object FreeCam : Module(
     override fun onDisable() {
         super.onDisable()
         if (mc.thePlayer == null || mc.theWorld == null) return
-        when(mode.selected) {
+        when (mode.selected) {
             "True Free Cam" -> resetViewEntity()
             "Ping Spoof" -> resetPlayer()
         }
@@ -138,7 +144,7 @@ object FreeCam : Module(
      * @see floppaclient.mixins.render.EntityRendererMixin.tweakRenderViewEntityMouseOver
      * @see floppaclient.mixins.render.EntityRendererMixin.tweakMouseOver
      */
-    fun shouldTweakLookingAt(): Boolean{
+    fun shouldTweakLookingAt(): Boolean {
         return this.enabled && tweakTarget.enabled && mode.isSelected("True Free Cam")
     }
 
@@ -150,7 +156,7 @@ object FreeCam : Module(
      * @see floppaclient.mixins.render.ChunkRendererWorkerMixin
      * @see floppaclient.mixins.render.RenderGlobalMixin
      * @see floppaclient.mixins.render.RenderPlayerMixin
-    */
+     */
     fun tweakRenderViewEntityHook(): Entity {
         return viewEntity ?: mc.renderViewEntity
     }
@@ -159,7 +165,7 @@ object FreeCam : Module(
      * Sets the angles of [viewEntity].
      */
     fun setViewAngles(yaw: Float, pitch: Float) {
-        viewEntity?.prevRotationYaw   = viewEntity!!.rotationYaw
+        viewEntity?.prevRotationYaw = viewEntity!!.rotationYaw
         viewEntity?.prevRotationPitch = viewEntity!!.rotationPitch
         viewEntity?.setAngles(yaw, pitch)
     }
@@ -231,7 +237,7 @@ object FreeCam : Module(
      * Moves the camera ([viewEntity]) based on key inputs.
      */
     private fun moveViewEntity(moveSpeed: Float) {
-        if(viewEntity == null) return
+        if (viewEntity == null) return
         viewEntity!!.lastTickPosX = viewEntity!!.posX
         viewEntity!!.lastTickPosY = viewEntity!!.posY
         viewEntity!!.lastTickPosZ = viewEntity!!.posZ
@@ -275,7 +281,7 @@ object FreeCam : Module(
             viewEntity!!.posZ += (moveForward * f2 + moveStrafe * f1).toDouble()
         }
 
-        if (mc.gameSettings.keyBindJump.isKeyDown)  viewEntity!!.posY += moveSpeed * 1.0
+        if (mc.gameSettings.keyBindJump.isKeyDown) viewEntity!!.posY += moveSpeed * 1.0
         if (mc.gameSettings.keyBindSneak.isKeyDown) viewEntity!!.posY -= moveSpeed * 1.0
     }
 

@@ -10,7 +10,7 @@ class RoomData(
     type: RoomType = RoomType.UNKNOWN,
 ) {
     constructor(configData: RoomConfigData) : this() {
-        this.configData= configData
+        this.configData = configData
     }
 
     var hasMimic = false

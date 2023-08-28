@@ -62,7 +62,10 @@ class FloppaClientCommands : CommandBase() {
             "gui" -> display = clickGUI
             "scan" -> DungeonScan.scanDungeon()
             "roomdata" -> DungeonScan.getRoomCentre(mc.thePlayer.posX.toInt(), mc.thePlayer.posZ.toInt()).let {
-                RoomUtils.getRoomConfigData(DungeonScan.getCore(it.first, it.second)) ?: DungeonScan.getCore(it.first, it.second)
+                RoomUtils.getRoomConfigData(DungeonScan.getCore(it.first, it.second)) ?: DungeonScan.getCore(
+                    it.first,
+                    it.second
+                )
             }.run {
                 GuiScreen.setClipboardString(this.toString())
                 modMessage(
@@ -70,11 +73,13 @@ class FloppaClientCommands : CommandBase() {
                     else "Existing room data not found. Copied room core to clipboard."
                 )
             }
+
             "stop" -> {
                 AutoWater.stop()
                 AutoBlaze.stop()
                 JerryBoxOpener.abort()
             }
+
             "reload" -> {
                 modMessage("Reloading config files.")
                 autoactions.loadConfig()
@@ -82,9 +87,10 @@ class FloppaClientCommands : CommandBase() {
                 FloppaClient.moduleConfig.loadConfig()
                 clickGUI.setUpPanels()
             }
+
             "clear" -> {
                 if (args.size < 2) return modMessage("Specify what to clear. Options: \"clips\", \"etherwarps\", \"blocks\", \"cmds\", \"all\".")
-                when(args[1].lowercase()) {
+                when (args[1].lowercase()) {
                     "clips" -> DataHandler.clearClipsInRoom()
                     "etherwarps", "ether" -> DataHandler.clearEtherInRoom()
                     "blocks", "extras" -> DataHandler.clearBlocksInRoom()
@@ -95,12 +101,14 @@ class FloppaClientCommands : CommandBase() {
                         DataHandler.clearBlocksInRoom()
                         DataHandler.clearCmdsInRoom()
                     }
+
                     else -> modMessage("Wrong usage, options: \"clips\", \"etherwarps\", \"blocks\", \"cmds\", \"all\".")
                 }
             }
+
             "undo" -> {
                 if (args.size < 2) return modMessage("Specify what to undo. Options: \"clips\", \"etherwarps\", \"cmds\", \"blocks\".")
-                when(args[1].lowercase()) {
+                when (args[1].lowercase()) {
                     "clips" -> DataHandler.undoClearClips()
                     "etherwarps", "ether" -> DataHandler.undoClearEther()
                     "blocks", "extras" -> DataHandler.undoClearBlocks()
@@ -108,12 +116,13 @@ class FloppaClientCommands : CommandBase() {
                     else -> modMessage("Wrong usage, options: \"clips\", \"etherwarps\", \"blocks\", \"cmds\".")
                 }
             }
+
             "rotate" -> {
                 if (args.size < 2) return modMessage("Specify what to rotate. Options: \"clips\", \"etherwarps\", \"blocks\", \"cmds\", \"actions\".")
                 val rotation: Int = if (args.size >= 3) {
                     args[2].toInt()
-                }else 90
-                when(args[1].lowercase()) {
+                } else 90
+                when (args[1].lowercase()) {
                     "clips" -> DataHandler.rotateClips(rotation)
                     "etherwarps", "ether" -> DataHandler.rotateEther(rotation)
                     "blocks", "extras" -> DataHandler.rotateBlocks(rotation)
@@ -123,20 +132,25 @@ class FloppaClientCommands : CommandBase() {
                         DataHandler.rotateEther(rotation)
                         DataHandler.rotateCmds(rotation)
                     }
+
                     else -> modMessage("Wrong usage, options: \"clips\", \"etherwarps\", \"cmds\", \"blocks\".")
                 }
             }
+
             "freewalk", "freecamwalk" -> {
                 val enabled = FreeCam.toggleControlCharacter()
-                modMessage("${if(enabled) "${ChatUtils.GREEN}enabled" else "${ChatUtils.RED}disabled"}${ChatUtils.RESET} walking in Freecam")
+                modMessage("${if (enabled) "${ChatUtils.GREEN}enabled" else "${ChatUtils.RED}disabled"}${ChatUtils.RESET} walking in Freecam")
             }
+
             "resetgui" -> {
                 modMessage("Resetting positions in the click gui.")
                 ClickGui.resetPositions()
             }
+
             "clickentity" -> {
                 FakeActionUtils.interactWithEntity(args[1].toInt())
             }
+
             "armorstands" -> {
                 mc.theWorld.loadedEntityList
                     .filter { entity ->
@@ -146,62 +160,73 @@ class FloppaClientCommands : CommandBase() {
                         -mc.thePlayer.getDistanceToEntity(it)
                     }
                     .forEach { entity ->
-                        chatMessage("Name: " + entity.name +", Custom Name: " + entity.customNameTag + ", Id: " + entity.entityId)
+                        chatMessage("Name: " + entity.name + ", Custom Name: " + entity.customNameTag + ", Id: " + entity.entityId)
                     }
             }
+
             "entities" -> {
                 mc.theWorld.loadedEntityList
                     .sortedBy {
                         -mc.thePlayer.getDistanceToEntity(it)
                     }
                     .forEach { entity ->
-                        chatMessage("Type: " + entity::class.simpleName +
-                                ", Name: " + entity.name +", Custom Name: " + entity.customNameTag + ", Id: " + entity.entityId)
+                        chatMessage(
+                            "Type: " + entity::class.simpleName +
+                                    ", Name: " + entity.name + ", Custom Name: " + entity.customNameTag + ", Id: " + entity.entityId
+                        )
                     }
             }
+
             "clickblock" -> {
                 if (args.size < 4)
                     return modMessage("Not enough arguments.")
                 val blockPos = BlockPos(args[1].toDouble(), args[2].toDouble(), args[3].toDouble())
                 FakeActionUtils.clickBlock(blockPos)
             }
+
             "core" -> {
                 if (args.size < 3)
                     return modMessage("Not enough arguments.")
                 modMessage(DungeonScan.getCore(args[1].toInt(), args[2].toInt()).toString())
             }
+
             "shader" -> {
                 if (args.size < 2) return modMessage("Specify shader name.")
                 val name = args[1]
                 try {
                     mc.entityRenderer.loadShader(ResourceLocation("shaders/post/$name.json"))
-                }catch (_: Exception) {
+                } catch (_: Exception) {
                     modMessage("Error loading shader.")
                 }
 
             }
+
             "secrets" -> scope.launch(Dispatchers.IO) {
-                val uuid = if (args.size > 1 ) {
+                val uuid = if (args.size > 1) {
                     args[1]
-                }else {
+                } else {
                     mc.thePlayer.uniqueID.toString()
                 }
                 val secrets = HypixelApiUtils.getSecrets(uuid)
                 modMessage("$secrets")
             }
+
             "gametype" -> {
                 modMessage(mc.playerController.currentGameType.name)
             }
+
             "effects" -> {
                 modMessage("§eActive potion effects:")
                 mc.thePlayer.activePotionEffects.forEach { effect ->
                     modMessage("${effect.effectName}, amplifier: ${effect.amplifier}, duration: ${effect.duration}")
                 }
             }
+
             "forgerender" -> {
                 ForgeModContainer.forgeLightPipelineEnabled = !ForgeModContainer.forgeLightPipelineEnabled
                 modMessage("${if (ForgeModContainer.forgeLightPipelineEnabled) "enabled" else "disabled"} the forge block rendering pipeline.")
             }
+
             else -> {
                 modMessage("Command not recognized!")
             }
@@ -216,7 +241,20 @@ class FloppaClientCommands : CommandBase() {
         if (args.size == 1) {
             return getListOfStringsMatchingLastWord(
                 args,
-                mutableListOf("scan", "roomdata", "reload" , "stop" , "reload" , "clear" , "undo" , "rotate" , "freecamwalk" , "clickentity" , "armorstands" , "entities")
+                mutableListOf(
+                    "scan",
+                    "roomdata",
+                    "reload",
+                    "stop",
+                    "reload",
+                    "clear",
+                    "undo",
+                    "rotate",
+                    "freecamwalk",
+                    "clickentity",
+                    "armorstands",
+                    "entities"
+                )
             )
         }
         return mutableListOf()

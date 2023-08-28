@@ -78,26 +78,25 @@ object AutoCmd : Module(
         )
     }
 
-/*
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!FloppaClient.inSkyblock || EditMode.enabled || !enabled) return
-        //if the player is standing in a cmd point, run the command except if onlyOnKeybind is enabled
-        if (!onlyOnKeybind.enabled) {
-            for (cmd in DataHandler.Ins.autoCmds) {
-                if (cmd.key == FloppaClient.mc.thePlayer.flooredPosition) {
-                    tryCmd = true
-                    break
+    /*
+        @SubscribeEvent
+        fun onTick(event: TickEvent.ClientTickEvent) {
+            if (!FloppaClient.inSkyblock || EditMode.enabled || !enabled) return
+            //if the player is standing in a cmd point, run the command except if onlyOnKeybind is enabled
+            if (!onlyOnKeybind.enabled) {
+                for (cmd in DataHandler.Ins.autoCmds) {
+                    if (cmd.key == FloppaClient.mc.thePlayer.flooredPosition) {
+                        tryCmd = true
+                        break
+                    }
                 }
             }
         }
-    }
 
- */
+     */
 
     override fun onKeyBind() {
         if (!FloppaClient.inSkyblock || EditMode.enabled || !enabled) return
-        println("")
         if (onlyOnKeybind.enabled) {
             tryCmd = true
         }
@@ -129,51 +128,53 @@ object AutoCmd : Module(
      * And calls the corresponding function to perform the clip.
      */
     private fun tryCmd() {
-        try { // stop module from breaking when dungoen not scanned
-
-            val pos = FloppaClient.mc.thePlayer.position
-
-            val room = Dungeon.currentRoomPair ?: FloppaClient.currentRegionPair ?: return
-            if (room.first.isSeparator) return
-
-            var key: MutableList<Int>
-
-            RoomUtils.getRoomAutoActionData(room.first)?.run {
-                /** check for the start pos in config
-                 * Note here that a new BlockPos instace is created, so that the Etherwarp data can not be overwritten.*/
-                val range = detectionRange.value
-                val point1 = pos.add(range, range, range)
-                val point2 = pos.add(-range, -range, -range)
-                for (blockPos in BlockPos.getAllInBox(point1, point2)
-                    .sortedBy { FloppaClient.mc.thePlayer.getDistanceSqToCenter(it) }
-                ) {
-                    key = DataHandler.getKey(
-                        Vec3(blockPos),
-                        room.first.x,
-                        room.first.z,
-                        room.second
-                    )
-
-                    if (this.autocmds.containsKey(key)) {
-                        val value = this.autocmds[key]!!
-                        if (debugMessages.enabled) {
-                            println("AutoCmd: $key -> ${this.autocmds[key]}  (range: $range) (pos: $pos) (room: ${room.first}) (region: ${room.second}) (value: $value)")
-                        }
-                        if (value != "" && !debugMessages.enabled) {
-
-                            if (chatInfo.enabled) {
-                                ChatUtils.modMessage("Ran Command: $value")
-                            }
-                            FloppaClient.mc.thePlayer.sendChatMessage(value)
-                        }
-                        break
-                    }
-                }
-            }
-
-        } catch (e: Throwable) {
-            return
-        }
+        ChatUtils.modMessage("This Feature is currently disabled due to a bug in the game.")
+        return;
+//        try { // stop module from breaking when dungoen not scanned
+//
+//            val pos = FloppaClient.mc.thePlayer.position
+//
+//            val room = Dungeon.currentRoomPair ?: FloppaClient.currentRegionPair ?: return
+//            if (room.first.isSeparator) return
+//
+//            var key: MutableList<Int>
+//
+//            RoomUtils.getRoomAutoActionData(room.first)?.run {
+//                /** check for the start pos in config
+//                 * Note here that a new BlockPos instace is created, so that the Etherwarp data can not be overwritten.*/
+//                val range = detectionRange.value
+//                val point1 = pos.add(range, range, range)
+//                val point2 = pos.add(-range, -range, -range)
+//                for (blockPos in BlockPos.getAllInBox(point1, point2)
+//                    .sortedBy { FloppaClient.mc.thePlayer.getDistanceSqToCenter(it) }
+//                ) {
+//                    key = DataHandler.getKey(
+//                        Vec3(blockPos),
+//                        room.first.x,
+//                        room.first.z,
+//                        room.second
+//                    )
+//
+//                    if (this.autocmds.containsKey(key)) {
+//                        val value = this.autocmds[key]!!
+//                        if (debugMessages.enabled) {
+//                            println("AutoCmd: $key -> ${this.autocmds[key]}  (range: $range) (pos: $pos) (room: ${room.first}) (region: ${room.second}) (value: $value)")
+//                        }
+//                        if (value != "" && !debugMessages.enabled) {
+//
+//                            if (chatInfo.enabled) {
+//                                ChatUtils.modMessage("Ran Command: $value")
+//                            }
+//                            FloppaClient.mc.thePlayer.sendChatMessage(value)
+//                        }
+//                        break
+//                    }
+//                }
+//            }
+//
+//        } catch (e: Throwable) {
+//            return
+//        }
     }
 
 

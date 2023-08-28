@@ -23,28 +23,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockRendererDispatcher.class)
 abstract public class BlockRendererDispatcherMixin implements IResourceManagerReloadListener {
-    @Shadow @Final private BlockFluidRenderer fluidRenderer;
+    @Shadow
+    @Final
+    private BlockFluidRenderer fluidRenderer;
 
-    @Unique final private BlockRenderer blockRenderer = new BlockRenderer();
+    @Unique
+    final private BlockRenderer blockRenderer = new BlockRenderer();
 
-    @Shadow public abstract IBakedModel getModelFromBlockState(IBlockState state, IBlockAccess worldIn, BlockPos pos);
+    @Shadow
+    public abstract IBakedModel getModelFromBlockState(IBlockState state, IBlockAccess worldIn, BlockPos pos);
 
     @Inject(method = "renderBlock", at = @At("HEAD"), cancellable = true)
     private void onRenderBlock(IBlockState state, BlockPos pos, IBlockAccess blockAccess, WorldRenderer worldRendererIn, CallbackInfoReturnable<Boolean> cir) {
         if (XRay.INSTANCE.getEnabled()) {
 
-            try
-            {
+            try {
                 int i = state.getBlock().getRenderType();
 
-                if (i == -1)
-                {
+                if (i == -1) {
                     cir.setReturnValue(false);
-                }
-                else
-                {
-                    switch (i)
-                    {
+                } else {
+                    switch (i) {
                         case 1:
                             cir.setReturnValue(this.fluidRenderer.renderFluid(blockAccess, state, pos, worldRendererIn));
                             return;
@@ -54,15 +53,13 @@ abstract public class BlockRendererDispatcherMixin implements IResourceManagerRe
                         case 3:
                             IBakedModel ibakedmodel = this.getModelFromBlockState(state, blockAccess, pos);
 
-                            cir.setReturnValue( this.blockRenderer.renderModel(blockAccess, ibakedmodel, state, pos, worldRendererIn));
+                            cir.setReturnValue(this.blockRenderer.renderModel(blockAccess, ibakedmodel, state, pos, worldRendererIn));
                             return;
                         default:
                             cir.setReturnValue(false);
                     }
                 }
-            }
-            catch (Throwable throwable)
-            {
+            } catch (Throwable throwable) {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block in world");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");
                 CrashReportCategory.addBlockInfo(crashreportcategory, pos, state.getBlock(), state.getBlock().getMetaFromState(state));

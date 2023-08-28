@@ -22,9 +22,9 @@ import java.nio.file.StandardCopyOption
 class AutoActionConfig(path: File) {
 
     private val gson = GsonBuilder()
-        .registerTypeAdapter(object : TypeToken<MutableList<Int>>(){}.type, IntListDeserializer())
-        .registerTypeAdapter(object : TypeToken<BlockPos>(){}.type, BlockPosSerializer())
-        .registerTypeAdapter(object : TypeToken<BlockPos>(){}.type, BlockPosDeserializer())
+        .registerTypeAdapter(object : TypeToken<MutableList<Int>>() {}.type, IntListDeserializer())
+        .registerTypeAdapter(object : TypeToken<BlockPos>() {}.type, BlockPosSerializer())
+        .registerTypeAdapter(object : TypeToken<BlockPos>() {}.type, BlockPosDeserializer())
         .setPrettyPrinting().create()
 
 

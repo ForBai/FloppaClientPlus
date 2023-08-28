@@ -75,9 +75,9 @@ object MapUpdate {
                 val fake = potPlayer == null
                 (potPlayer ?: EntityOtherPlayerMP(mc.theWorld, tabEntries[i].first.gameProfile))
                     .let {
-                        if (teammate == null){
+                        if (teammate == null) {
                             Dungeon.dungeonTeammates.add(DungeonPlayer(it, name, fake))
-                        }else{
+                        } else {
                             teammate!!.player = it
                             teammate!!.name = name
                             teammate!!.fakeEntity = fake
@@ -166,10 +166,12 @@ object MapUpdate {
                             RoomType.PUZZLE -> RoomState.FAILED
                             else -> tile.state
                         } else RoomState.DISCOVERED
+
                         30 -> if (tile is Room) when (tile.data.type) {
                             RoomType.ENTRANCE -> RoomState.DISCOVERED
                             else -> RoomState.GREEN
                         } else tile.state
+
                         34 -> RoomState.CLEARED
                         else -> {
                             if (tile is Door)
@@ -208,8 +210,8 @@ object MapUpdate {
             val row = index % 11
 
             // If the tile is a room check neighboring tiles for data in the order left, top
-            val leftConnector = Dungeon.getDungeonTile(column-1, row) as? Room
-            val topConnector = Dungeon.getDungeonTile(column, row-1) as? Room
+            val leftConnector = Dungeon.getDungeonTile(column - 1, row) as? Room
+            val topConnector = Dungeon.getDungeonTile(column, row - 1) as? Room
             var finalData: RoomData? = null
             val bufferedDataTemporary: MutableSet<RoomData> = mutableSetOf()
             var gotDataFromLeft = false
@@ -217,7 +219,7 @@ object MapUpdate {
             // link the tile and connector to the correct data
             // this code could be compacted into a loop to reduce redundancy, but this form has better readability
             if (leftConnector?.isSeparator == true) {
-                val leftRoom = Dungeon.getDungeonTile(column-2, row) as? Room
+                val leftRoom = Dungeon.getDungeonTile(column - 2, row) as? Room
                 if (leftRoom != null) {
                     gotDataFromLeft = true
                     finalData = leftRoom.data
@@ -227,13 +229,13 @@ object MapUpdate {
                 }
             }
             if (topConnector?.isSeparator == true) {
-                val topRoom = Dungeon.getDungeonTile(column, row-2) as? Room
+                val topRoom = Dungeon.getDungeonTile(column, row - 2) as? Room
                 if (topRoom != null) {
                     if (gotDataFromLeft) {
                         bufferedDataTemporary.add(topRoom.data)
                         topRoom.data = tile.data
                         topConnector.data = tile.data
-                    }else {
+                    } else {
                         finalData = topRoom.data
                         bufferedDataTemporary.add(tile.data)
                         topConnector.data = topRoom.data
@@ -259,7 +261,7 @@ object MapUpdate {
 
         // Update the isUnique state. This works by checking whether a tile is the first in the list.
         // This assumes that groupBy preserves the initial order of the rooms, which it should do.
-        Dungeon.getDungeonTileList<Room>().filter { !it.isSeparator }.groupBy { it.data }.forEach{ (_, rooms) ->
+        Dungeon.getDungeonTileList<Room>().filter { !it.isSeparator }.groupBy { it.data }.forEach { (_, rooms) ->
             rooms.withIndex().forEach { (index, room) ->
                 room.isUnique = index == 0
             }
@@ -274,10 +276,11 @@ object MapUpdate {
      */
     private fun updatePuzzleNames() {
         val puzzles = Dungeon.getDungeonTileList<Room>()
-            .filter { room -> !room.isSeparator && room.data.type == RoomType.PUZZLE && room.state.revealed  }
-            .sortedBy { room -> room.column*11 + room.row } // This is probably redundant since this is already the sort order of dungeonList
+            .filter { room -> !room.isSeparator && room.data.type == RoomType.PUZZLE && room.state.revealed }
+            .sortedBy { room -> room.column * 11 + room.row } // This is probably redundant since this is already the sort order of dungeonList
         if (RunInformation.puzzles.size == puzzles.size) {
-            RunInformation.puzzles.withIndex().forEach { (index, puzzlePair) -> puzzles[index].data.name = puzzlePair.first }
+            RunInformation.puzzles.withIndex()
+                .forEach { (index, puzzlePair) -> puzzles[index].data.name = puzzlePair.first }
             unmappedPuzz = false
         }
     }
@@ -310,33 +313,35 @@ object MapUpdate {
         return when {
             rowEven && columnEven -> { // room
                 val roomType = when (mapColors[(cornerZ shl 7) + cornerX].toInt()) {
-                    0       -> return null
-                    18      -> RoomType.BLOOD
-                    30      -> RoomType.ENTRANCE
-                    85      -> RoomType.UNKNOWN
-                    63      -> RoomType.NORMAL
-                    74      -> RoomType.CHAMPION
-                    66      -> RoomType.PUZZLE
-                    82      -> RoomType.FAIRY
-                    62      -> RoomType.TRAP
-                    else    -> RoomType.NORMAL
+                    0 -> return null
+                    18 -> RoomType.BLOOD
+                    30 -> RoomType.ENTRANCE
+                    85 -> RoomType.UNKNOWN
+                    63 -> RoomType.NORMAL
+                    74 -> RoomType.CHAMPION
+                    66 -> RoomType.PUZZLE
+                    82 -> RoomType.FAIRY
+                    62 -> RoomType.TRAP
+                    else -> RoomType.NORMAL
                 }
 
                 val data = RoomData("Unknown$column$row", roomType)
                 Room(xPos, zPos, data)
             }
+
             !rowEven && !columnEven -> { // possible separator (only for 2x2)
-                if(mapColors[(centerZ shl 7) + centerX].toInt() != 0){
-                    Dungeon.getDungeonTile(column-1, row-1)?.let {
+                if (mapColors[(centerZ shl 7) + centerX].toInt() != 0) {
+                    Dungeon.getDungeonTile(column - 1, row - 1)?.let {
                         if (it is Room) {
                             Room(xPos, zPos, it.data).apply { isSeparator = true }
                         } else null
                     }
-                }else null
+                } else null
             }
+
             else -> { // door or separator
                 // Check the "side" of the connector to see whether it is a connector
-                if (mapColors[( (if (rowEven) cornerZ else centerZ) shl 7) + (if (rowEven) centerX else cornerX)].toInt() != 0) { // separator
+                if (mapColors[((if (rowEven) cornerZ else centerZ) shl 7) + (if (rowEven) centerX else cornerX)].toInt() != 0) { // separator
                     (if (rowEven) Dungeon.getDungeonTile(column - 1, row)
                     else Dungeon.getDungeonTile(column, row - 1))?.let {
                         if (it is Room) {
@@ -344,7 +349,7 @@ object MapUpdate {
                         } else null
                     }
                 } else { // door or nothing
-                    val doorType = when(mapColors[(centerZ shl 7) + centerX].toInt()) {
+                    val doorType = when (mapColors[(centerZ shl 7) + centerX].toInt()) {
                         0 -> return null
                         119 -> DoorType.WITHER
                         30 -> DoorType.ENTRANCE

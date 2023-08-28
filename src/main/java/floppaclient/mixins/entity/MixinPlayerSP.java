@@ -135,7 +135,7 @@ public abstract class MixinPlayerSP extends MixinAbstractClientPlayer {
     }
 
     @Redirect(method = {"pushOutOfBlocks"}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/entity/EntityPlayerSP;noClip:Z"))
-    public boolean shouldCancelPushOut(EntityPlayerSP instance){
+    public boolean shouldCancelPushOut(EntityPlayerSP instance) {
         return QOL.INSTANCE.preventPushOut(this.noClip);
     }
 }

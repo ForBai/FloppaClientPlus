@@ -23,19 +23,21 @@ public abstract class BlockMixin {
     private final Block block = (Block) (Object) this;
 
     @Shadow
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {}
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+    }
 
-    @Shadow public abstract void setBlockBounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+    @Shadow
+    public abstract void setBlockBounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
 
     @Inject(method = "shouldSideBeRendered", at = @At("RETURN"), cancellable = true)
     private void onShouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side, CallbackInfoReturnable<Boolean> cir) {
-        if(XRay.INSTANCE.getEnabled()) {
+        if (XRay.INSTANCE.getEnabled()) {
             cir.setReturnValue(XRay.INSTANCE.modifyRenderdSideHook(block, cir.getReturnValue()));
         }
     }
 
     @Inject(method = "canRenderInLayer", at = @At("HEAD"), cancellable = true, remap = false)
-    private void tweakCanRender(EnumWorldBlockLayer layer, CallbackInfoReturnable<Boolean> cir){
+    private void tweakCanRender(EnumWorldBlockLayer layer, CallbackInfoReturnable<Boolean> cir) {
         if (XRay.INSTANCE.getEnabled()) {
             cir.setReturnValue(EnumWorldBlockLayer.TRANSLUCENT == layer);
         }

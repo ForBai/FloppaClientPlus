@@ -22,7 +22,7 @@ class StringSetting(
             val tempStr = processInput(newStr)
             field = if (tempStr.length > length) {
                 tempStr.substring(0, length - 1)
-            }else
+            } else
                 tempStr
         }
 

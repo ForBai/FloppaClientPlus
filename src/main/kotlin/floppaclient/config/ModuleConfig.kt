@@ -25,8 +25,8 @@ import java.io.IOException
 class ModuleConfig(path: File) {
 
     private val gson = GsonBuilder()
-        .registerTypeAdapter(object : TypeToken<Setting<*>>(){}.type, SettingSerializer())
-        .registerTypeAdapter(object : TypeToken<Setting<*>>(){}.type, SettingDeserializer())
+        .registerTypeAdapter(object : TypeToken<Setting<*>>() {}.type, SettingSerializer())
+        .registerTypeAdapter(object : TypeToken<Setting<*>>() {}.type, SettingDeserializer())
         .excludeFieldsWithoutExposeAnnotation()
         .setPrettyPrinting().create()
 
@@ -56,7 +56,7 @@ class ModuleConfig(path: File) {
                 if (this == "") {
                     return
                 }
-                configModules= gson.fromJson(
+                configModules = gson.fromJson(
                     this,
                     object : TypeToken<ArrayList<ConfigModule>>() {}.type
                 )
@@ -64,11 +64,12 @@ class ModuleConfig(path: File) {
             configModules.forEach { configModule ->
                 ModuleManager.getModuleByName(configModule.name).run updateModule@{
                     // If the module was not found check whether it can be a keybind
-                    val module = this ?: if (configModule.settings.find { (it is BooleanSetting) && it.name == "THIS_IS_A_KEY_BIND" } != null) {
-                        ModuleManager.addNewKeybind()
-                    }else {
-                        return@updateModule
-                    }
+                    val module = this
+                        ?: if (configModule.settings.find { (it is BooleanSetting) && it.name == "THIS_IS_A_KEY_BIND" } != null) {
+                            ModuleManager.addNewKeybind()
+                        } else {
+                            return@updateModule
+                        }
                     if (module.enabled != configModule.enabled) module.toggle()
                     module.keyCode = configModule.keyCode
                     for (configSetting in configModule.settings) {
@@ -81,7 +82,9 @@ class ModuleConfig(path: File) {
                         when (setting) {
                             is BooleanSetting -> setting.enabled = (configSetting as BooleanSetting).enabled
                             is NumberSetting -> setting.value = (configSetting as NumberSetting).value
-                            is ColorSetting -> setting.value = Color((configSetting as NumberSetting).value.toInt(), true)
+                            is ColorSetting -> setting.value =
+                                Color((configSetting as NumberSetting).value.toInt(), true)
+
                             is StringSelectorSetting -> setting.selected = (configSetting as StringSetting).text
                             is SelectorSetting -> setting.selected = (configSetting as StringSetting).text
                             is StringSetting -> setting.text = (configSetting as StringSetting).text

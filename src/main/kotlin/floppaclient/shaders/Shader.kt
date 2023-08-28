@@ -105,15 +105,15 @@ open class Shader(vertexFile: String, fragmentFile: String) {
                 line = reader.readLine()
             }
             reader.close()
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
-            throw  e
+            throw e
         }
         val shaderId = GL20.glCreateShader(type)
         GL20.glShaderSource(shaderId, builder)
         GL20.glCompileShader(shaderId)
 
-        if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE){
+        if (GL20.glGetShaderi(shaderId, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
             println(GL20.glGetShaderInfoLog(shaderId, 1000))
             throw Error("Failed loading shader")
         }

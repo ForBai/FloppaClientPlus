@@ -52,7 +52,7 @@ object ItemUtils {
             return this.extraAttributes?.getString("id") ?: ""
         }
 
-    val ItemStack?.reforge : String
+    val ItemStack?.reforge: String
         get() {
             return this?.extraAttributes?.getString("modifier") ?: ""
         }
@@ -77,25 +77,25 @@ object ItemUtils {
     val ItemStack?.hasAbility: Boolean
         get() {
             val lore = this?.lore
-            lore?.forEach{
-                if(it.contains("Ability:") && it.endsWith("RIGHT CLICK")) return true
+            lore?.forEach {
+                if (it.contains("Ability:") && it.endsWith("RIGHT CLICK")) return true
             }
             return false
         }
 
-    private fun NBTTagCompound?.hasKey(key: String) : Boolean {
+    private fun NBTTagCompound?.hasKey(key: String): Boolean {
         return this?.hasKey(key) ?: false
     }
 
-/**
- * Checks the item's lore for whether it is a shortbow.
- *
- * See also [SkyblockItem] for a list of skyblock items.
- */
+    /**
+     * Checks the item's lore for whether it is a shortbow.
+     *
+     * See also [SkyblockItem] for a list of skyblock items.
+     */
     val ItemStack?.isShortbow: Boolean
-    get() {
-        return this?.lore?.any { it.contains("Shortbow: Instantly shoots!") } == true
-    }
+        get() {
+            return this?.lore?.any { it.contains("Shortbow: Instantly shoots!") } == true
+        }
 
 
     /**

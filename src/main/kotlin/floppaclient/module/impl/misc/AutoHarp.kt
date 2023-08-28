@@ -21,7 +21,7 @@ object AutoHarp : Module(
     "Auto Harp",
     category = Category.MISC,
     description = "Automatically Completes Melody's Harp"
-){
+) {
     private var inHarp = false
     private var lastInv = 0
 
@@ -47,7 +47,8 @@ object AutoHarp : Module(
             inHarp = false
             return
         }
-        val newHash = container.inventorySlots.subList(0,36).joinToString("") { it?.stack?.displayName ?: "" }.hashCode()
+        val newHash =
+            container.inventorySlots.subList(0, 36).joinToString("") { it?.stack?.displayName ?: "" }.hashCode()
         if (lastInv == newHash) return
         lastInv = newHash
         for (ii in 0..6) {
@@ -56,8 +57,8 @@ object AutoHarp : Module(
                 mc.playerController.windowClick(
                     container.windowId,
                     slot.slotNumber,
-                    2,
-                    3,
+                    0,
+                    0,
                     mc.thePlayer
                 )
                 break

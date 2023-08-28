@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 /**
  * The mixins in here are used for
  * {@link FreeCam}.
+ *
  * @author Aton
  */
 @Mixin(ChunkRenderWorker.class)
@@ -19,7 +20,7 @@ abstract public class ChunkRendererWorkerMixin implements Runnable {
     public Entity tweakRenderViewEntity(Minecraft instance) {
         if (FreeCam.INSTANCE.shouldTweakViewEntity()) {
             return FreeCam.INSTANCE.tweakRenderViewEntityHook();
-        }else {
+        } else {
             return instance.getRenderViewEntity();
         }
     }

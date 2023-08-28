@@ -18,7 +18,7 @@ class ColorSetting(
     var allowAlpha: Boolean = true,
     visibility: Visibility = Visibility.VISIBLE,
     description: String? = null,
-) : Setting<Color>(name, visibility, description){
+) : Setting<Color>(name, visibility, description) {
 
     override var value: Color = default
         set(value) {
@@ -29,17 +29,17 @@ class ColorSetting(
     var red: Int
         get() = value.red
         set(input) {
-            value = Color(MathHelper.clamp_int(input,0,255), green, blue, alpha)
+            value = Color(MathHelper.clamp_int(input, 0, 255), green, blue, alpha)
         }
     var green: Int
         get() = value.green
         set(input) {
-            value = Color(red, MathHelper.clamp_int(input,0,255), blue, alpha)
+            value = Color(red, MathHelper.clamp_int(input, 0, 255), blue, alpha)
         }
     var blue: Int
         get() = value.blue
         set(input) {
-            value = Color(red, green, MathHelper.clamp_int(input,0,255), alpha)
+            value = Color(red, green, MathHelper.clamp_int(input, 0, 255), alpha)
         }
     var hue: Float
         get() {
@@ -73,14 +73,14 @@ class ColorSetting(
         set(input) {
             // prevents changing the alpha if not allowed
             if (!allowAlpha) return
-            value = Color(red, green, blue, MathHelper.clamp_int(input,0,255))
+            value = Color(red, green, blue, MathHelper.clamp_int(input, 0, 255))
         }
 
     /**
      * Updates the color stored in value from the hsb values stored in hsbvals
      */
     private fun updateColor() {
-        val tempColor =  Color(Color.HSBtoRGB(hsbvals[0], hsbvals[1], hsbvals[2]))
+        val tempColor = Color(Color.HSBtoRGB(hsbvals[0], hsbvals[1], hsbvals[2]))
         value = Color(tempColor.red, tempColor.green, tempColor.blue, alpha)
     }
 
@@ -94,7 +94,7 @@ class ColorSetting(
         hsbvals[2] = newHSB[2]
         if (newHSB[2] > 0) {
             hsbvals[1] = newHSB[1]
-            if (newHSB[1] > 0){
+            if (newHSB[1] > 0) {
                 hsbvals[0] = newHSB[0]
             }
         }
@@ -105,7 +105,7 @@ class ColorSetting(
      * @see ColorComponent.maxValue
      */
     fun getNumber(colorNumber: ColorComponent): Double {
-        return when(colorNumber) {
+        return when (colorNumber) {
             ColorComponent.RED -> red.toDouble()
             ColorComponent.GREEN -> green.toDouble()
             ColorComponent.BLUE -> blue.toDouble()
@@ -121,7 +121,7 @@ class ColorSetting(
      * @see ColorComponent.maxValue
      */
     fun setNumber(colorNumber: ColorComponent, number: Double) {
-        when(colorNumber) {
+        when (colorNumber) {
             ColorComponent.RED -> red = number.toInt()
             ColorComponent.GREEN -> green = number.toInt()
             ColorComponent.BLUE -> blue = number.toInt()
@@ -155,7 +155,7 @@ class ColorSetting(
         RED, GREEN, BLUE, HUE, SATURATION, BRIGHTNESS, ALPHA;
 
         fun getName(): String {
-            return when(this) {
+            return when (this) {
                 RED -> "Red"
                 GREEN -> "Green"
                 BLUE -> "Blue"
@@ -175,7 +175,7 @@ class ColorSetting(
          * 0 to 1 for [HUE], [SATURATION], [BRIGHTNESS].
          */
         fun maxValue(): Double {
-            return when(this) {
+            return when (this) {
                 RED, GREEN, BLUE, ALPHA -> 255.0
                 HUE, SATURATION, BRIGHTNESS -> 1.0
             }

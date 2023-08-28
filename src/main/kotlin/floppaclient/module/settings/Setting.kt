@@ -23,7 +23,7 @@ abstract class Setting<T>(
     val name: String,
     val visibility: Visibility = Visibility.VISIBLE,
     var description: String? = null,
-) : ReadWriteProperty<Module, T>, PropertyDelegateProvider<Module, ReadWriteProperty<Module,T>> {
+) : ReadWriteProperty<Module, T>, PropertyDelegateProvider<Module, ReadWriteProperty<Module, T>> {
     protected var visibilityDependency: () -> Boolean = { true }
 
     /**
@@ -70,7 +70,7 @@ abstract class Setting<T>(
     override operator fun provideDelegate(thisRef: Module, property: KProperty<*>): ReadWriteProperty<Module, T> {
         return if (!property.hasAnnotation<DoNotRegister>()) {
             thisRef.register(this)
-        }else this
+        } else this
     }
 
     /**
@@ -90,21 +90,21 @@ abstract class Setting<T>(
     /**
      * This companion object provides extension functions for the Setting classes.
      */
-    companion object{
+    companion object {
         /** Set a dependency which has to be fulfilled for this Setting to show up in the GUI.
          *
          * <br>
         The definition of this function as an extension function within a companion object is really scuffed and overly
         complicated.
         But this allows for a streamlined usage:
-            private val setting = SomeSetting("Name", ... parameters)
-            .withDependency {
-                this.mode.index == 0
-            }
+        private val setting = SomeSetting("Name", ... parameters)
+        .withDependency {
+        this.mode.index == 0
+        }
         Almost like with a lambda function in the constructor (which would not be a good choice here).
-         </br>
-        */
-        fun <K: Setting<*>> K.withDependency(dependency: () -> Boolean): K {
+        </br>
+         */
+        fun <K : Setting<*>> K.withDependency(dependency: () -> Boolean): K {
             visibilityDependency = dependency
             return this
         }
@@ -114,7 +114,7 @@ abstract class Setting<T>(
          *
          * Is used differently in the implementations alongside with additional restraints on inputs.
          */
-        fun <K: Setting<T>, T> K.withInputTransform(transform: (input: T, setting: K) -> T): K {
+        fun <K : Setting<T>, T> K.withInputTransform(transform: (input: T, setting: K) -> T): K {
             processInput = { transform(it, this) }
             return this
         }
@@ -124,7 +124,7 @@ abstract class Setting<T>(
          *
          * Is used differently in the implementations alongside with additional restraints on inputs.
          */
-        fun <K: Setting<T>, T> K.withInputTransform(transform: (input: T) -> T): K {
+        fun <K : Setting<T>, T> K.withInputTransform(transform: (input: T) -> T): K {
             processInput = transform
             return this
         }

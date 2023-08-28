@@ -25,16 +25,30 @@ object NoRotate : Module(
     "No Rotate",
     category = Category.PLAYER,
     description = "Prevents rotation on received teleport packets."
-){
+) {
     /**
      * Option to toggle no rotate on packets with 0 pitch. Those are used for special teleports which in general should
      * rotate you.
      */
-    private val pitch = BooleanSetting("0 Pitch", false, description = "Also prevents rotation of packets with 0 pitch, those are in general used for teleport which should rotate you..")
-    private val keepMotion = BooleanSetting("Keep Motion", false, description = "Teleporting will not reset your horizontal motion.")
-    private val stopOnHopper = BooleanSetting("Stop on Hopper", false, description = "Teleporting onto a hopper will stop your movement. Press your walk keys again to move again.")
-    private val clipInHopper = BooleanSetting("Clip into Hopper", false, description = "Will directly place you inside of a hopper when you teleport onto it.")
-    private val stopMotionWithPearl = BooleanSetting("Stop with Pearl", true, description = "Stops keep motion when holding a Pearl.")
+    private val pitch = BooleanSetting(
+        "0 Pitch",
+        false,
+        description = "Also prevents rotation of packets with 0 pitch, those are in general used for teleport which should rotate you.."
+    )
+    private val keepMotion =
+        BooleanSetting("Keep Motion", false, description = "Teleporting will not reset your horizontal motion.")
+    private val stopOnHopper = BooleanSetting(
+        "Stop on Hopper",
+        false,
+        description = "Teleporting onto a hopper will stop your movement. Press your walk keys again to move again."
+    )
+    private val clipInHopper = BooleanSetting(
+        "Clip into Hopper",
+        false,
+        description = "Will directly place you inside of a hopper when you teleport onto it."
+    )
+    private val stopMotionWithPearl =
+        BooleanSetting("Stop with Pearl", true, description = "Stops keep motion when holding a Pearl.")
 
     private var doneLoadingTerrain = false
 
@@ -74,7 +88,8 @@ object NoRotate : Module(
 
             event.isCanceled = true
 
-            val stopMotion = !keepMotion.enabled || (stopMotionWithPearl.enabled && mc.thePlayer.isHolding("Ender Pearl"))
+            val stopMotion =
+                !keepMotion.enabled || (stopMotionWithPearl.enabled && mc.thePlayer.isHolding("Ender Pearl"))
 
 
             val packetIn = event.packet
@@ -118,7 +133,7 @@ object NoRotate : Module(
             // Stop on Hopper Part
 
             var hopperClip = false
-            if (stopOnHopper.enabled || clipInHopper.enabled){
+            if (stopOnHopper.enabled || clipInHopper.enabled) {
                 val pos = BlockPos(d0, d1, d2).down()
                 if (mc.theWorld.getBlockState(pos).block === Blocks.hopper) {
                     if (stopOnHopper.enabled) {
@@ -127,7 +142,7 @@ object NoRotate : Module(
                             KeyBinding.setKeyBindState(it.keyCode, false)
                         }
                     }
-                    if (clipInHopper.enabled){
+                    if (clipInHopper.enabled) {
                         hopperClip = true
                     }
                 }
@@ -149,8 +164,8 @@ object NoRotate : Module(
                 )
             )
 
-            if (hopperClip){
-                entityplayer.setPosition(d0, d1-0.3, d2)
+            if (hopperClip) {
+                entityplayer.setPosition(d0, d1 - 0.3, d2)
             }
 
             if (!this.doneLoadingTerrain) {

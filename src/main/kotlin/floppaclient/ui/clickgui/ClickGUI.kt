@@ -41,10 +41,12 @@ import java.io.IOException
  */
 class ClickGUI : GuiScreen() {
     var scale = 2.0
+
     /**
      * Used to add a delay for closing the gui, so that it does not instantly get closed
      */
     private var openedTime = System.currentTimeMillis()
+
     /**
      * Used to create the advanced menu for modules
      */
@@ -89,7 +91,7 @@ class ClickGUI : GuiScreen() {
             p.drawScreen(scaledMouseX, scaledMouseY, partialTicks)
         }
 
-        if(ClickGui.showUsageInfo.enabled) {
+        if (ClickGui.showUsageInfo.enabled) {
             renderUsageInfo()
         }
 
@@ -123,7 +125,7 @@ class ClickGUI : GuiScreen() {
         GlStateManager.color(255f, 255f, 255f, 255f)
         FloppaClient.mc.textureManager.bindTexture(LOGO)
         Gui.drawModalRectWithCustomSizedTexture(
-            - 5 - logoSize,
+            -5 - logoSize,
             -5 - logoSize,
             0f, 0f, logoSize, logoSize, logoSize.toFloat(), logoSize.toFloat()
         )
@@ -140,7 +142,8 @@ class ClickGUI : GuiScreen() {
     private fun renderUsageInfo() {
         val scaledResolution = ScaledResolution(mc)
 
-        val lines = listOf("GUI Usage:",
+        val lines = listOf(
+            "GUI Usage:",
             "Left click Module Buttons to toggle the Module.",
             "Right click Module Buttons to extend the Settings dropdown.",
             "Middle click Module Buttons to open the Advanced Gui.",
@@ -149,8 +152,8 @@ class ClickGUI : GuiScreen() {
 
         GL11.glPushMatrix()
         GL11.glTranslated(
-            scaledResolution.scaledWidth.toDouble()*0.1,
-            scaledResolution.scaledHeight.toDouble()*0.7,
+            scaledResolution.scaledWidth.toDouble() * 0.1,
+            scaledResolution.scaledHeight.toDouble() * 0.7,
             0.0
         )
 
@@ -205,15 +208,16 @@ class ClickGUI : GuiScreen() {
         val scaledMouseY = getScaledMouseY()
 
         // handle the advanced gui first
-        if (advancedMenu?.mouseClicked(scaledMouseX, scaledMouseY, mouseButton) == true){
+        if (advancedMenu?.mouseClicked(scaledMouseX, scaledMouseY, mouseButton) == true) {
             // Update the elements of the corresponding module button
             val module = advancedMenu?.module ?: return
-            panels.find { it.category == module.category }?.moduleButtons?.find { it.module == module }?.updateElements()
+            panels.find { it.category == module.category }?.moduleButtons?.find { it.module == module }
+                ?.updateElements()
             return
         }
 
         /** Checking all panels for click action.
-          * Reversed order is used to guarantee that the panel rendered on top will be handled first. */
+         * Reversed order is used to guarantee that the panel rendered on top will be handled first. */
         for (panel in panels.reversed()) {
             if (panel.mouseClicked(scaledMouseX, scaledMouseY, mouseButton)) return
         }
@@ -247,7 +251,7 @@ class ClickGUI : GuiScreen() {
             if (keyCode == Keyboard.KEY_ESCAPE && !advancedMenu!!.isListening()) {
                 advancedMenu = null
             }
-            advancedMenu?.keyTyped(typedChar,keyCode)
+            advancedMenu?.keyTyped(typedChar, keyCode)
             return
         }
 
@@ -334,9 +338,10 @@ class ClickGUI : GuiScreen() {
     fun getScaledMouseX(): Int {
         return MathHelper.ceiling_double_int(Mouse.getX() / CLICK_GUI_SCALE)
     }
+
     fun getScaledMouseY(): Int {
         // maybe -1 or floor required here because of the inversion.
-        return MathHelper.ceiling_double_int( (mc.displayHeight - Mouse.getY()) / CLICK_GUI_SCALE)
+        return MathHelper.ceiling_double_int((mc.displayHeight - Mouse.getY()) / CLICK_GUI_SCALE)
     }
 
     companion object {

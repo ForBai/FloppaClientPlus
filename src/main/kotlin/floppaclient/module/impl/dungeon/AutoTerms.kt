@@ -39,14 +39,24 @@ object AutoTerms : Module(
     "Auto Terms",
     category = Category.DUNGEON,
     description = "Automatically solves floor 7 terminals."
-){
+) {
     private val sleep = NumberSetting("Sleep", 200.0, 0.0, 1000.0, 10.0, description = "Delay between clicks.")
-    private val safeMeoldy = BooleanSetting("Safe Melody", true, description = "Stops the melody terminal from freezing on row change. But removes the possibility to insta complete when the column stays the same.")
-    private val pingless = BooleanSetting("Pingless", false, description = "Preclicks terminals.")
+    private val safeMeoldy = BooleanSetting(
+        "Safe Melody",
+        true,
+        description = "Stops the melody terminal from freezing on row change. But removes the possibility to insta complete when the column stays the same."
+    )
+
+    //    private val pingless = BooleanSetting("Pingless", false, description = "Preclicks terminals.")
     private val fixTime = NumberSetting("Fix Time", 500.0, 50.0, 2000.0, 10.0, description = "")
-    private val middleClick = BooleanSetting("Middle Click", false, description = "Uses middle click in terminals.")
+
+    //    private val middleClick = BooleanSetting("Middle Click", false, description = "Uses middle click in terminals.")
     val showClicks = BooleanSetting("Show Clicks", true, description = "Highlights the slots that will be clicked.")
-    private val termInfo = BooleanSetting("Terminal Info", false, description = "Shows extra information about the current terminal. Meant for debugging.")
+    private val termInfo = BooleanSetting(
+        "Terminal Info",
+        false,
+        description = "Shows extra information about the current terminal. Meant for debugging."
+    )
 
     var clickQueue = arrayListOf<Slot>()
     var currentTerminal = TerminalType.NONE
@@ -65,9 +75,9 @@ object AutoTerms : Module(
         this.addSettings(
             sleep,
             safeMeoldy,
-            pingless,
+//            pingless,
             fixTime,
-            middleClick,
+//            middleClick,
             showClicks,
             termInfo
         )
@@ -120,16 +130,16 @@ object AutoTerms : Module(
 
     @SubscribeEvent
     fun onGuiDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
-        if ( !this.enabled || currentTerminal == TerminalType.NONE || event.gui !is GuiChest) return
+        if (!this.enabled || currentTerminal == TerminalType.NONE || event.gui !is GuiChest) return
         val container = (event.gui as GuiChest).inventorySlots
         if (container is ContainerChest) {
             if (clickQueue.isEmpty() || totalClicks - clickQueue.size > container.windowId - startWindowID + 2) {
                 resetClicks()
                 clickQueue.addAll(getClicks(container).also { totalClicks = it.size })
                 startWindowID = container.windowId
-            } else if (pingless.enabled) {
+            } /*else if (pingless.enabled) {
                 fixTerm(container)
-            } else {
+            }*/ else {
                 updateClickQueue(container)
             }
             if (clickQueue.isNotEmpty() || currentTerminal == TerminalType.TIMING) {
@@ -155,9 +165,9 @@ object AutoTerms : Module(
             val i: Int = event.slot.xDisplayPosition
             val j: Int = event.slot.yDisplayPosition
             val color = if (clickQueue.indexOf(event.slot) == 0)
-                Color(0,255,0,100)
+                Color(0, 255, 0, 100)
             else
-                Color(255,255,0,100)
+                Color(255, 255, 0, 100)
             Gui.drawRect(i, j, i + 16, j + 16, color.rgb)
         }
     }
@@ -173,9 +183,11 @@ object AutoTerms : Module(
                     .sortedBy { it.stack.stackSize })
                 if (clicks.size + min != 14) clicks.clear()
             }
+
             TerminalType.CORRECT_ALL -> {
                 clicks.addAll(chestSlots.filter { it.stack?.item == Item.getItemFromBlock(Blocks.stained_glass_pane) && it.stack?.itemDamage == 14 })
             }
+
             TerminalType.LETTER -> {
                 val chestName = container.lowerChestInventory.displayName.unformattedText
                 if (chestName.length > chestName.indexOf("'") + 1) {
@@ -189,6 +201,7 @@ object AutoTerms : Module(
                     })
                 }
             }
+
             TerminalType.COLOR -> {
                 val colorNeeded = EnumDyeColor.values().find {
                     container.lowerChestInventory.displayName.unformattedText.contains(
@@ -201,6 +214,7 @@ object AutoTerms : Module(
                     }
                 })
             }
+
             TerminalType.SAME_COLOR -> {
                 val panes = chestSlots.filter {
                     it.stack?.item == Item.getItemFromBlock(Blocks.stained_glass_pane) && colorOrder.contains(it.stack?.itemDamage)
@@ -219,6 +233,7 @@ object AutoTerms : Module(
                 }
                 clicks.addAll(extraClick)
             }
+
             else -> {}
         }
         return clicks
@@ -242,12 +257,15 @@ object AutoTerms : Module(
             TerminalType.NUMBERS, TerminalType.CORRECT_ALL -> {
                 clickQueue.removeIf { invSlots[it.slotNumber].stack?.itemDamage == 5 }
             }
+
             TerminalType.LETTER, TerminalType.COLOR -> {
                 clickQueue.removeIf { invSlots[it.slotNumber].stack?.isItemEnchanted == true }
             }
+
             TerminalType.SAME_COLOR -> clickQueue.removeIf {
                 invSlots[it.slotNumber].stack?.itemDamage == colorOrder.getOrElse(closestColorIndex) { 0 }
             }
+
             else -> {}
         }
     }
@@ -262,20 +280,21 @@ object AutoTerms : Module(
             if (clickQueue.contains(slot)) continue
             if (slotClickTime.getOrDefault(slot, 0L) + fixTime.value > System.currentTimeMillis()) {
                 slotIterator.remove()
-            }else resetClicks = true
+            } else resetClicks = true
         }
-        if (resetClicks){
+        if (resetClicks) {
             clickQueue.clear()
             clickQueue.addAll(getClicks(container).also { totalClicks = it.size })
         }
     }
 
     private fun handleClick(container: ContainerChest) {
-        if (System.currentTimeMillis() - lastClickTime > sleep.value ) {
+        if (System.currentTimeMillis() - lastClickTime > sleep.value) {
             when (currentTerminal) {
                 TerminalType.NUMBERS, TerminalType.CORRECT_ALL, TerminalType.LETTER, TerminalType.COLOR -> {
-                    clickSlot(clickQueue[0], if (middleClick.enabled) 2 else 0)
+                    clickSlot(clickQueue[0], /*if (middleClick.enabled) 2 else */0)
                 }
+
                 TerminalType.TIMING -> {
                     if (safeMeoldy.enabled && System.currentTimeMillis() - lastClickTime < 500) return
                     val panes = container.inventorySlots.filter { it.inventory != mc.thePlayer.inventory }
@@ -290,24 +309,26 @@ object AutoTerms : Module(
                         mc.playerController.windowClick(
                             mc.thePlayer.openContainer.windowId,
                             row * 9 + 7,
-                            if (middleClick.enabled) 2 else 0,
-                            if (middleClick.enabled) 3 else 0,
+                            /*if (middleClick.enabled) 2 else */0,
+                            /*if (middleClick.enabled) 3 else*/ 0,
                             mc.thePlayer
                         )
                         lastClickTime = System.currentTimeMillis()
                         lastRowClicked = row
                     }
                 }
+
                 TerminalType.SAME_COLOR -> {
                     val slot = container.inventorySlots[clickQueue[0].slotNumber]
                     if (slot.stack?.item != Item.getItemFromBlock(Blocks.stained_glass_pane)) return
                     val paneIndex = colorOrder.indexOf(slot.stack.itemDamage)
                     if (paneIndex == -1) return
                     val button = if ((closestColorIndex - paneIndex + 5) % 5 < 3) {
-                        if (middleClick.enabled) 2 else 0
+                        /*if (middleClick.enabled) 2 else*/ 0
                     } else 1
                     clickSlot(clickQueue[0], button)
                 }
+
                 else -> {}
             }
         }
@@ -319,15 +340,15 @@ object AutoTerms : Module(
         else startWindowID + windowClicks
         if (windowID > 100) windowID -= 100
         lastClickTime = System.currentTimeMillis()
-        val mode = if (clickType  == 2) 3 else 0
+//        val mode = if (clickType  == 2) 3 else 0
         mc.playerController.windowClick(
-            windowID, slotNumber, clickType, mode, mc.thePlayer
+            windowID, slotNumber, 0, 0, mc.thePlayer
         )
-        if (pingless.enabled) {
+        /*if (pingless.enabled) {
             windowClicks++
             clickQueue.removeAt(0)
             slotClickTime[slot] = System.currentTimeMillis()
-        }
+        }*/
     }
 
     enum class TerminalType {

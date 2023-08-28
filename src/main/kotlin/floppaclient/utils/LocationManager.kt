@@ -47,8 +47,8 @@ object LocationManager {
             tickRamp = 0
         }
         val newRegion = getArea()
-        if (currentRegionPair?.first?.data?.name != newRegion){
-            currentRegionPair = newRegion?.let { Pair( RoomUtils.instanceRegionRoom(it) , 0) }
+        if (currentRegionPair?.first?.data?.name != newRegion) {
+            currentRegionPair = newRegion?.let { Pair(RoomUtils.instanceRegionRoom(it), 0) }
         }
     }
 
@@ -96,7 +96,7 @@ object LocationManager {
                 area = areaText.substringAfter("Area: ")
                 if (!area.contains("Private Island")) break
             }
-            if (areaText.contains("Owner:")){
+            if (areaText.contains("Owner:")) {
                 extraInfo = areaText.substringAfter("Owner:")
             }
 

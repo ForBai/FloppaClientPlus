@@ -14,9 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin({EntityLivingBase.class})
 public abstract class MixinEntityLivingBase extends MixinEntity {
 
-    @Shadow public abstract boolean isPotionActive(Potion potionIn);
+    @Shadow
+    public abstract boolean isPotionActive(Potion potionIn);
 
-    @Shadow public abstract PotionEffect getActivePotionEffect(Potion potionIn);
+    @Shadow
+    public abstract PotionEffect getActivePotionEffect(Potion potionIn);
 
     @Inject(method = {"getArmSwingAnimationEnd()I"}, at = @At("HEAD"), cancellable = true)
     public void adjustSwingLength(CallbackInfoReturnable<Integer> cir) {
@@ -26,6 +28,6 @@ public abstract class MixinEntityLivingBase extends MixinEntity {
                 (this.isPotionActive(Potion.digSlowdown) ?
                         6 + (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 :
                         6);
-        cir.setReturnValue(Math.max((int)(length* Math.exp(-ItemAnimations.INSTANCE.getSpeed().getValue())), 1));
+        cir.setReturnValue(Math.max((int) (length * Math.exp(-ItemAnimations.INSTANCE.getSpeed().getValue())), 1));
     }
 }

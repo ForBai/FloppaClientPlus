@@ -16,7 +16,7 @@ abstract public class RenderGlobalMixin implements IWorldAccess, IResourceManage
     public Entity tweakViewEntity(Minecraft instance) {
         if (FreeCam.INSTANCE.shouldTweakViewEntity()) {
             return FreeCam.INSTANCE.tweakRenderViewEntityHook();
-        }else {
+        } else {
             return instance.getRenderViewEntity();
         }
     }

@@ -22,10 +22,17 @@ object MelodyMessage : Module(
     "Melody Message",
     category = Category.DUNGEON,
     description = "Automatically sends a message in chat when you open the melody terminal."
-){
+) {
 
     private val message = StringSetting("Message", "Melody on me!", 40, description = "The message that will be sent.")
-    private var cooldown = NumberSetting("Cooldwon Ticks", 30.0, 10.0, 200.0, 10.0, description = "Increase this if the message gets spammed, should not be needed.")
+    private var cooldown = NumberSetting(
+        "Cooldwon Ticks",
+        30.0,
+        10.0,
+        200.0,
+        10.0,
+        description = "Increase this if the message gets spammed, should not be needed."
+    )
 
     /**
      * Used to create a cooldown for the melody open message.
@@ -42,7 +49,7 @@ object MelodyMessage : Module(
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onGuiOpen(event: GuiOpenEvent) {
-        if (event.gui !is GuiChest ||  !RunInformation.isInFloor(7) || !Dungeon.inBoss) return
+        if (event.gui !is GuiChest || !RunInformation.isInFloor(7) || !Dungeon.inBoss) return
         if (currentTerminal == AutoTerms.TerminalType.TIMING) {
             if (melodyTicks <= 0) {
                 sendChat("/pc ${message.text}")

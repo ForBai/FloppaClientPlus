@@ -2,6 +2,7 @@ package floppaclient.mixins;
 
 import floppaclient.events.PacketSentEvent;
 import floppaclient.events.ReceiveChatPacketEvent;
+import floppaclient.events.ReceivePacketEvent;
 import floppaclient.events.TeleportEventPre;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.NetworkManager;
@@ -13,7 +14,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import floppaclient.events.ReceivePacketEvent;
 
 @Mixin(value = {NetworkManager.class}, priority = 800)
 public class MixinNetworkManager {

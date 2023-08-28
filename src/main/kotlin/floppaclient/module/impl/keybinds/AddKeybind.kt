@@ -11,7 +11,7 @@ object AddKeybind : Module(
     category = Category.KEY_BIND,
     description = "Adds a new key bind you can customize.",
     toggled = true
-){
+) {
     override fun onEnable() {}
 
     override fun onDisable() {

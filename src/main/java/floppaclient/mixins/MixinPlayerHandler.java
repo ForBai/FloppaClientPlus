@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinPlayerHandler {
     @Inject(method = {"handleExplosion"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/Explosion;doExplosionB(Z)V", shift = At.Shift.AFTER), cancellable = true)
     private void handleExplosionMomentum(S27PacketExplosion packet, CallbackInfo ci) {
-        if(MinecraftForge.EVENT_BUS.post(new ExplosionHandledEvent(packet))) ci.cancel();
+        if (MinecraftForge.EVENT_BUS.post(new ExplosionHandledEvent(packet))) ci.cancel();
     }
 
     @Inject(method = "handleEntityVelocity", at = @At("HEAD"), cancellable = true)

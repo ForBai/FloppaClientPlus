@@ -33,12 +33,12 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         Gui.drawRect(width - 26, 2, width - 1, 11, colorValue)
 
         /** Render the tab indicating the drop-down */
-        Gui.drawRect(0,  13, width, 15, ColorUtil.tabColorBg)
+        Gui.drawRect(0, 13, width, 15, ColorUtil.tabColorBg)
         Gui.drawRect((width * 0.4).toInt(), 12, (width * 0.6).toInt(), 15, ColorUtil.tabColor)
 
         /** Render the extended */
         if (extended) {
-            Gui.drawRect(0, DEFAULT_HEIGHT,  width, height, ColorUtil.dropDownColor)
+            Gui.drawRect(0, DEFAULT_HEIGHT, width, height, ColorUtil.dropDownColor)
             var currentDrawY = DEFAULT_HEIGHT
             val increment = DEFAULT_HEIGHT
 
@@ -50,7 +50,8 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
                     GL11.glPushMatrix()
                     GlStateManager.color(255f, 255f, 255f, 255f)
                     FloppaClient.mc.textureManager.bindTexture(HUE_SCALE)
-                    Gui.drawModalRectWithCustomSizedTexture(0, currentDrawY,
+                    Gui.drawModalRectWithCustomSizedTexture(
+                        0, currentDrawY,
                         0f, 0f, width, 11, width.toFloat(), 11.toFloat()
                     )
                     GL11.glPopMatrix()
@@ -61,12 +62,21 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
                 FontUtil.drawString(dispVal, width - FontUtil.getStringWidth(dispVal), currentDrawY + 2)
 
                 val maxVal = currentColor.maxValue()
-                val percentage = setting.getNumber(currentColor)  / maxVal
+                val percentage = setting.getNumber(currentColor) / maxVal
                 Gui.drawRect(0, currentDrawY + 12, width, currentDrawY + 13, -0xefeff0)
-                Gui.drawRect(0, currentDrawY + 12, (percentage * width).toInt(), currentDrawY + 13, ColorUtil.sliderColor(isColorDragged))
+                Gui.drawRect(
+                    0,
+                    currentDrawY + 12,
+                    (percentage * width).toInt(),
+                    currentDrawY + 13,
+                    ColorUtil.sliderColor(isColorDragged)
+                )
                 if (percentage > 0 && percentage < 1) Gui.drawRect(
                     (percentage * width - 1).toInt(),
-                    (currentDrawY + 12), (percentage * width).toInt().coerceAtMost(width), currentDrawY + 13, ColorUtil.sliderKnobColor(isColorDragged)
+                    (currentDrawY + 12),
+                    (percentage * width).toInt().coerceAtMost(width),
+                    currentDrawY + 13,
+                    ColorUtil.sliderKnobColor(isColorDragged)
                 )
 
                 /** Calculate and set new value when dragging */
@@ -106,7 +116,7 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
                 }
                 ay += increment
             }
-        } else if( mouseButton == 1) {
+        } else if (mouseButton == 1) {
             if (isButtonHovered(mouseX, mouseY)) {
                 extended = !extended
                 return true
@@ -134,11 +144,11 @@ class ElementColor(parent: ModuleButton, setting: ColorSetting) :
         val increment = DEFAULT_HEIGHT
         for (currentColor in setting.colors()) {
             if (scaledMouseX >= xAbsolute && scaledMouseX <= xAbsolute + width && scaledMouseY >= yAbsolute + ay && scaledMouseY <= yAbsolute + ay + increment) {
-                if (keyCode == Keyboard.KEY_RIGHT){
-                    setting.setNumber(currentColor, setting.getNumber(currentColor)+currentColor.maxValue()/255.0)
+                if (keyCode == Keyboard.KEY_RIGHT) {
+                    setting.setNumber(currentColor, setting.getNumber(currentColor) + currentColor.maxValue() / 255.0)
                 }
-                if (keyCode == Keyboard.KEY_LEFT){
-                    setting.setNumber(currentColor, setting.getNumber(currentColor)-currentColor.maxValue()/255.0)
+                if (keyCode == Keyboard.KEY_LEFT) {
+                    setting.setNumber(currentColor, setting.getNumber(currentColor) - currentColor.maxValue() / 255.0)
                 }
                 return true
             }

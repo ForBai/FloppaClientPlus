@@ -16,10 +16,20 @@ object QOL : Module(
     category = Category.MISC,
     description = "Collection of general qol features."
 ) {
-    private val noBlind = BooleanSetting("No Blindness", true, description = "Prevents the blindness effect from influencing your vision.")
-    private val noBurn = BooleanSetting("No Fire Overlay", true, description = "Hides the burning overlay in first person.")
-    private val noPushOut = BooleanSetting("No Push Out Block", true, description = "Prevents you from being pushed out of blocks.")
-    private val noHeadInBlock = BooleanSetting("Cancel in Block", true, description = "Removes the in Block Overlay and prevents the perspective from resetting when in a block.")
+    private val noBlind = BooleanSetting(
+        "No Blindness",
+        true,
+        description = "Prevents the blindness effect from influencing your vision."
+    )
+    private val noBurn =
+        BooleanSetting("No Fire Overlay", true, description = "Hides the burning overlay in first person.")
+    private val noPushOut =
+        BooleanSetting("No Push Out Block", true, description = "Prevents you from being pushed out of blocks.")
+    private val noHeadInBlock = BooleanSetting(
+        "Cancel in Block",
+        true,
+        description = "Removes the in Block Overlay and prevents the perspective from resetting when in a block."
+    )
     private val noCarpet = BooleanSetting("No Carpet", true, description = "Removes carpet hitboxes.")
 
     init {
@@ -31,6 +41,7 @@ object QOL : Module(
             noCarpet
         )
     }
+
     // Also look in BarPhase
     const val minCoord = 0.446f
     const val maxCoord = 0.5455f
@@ -72,7 +83,7 @@ object QOL : Module(
     /**
      * Referenced by the PaneMixin to determine whether the collision box should be shrunk.
      */
-    fun modifyPane(): Boolean{
+    fun modifyPane(): Boolean {
         return BarPhase.enabled
     }
 }

@@ -10,12 +10,12 @@ import floppaclient.module.settings.Visibility
  * Represented by a toggle button in the GUI.
  * @author Aton
  */
-class BooleanSetting (
+class BooleanSetting(
     name: String,
     override val default: Boolean = false,
     visibility: Visibility = Visibility.VISIBLE,
     description: String? = null,
-): Setting<Boolean>(name, visibility, description) {
+) : Setting<Boolean>(name, visibility, description) {
 
     override var value: Boolean = default
         set(value) {

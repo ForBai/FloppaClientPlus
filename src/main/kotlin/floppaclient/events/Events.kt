@@ -48,10 +48,10 @@ class DrawContainerEvent(val mouseX: Int, val mouseY: Int) : Event()
 class DrawContainerLastEvent(val mouseX: Int, val mouseY: Int) : Event()
 
 @Cancelable
-class ContainerMouseClickedEvent(val mouseX: Int, val mouseY: Int, val mouseButton: Int): Event()
+class ContainerMouseClickedEvent(val mouseX: Int, val mouseY: Int, val mouseButton: Int) : Event()
 
 @Cancelable
-class ContainerKeyTypedEvent(val keyCode: Int): Event()
+class ContainerKeyTypedEvent(val keyCode: Int) : Event()
 
 @Cancelable
 class ReceivePacketEvent(val packet: Packet<*>) : Event()
@@ -72,6 +72,7 @@ class ReceiveChatPacketEvent(val packet: S02PacketChat) : Event()
  */
 @Cancelable
 class TeleportEventPre(val packet: S08PacketPlayerPosLook) : Event()
+
 // This event only gets fired after the vanilla action by the NetHandlerPlayClient ist performed, which does not happen when the
 // pacet is cancelled.
 class TeleportEventPost(val packet: S08PacketPlayerPosLook) : Event()

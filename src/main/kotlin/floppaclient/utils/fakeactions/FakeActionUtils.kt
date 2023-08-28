@@ -5,9 +5,9 @@ import floppaclient.mixins.packet.C02Accessor
 import floppaclient.module.impl.player.AutoEther
 import floppaclient.utils.ChatUtils
 import floppaclient.utils.GeometryUtils
-import floppaclient.utils.inventory.SkyblockItem
 import floppaclient.utils.Utils
 import floppaclient.utils.inventory.InventoryUtils
+import floppaclient.utils.inventory.SkyblockItem
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.Entity
@@ -120,14 +120,20 @@ object FakeActionUtils {
         )
 
         FakeActionManager.stageRightClickSlot(direction[1].toFloat(), direction[2].toFloat(), aotvSlot, true).apply {
-            if (fakeTp){
+            if (fakeTp) {
                 val newX = targetPos.x + 0.5
                 val newY = targetPos.y + 1.05
                 val newZ = targetPos.z + 0.5
                 this.extraActionFun = {
                     mc.thePlayer.setPosition(newX, newY, newZ)
                     Timer().schedule(10) {
-                        AutoEther.fakeTPResponse(newX, newY, newZ, direction[1].toFloat() % 360f, direction[2].toFloat() % 360f)
+                        AutoEther.fakeTPResponse(
+                            newX,
+                            newY,
+                            newZ,
+                            direction[1].toFloat() % 360f,
+                            direction[2].toFloat() % 360f
+                        )
                     }
                 }
             }
@@ -224,14 +230,20 @@ object FakeActionUtils {
             FakeActionManager.stageRightClickSlot(direction[1].toFloat(), direction[2].toFloat(), aotvSlot, true)
         }
         fakeAction.apply {
-            if (fakeTp){
+            if (fakeTp) {
                 val newX = targetPos.x + 0.5
                 val newY = targetPos.y + 1.05
                 val newZ = targetPos.z + 0.5
                 this.extraActionFun = {
                     mc.thePlayer.setPosition(newX, newY, newZ)
                     Timer().schedule(10) {
-                        AutoEther.fakeTPResponse(newX, newY, newZ, direction[1].toFloat() % 360f, direction[2].toFloat() % 360f)
+                        AutoEther.fakeTPResponse(
+                            newX,
+                            newY,
+                            newZ,
+                            direction[1].toFloat() % 360f,
+                            direction[2].toFloat() % 360f
+                        )
                     }
                 }
             }
@@ -268,14 +280,20 @@ object FakeActionUtils {
         else
             FakeActionManager.stageRightClickSlot(direction[1].toFloat(), direction[2].toFloat(), aotvSlot, true)
         fakeAction.apply {
-            if (fakeTp){
+            if (fakeTp) {
                 val newX = targetPos.x + 0.5
                 val newY = targetPos.y + 1.05
                 val newZ = targetPos.z + 0.5
                 this.extraActionFun = {
                     mc.thePlayer.setPosition(newX, newY, newZ)
                     Timer().schedule(10) {
-                        AutoEther.fakeTPResponse(newX, newY, newZ, direction[1].toFloat() % 360f, direction[2].toFloat() % 360f)
+                        AutoEther.fakeTPResponse(
+                            newX,
+                            newY,
+                            newZ,
+                            direction[1].toFloat() % 360f,
+                            direction[2].toFloat() % 360f
+                        )
                     }
                 }
             }
@@ -329,7 +347,14 @@ object FakeActionUtils {
      * @param abortIfNotFound Will abort the click attempt if the specified item can not be found in the inventory. Will return false.
      * @return true when the block is clicked, and false when it is out of range and the click is aborted.
      */
-    fun clickBlockWithItem(blockPos: BlockPos, slot: Int? = null, name: String = "", range: Double = 10.0, fromInv: Boolean = false, abortIfNotFound: Boolean = false): Boolean {
+    fun clickBlockWithItem(
+        blockPos: BlockPos,
+        slot: Int? = null,
+        name: String = "",
+        range: Double = 10.0,
+        fromInv: Boolean = false,
+        abortIfNotFound: Boolean = false
+    ): Boolean {
         val previous = mc.thePlayer.inventory.currentItem
         val itemSlot = when (name) {
             "" -> slot
@@ -350,8 +375,7 @@ object FakeActionUtils {
             mc.thePlayer.inventory.currentItem = itemSlot
             clickBlock(blockPos, range)
             mc.thePlayer.inventory.currentItem = previous
-        }
-        else if (itemSlot < 36 && fromInv){
+        } else if (itemSlot < 36 && fromInv) {
             val inventory = GuiInventory(mc.thePlayer)
             // return if on horse.
             if (mc.playerController.isRidingHorse) return false
@@ -361,9 +385,21 @@ object FakeActionUtils {
                 if (mc.thePlayer.inventory.itemStack == null) {
                     val swapSlot = (inventory as GuiContainer).inventorySlots.inventorySlots[itemSlot] as Slot
                     val slotId = swapSlot.slotNumber
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, slotId, mc.thePlayer.inventory.currentItem, 2, mc.thePlayer)
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        slotId,
+                        mc.thePlayer.inventory.currentItem,
+                        2,
+                        mc.thePlayer
+                    )
                     clickBlock(blockPos, range)
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, slotId, mc.thePlayer.inventory.currentItem, 2, mc.thePlayer)
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        slotId,
+                        mc.thePlayer.inventory.currentItem,
+                        2,
+                        mc.thePlayer
+                    )
                 }
 
             }
@@ -395,7 +431,7 @@ object FakeActionUtils {
     /**
      * Swaps to and uses the specified [itemSlot].
      */
-    fun useItem(itemSlot: Int, swapBack: Boolean = true, fromInv: Boolean = false): Boolean{
+    fun useItem(itemSlot: Int, swapBack: Boolean = true, fromInv: Boolean = false): Boolean {
         if (itemSlot < 9) {
             val previous = mc.thePlayer.inventory.currentItem
 
@@ -412,8 +448,7 @@ object FakeActionUtils {
                 mc.thePlayer.inventory.currentItem = previous
                 mc.thePlayer.sendQueue.addToSendQueue(C09PacketHeldItemChange(previous))
             }
-        }
-        else if (itemSlot < 36 && fromInv) {
+        } else if (itemSlot < 36 && fromInv) {
             // return if on horse.
             if (mc.playerController.isRidingHorse) return false
 
@@ -422,9 +457,21 @@ object FakeActionUtils {
                 if (mc.thePlayer.inventory.itemStack == null) {
                     val slot = (inventory as GuiContainer).inventorySlots.inventorySlots[itemSlot] as Slot
                     val slotId = slot.slotNumber
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, slotId, mc.thePlayer.inventory.currentItem, 2, mc.thePlayer)
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        slotId,
+                        mc.thePlayer.inventory.currentItem,
+                        2,
+                        mc.thePlayer
+                    )
                     mc.thePlayer.sendQueue.addToSendQueue(C08PacketPlayerBlockPlacement(mc.thePlayer.heldItem))
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, slotId, mc.thePlayer.inventory.currentItem, 2, mc.thePlayer)
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        slotId,
+                        mc.thePlayer.inventory.currentItem,
+                        2,
+                        mc.thePlayer
+                    )
                 }
             }
             FakeInventoryActionManager.addAction(useItemFromInv)
@@ -446,7 +493,12 @@ object FakeActionUtils {
      * Attempts to swap to and use the item with the specified [name].
      * Returns true if successful.
      */
-    fun useItem(name: String, swapBack: Boolean = true, fromInv: Boolean = false, ignoreCase: Boolean = false): Boolean {
+    fun useItem(
+        name: String,
+        swapBack: Boolean = true,
+        fromInv: Boolean = false,
+        ignoreCase: Boolean = false
+    ): Boolean {
         val itemSlot = InventoryUtils.findItem(name, ignoreCase, fromInv) ?: return false
         this.useItem(itemSlot, swapBack, fromInv)
         return true
@@ -481,7 +533,7 @@ object FakeActionUtils {
      * @param targetSlot the slot in your hotbar that the item should be swapped to. Hsa to be in between 0 and 8.
      * @return true if the swap was successful, false otherwise.
      */
-    fun swapItemToSlot(sourceSlot: Int, targetSlot: Int) : Boolean{
+    fun swapItemToSlot(sourceSlot: Int, targetSlot: Int): Boolean {
         val source = if (sourceSlot < 9) sourceSlot + 36 else sourceSlot
         if (source in 0..36 && targetSlot in 0..8) {
             // return if on horse.
@@ -492,7 +544,13 @@ object FakeActionUtils {
                 if (mc.thePlayer.inventory.itemStack == null) {
                     val slot = (inventory as GuiContainer).inventorySlots.inventorySlots[source] as Slot
                     val slotId = slot.slotNumber
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, slotId, targetSlot, 2, mc.thePlayer)
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        slotId,
+                        targetSlot,
+                        2,
+                        mc.thePlayer
+                    )
                 }
             }
             FakeInventoryActionManager.addAction(swapSlots)
@@ -512,7 +570,7 @@ object FakeActionUtils {
      * @param matchMode Specify what to check for finding the item. 0: display name and item id. 1: only display name. 2: only itemID.
      * @return true if the swap was successful, false otherwise.
      */
-    fun swapItemToSlot(regex: Regex, target: Int, matchMode : Int = 0) : Boolean {
+    fun swapItemToSlot(regex: Regex, target: Int, matchMode: Int = 0): Boolean {
         val itemSlot = InventoryUtils.findItem(regex, true, matchMode) ?: return false
         return swapItemToSlot(itemSlot, target)
     }
@@ -526,7 +584,7 @@ object FakeActionUtils {
      * If it is 1 the helmet will not be swapped.
      * @return The armor slot that swapped or null if nothing was done. 0 is Helmet, 1 is Chest plate, 2 is Leggings, 3 is Boots.
      */
-    fun swapArmorItem(itemName: String, blockedSlots:Int = 0b0000, ignoreCase: Boolean = true): Int?{
+    fun swapArmorItem(itemName: String, blockedSlots: Int = 0b0000, ignoreCase: Boolean = true): Int? {
 
         if (mc.playerController.isRidingHorse) {
             // return if on horse.
@@ -555,7 +613,7 @@ object FakeActionUtils {
 
             // Crafting slots seem to be 0...4, armor 5..8, and the main inventory 9..44 starting top left when
             // it come to slot indices
-            val armorIndex = if (item is ItemArmor){
+            val armorIndex = if (item is ItemArmor) {
                 item.armorType
             } else if (item is ItemSkull) {
                 0
@@ -568,13 +626,37 @@ object FakeActionUtils {
             if (blockedSlots and swapNum > 0) return@swapSlots null
 
             val doArmorSwap: (GuiInventory) -> Unit = {
-                if(fromHotbar) {
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, 5 + armorIndex, itemSlot, 2, mc.thePlayer)
-                }else {
+                if (fromHotbar) {
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        5 + armorIndex,
+                        itemSlot,
+                        2,
+                        mc.thePlayer
+                    )
+                } else {
                     // swap the item through the hot bar. That way we don't have to deal with mouse release and other stuff possibly breaking it.
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, slotId, 0, 2, mc.thePlayer)
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, 5 + armorIndex, 0, 2, mc.thePlayer)
-                    mc.playerController.windowClick((inventory as GuiContainer).inventorySlots.windowId, slotId, 0, 2, mc.thePlayer)
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        slotId,
+                        0,
+                        2,
+                        mc.thePlayer
+                    )
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        5 + armorIndex,
+                        0,
+                        2,
+                        mc.thePlayer
+                    )
+                    mc.playerController.windowClick(
+                        (inventory as GuiContainer).inventorySlots.windowId,
+                        slotId,
+                        0,
+                        2,
+                        mc.thePlayer
+                    )
                 }
             }
             FakeInventoryActionManager.addAction(doArmorSwap)

@@ -5,7 +5,7 @@ import floppaclient.utils.ClipTools
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 
-class HClipCommand : CommandBase()  {
+class HClipCommand : CommandBase() {
     override fun getCommandName(): String {
         return "hclip"
     }
@@ -25,10 +25,11 @@ class HClipCommand : CommandBase()  {
             ChatUtils.modMessage("§cArguments error.")
             return
         }
-        when(values.size) {
+        when (values.size) {
             1 -> {
                 ClipTools.hClip(values[0])
             }
+
             2 -> {
                 ClipTools.hClip(values[0], yOffs = values[1])
             }

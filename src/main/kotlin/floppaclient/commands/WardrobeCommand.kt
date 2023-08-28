@@ -43,10 +43,13 @@ object WardrobeCommand : CommandBase() {
         if (thread == null || !thread!!.isAlive) {
             thread = Thread({
                 for (i in 0..100) {
-                    if (mc.thePlayer.openContainer is ContainerChest && mc.thePlayer.openContainer?.inventorySlots?.get(0)?.inventory?.name?.startsWith("Wardrobe") == true) {
+                    if (mc.thePlayer.openContainer is ContainerChest && mc.thePlayer.openContainer?.inventorySlots?.get(
+                            0
+                        )?.inventory?.name?.startsWith("Wardrobe") == true
+                    ) {
                         mc.playerController.windowClick(
                             mc.thePlayer.openContainer.windowId,
-                            35+slot,
+                            35 + slot,
                             0,
                             0,
                             mc.thePlayer

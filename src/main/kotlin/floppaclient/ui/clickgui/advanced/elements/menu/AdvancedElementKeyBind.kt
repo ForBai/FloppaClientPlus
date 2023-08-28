@@ -77,6 +77,6 @@ class AdvancedElementKeyBind(parent: AdvancedMenu, module: Module) :
      * Checks whether this element is hovered
      */
     private fun isCheckHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y  && mouseY <= parent.y + y + settingHeight
+        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y && mouseY <= parent.y + y + settingHeight
     }
 }

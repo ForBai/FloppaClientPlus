@@ -1,7 +1,6 @@
 package floppaclient.utils.render
 
 import floppaclient.FloppaClient.Companion.mc
-import org.lwjgl.opengl.GL11
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.WorldRenderer
@@ -9,6 +8,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 /**
@@ -44,7 +44,17 @@ object WorldRenderUtils {
      * @param phase Determines whether the box should be visible through walls (disables the depth test).
      */
     fun drawLine(start: Vec3, finish: Vec3, color: Color, thickness: Float = 3f, phase: Boolean = true) {
-        drawLine(start.xCoord, start.yCoord, start.zCoord, finish.xCoord, finish.yCoord, finish.zCoord, color, thickness, phase)
+        drawLine(
+            start.xCoord,
+            start.yCoord,
+            start.zCoord,
+            finish.xCoord,
+            finish.yCoord,
+            finish.zCoord,
+            color,
+            thickness,
+            phase
+        )
     }
 
     /**
@@ -52,7 +62,17 @@ object WorldRenderUtils {
      *
      * @param phase Determines whether the box should be visible through walls (disables the depth test).
      */
-    fun drawLine (x: Double, y: Double, z: Double, x2: Double, y2: Double, z2:Double, color: Color, thickness: Float = 3f, phase: Boolean = true) {
+    fun drawLine(
+        x: Double,
+        y: Double,
+        z: Double,
+        x2: Double,
+        y2: Double,
+        z2: Double,
+        color: Color,
+        thickness: Float = 3f,
+        phase: Boolean = true
+    ) {
         GlStateManager.disableLighting()
         GL11.glBlendFunc(770, 771)
         GlStateManager.enableBlend()
@@ -63,8 +83,10 @@ object WorldRenderUtils {
 
         GlStateManager.translate(-renderManager.viewerPosX, -renderManager.viewerPosY, -renderManager.viewerPosZ)
         worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        GlStateManager.color(color.red.toFloat() / 255f, color.green.toFloat() / 255f,
-            color.blue.toFloat() / 255f, 1f)
+        GlStateManager.color(
+            color.red.toFloat() / 255f, color.green.toFloat() / 255f,
+            color.blue.toFloat() / 255f, 1f
+        )
 
         worldRenderer.pos(x, y, z).endVertex()
         worldRenderer.pos(x2, y2, z2).endVertex()
@@ -84,7 +106,7 @@ object WorldRenderUtils {
      *
      * @param relocate Translates the coordinates to account for the camera position. See [WorldRenderUtils] for more information.
      */
-    fun drawBoxAtBlock (blockPos: BlockPos, color: Color, thickness: Float = 3f, relocate: Boolean = true) {
+    fun drawBoxAtBlock(blockPos: BlockPos, color: Color, thickness: Float = 3f, relocate: Boolean = true) {
         drawBoxAtBlock(blockPos.x.toDouble(), blockPos.y.toDouble(), blockPos.z.toDouble(), color, thickness, relocate)
     }
 
@@ -95,7 +117,7 @@ object WorldRenderUtils {
      *
      * @param relocate Translates the coordinates to account for the camera position. See [WorldRenderUtils] for more information.
      */
-    fun drawBoxAtBlock (x: Double, y: Double, z: Double, color: Color, thickness: Float = 3f, relocate: Boolean = true) {
+    fun drawBoxAtBlock(x: Double, y: Double, z: Double, color: Color, thickness: Float = 3f, relocate: Boolean = true) {
         drawCustomSizedBoxAt(x, y, z, 1.0, color, thickness, true, relocate)
     }
 
@@ -109,11 +131,23 @@ object WorldRenderUtils {
      * @param phase Determines whether the box should be visible through walls (disables the depth test).
      * @param partialTicks Used for predicting the [entity]'s position so that the box smoothly moves with the entity.
      */
-    fun drawBoxByEntity (entity: Entity, color: Color, width: Double, height: Double, partialTicks: Float = 0f,
-                         lineWidth: Double = 2.0, phase: Boolean = false,
-                         xOffset: Double = 0.0, yOffset: Double = 0.0, zOffset: Double = 0.0
+    fun drawBoxByEntity(
+        entity: Entity, color: Color, width: Double, height: Double, partialTicks: Float = 0f,
+        lineWidth: Double = 2.0, phase: Boolean = false,
+        xOffset: Double = 0.0, yOffset: Double = 0.0, zOffset: Double = 0.0
     ) {
-        drawBoxByEntity(entity, color, width.toFloat(), height.toFloat(), partialTicks, lineWidth.toFloat(),phase,xOffset, yOffset, zOffset)
+        drawBoxByEntity(
+            entity,
+            color,
+            width.toFloat(),
+            height.toFloat(),
+            partialTicks,
+            lineWidth.toFloat(),
+            phase,
+            xOffset,
+            yOffset,
+            zOffset
+        )
     }
 
     /**
@@ -126,13 +160,14 @@ object WorldRenderUtils {
      * @param phase Determines whether the box should be visible through walls (disables the depth test).
      * @param partialTicks Used for predicting the [entity]'s position so that the box smoothly moves with the entity.
      */
-    fun drawBoxByEntity (entity: Entity, color: Color, width: Float, height: Float, partialTicks: Float = 0f,
-                         lineWidth: Float = 2f, phase: Boolean = false,
-                         xOffset: Double = 0.0, yOffset: Double = 0.0, zOffset: Double = 0.0
-    ){
-        val x = entity.posX + ((entity.posX-entity.lastTickPosX)*partialTicks) + xOffset - width / 2.0
-        val y = entity.posY + ((entity.posY-entity.lastTickPosY)*partialTicks) + yOffset
-        val z = entity.posZ + ((entity.posZ-entity.lastTickPosZ)*partialTicks) + zOffset - width / 2.0
+    fun drawBoxByEntity(
+        entity: Entity, color: Color, width: Float, height: Float, partialTicks: Float = 0f,
+        lineWidth: Float = 2f, phase: Boolean = false,
+        xOffset: Double = 0.0, yOffset: Double = 0.0, zOffset: Double = 0.0
+    ) {
+        val x = entity.posX + ((entity.posX - entity.lastTickPosX) * partialTicks) + xOffset - width / 2.0
+        val y = entity.posY + ((entity.posY - entity.lastTickPosY) * partialTicks) + yOffset
+        val z = entity.posZ + ((entity.posZ - entity.lastTickPosZ) * partialTicks) + zOffset - width / 2.0
 
         drawCustomSizedBoxAt(x, y, z, width.toDouble(), height.toDouble(), width.toDouble(), color, lineWidth, phase)
     }
@@ -143,7 +178,16 @@ object WorldRenderUtils {
      * @param phase Determines whether the box should be visible through walls (disables the depth test).
      * @param relocate Translates the coordinates to account for the camera position. See [WorldRenderUtils] for more information.
      */
-    fun drawCustomSizedBoxAt(x: Double, y: Double, z: Double, size: Double, color: Color, thickness: Float = 3f, phase: Boolean = true, relocate: Boolean = true) {
+    fun drawCustomSizedBoxAt(
+        x: Double,
+        y: Double,
+        z: Double,
+        size: Double,
+        color: Color,
+        thickness: Float = 3f,
+        phase: Boolean = true,
+        relocate: Boolean = true
+    ) {
         drawCustomSizedBoxAt(x, y, z, size, size, size, color, thickness, phase, relocate)
     }
 
@@ -153,7 +197,18 @@ object WorldRenderUtils {
      * @param phase Determines whether the box should be visible through walls (disables the depth test).
      * @param relocate Translates the coordinates to account for the camera position. See [WorldRenderUtils] for more information.
      */
-    fun drawCustomSizedBoxAt(x: Double, y: Double, z: Double, xWidth: Double, yHeight: Double, zWidth: Double, color: Color, thickness: Float = 3f, phase: Boolean = true, relocate: Boolean = true) {
+    fun drawCustomSizedBoxAt(
+        x: Double,
+        y: Double,
+        z: Double,
+        xWidth: Double,
+        yHeight: Double,
+        zWidth: Double,
+        color: Color,
+        thickness: Float = 3f,
+        phase: Boolean = true,
+        relocate: Boolean = true
+    ) {
         GlStateManager.disableLighting()
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
@@ -163,31 +218,37 @@ object WorldRenderUtils {
 
         GlStateManager.pushMatrix()
 
-        if (relocate) GlStateManager.translate(-renderManager.viewerPosX, -renderManager.viewerPosY, -renderManager.viewerPosZ)
+        if (relocate) GlStateManager.translate(
+            -renderManager.viewerPosX,
+            -renderManager.viewerPosY,
+            -renderManager.viewerPosZ
+        )
         worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        GlStateManager.color(color.red.toFloat() / 255f, color.green.toFloat() / 255f,
-            color.blue.toFloat() / 255f, 1f)
+        GlStateManager.color(
+            color.red.toFloat() / 255f, color.green.toFloat() / 255f,
+            color.blue.toFloat() / 255f, 1f
+        )
 
 
-        worldRenderer.pos(x+xWidth,y+yHeight,z+zWidth).endVertex()
-        worldRenderer.pos(x+xWidth,y+yHeight,z).endVertex()
-        worldRenderer.pos(x,y+yHeight,z).endVertex()
-        worldRenderer.pos(x,y+yHeight,z+zWidth).endVertex()
-        worldRenderer.pos(x+xWidth,y+yHeight,z+zWidth).endVertex()
-        worldRenderer.pos(x+xWidth,y,z+zWidth).endVertex()
-        worldRenderer.pos(x+xWidth,y,z).endVertex()
-        worldRenderer.pos(x,y,z).endVertex()
-        worldRenderer.pos(x,y,z+zWidth).endVertex()
-        worldRenderer.pos(x,y,z).endVertex()
-        worldRenderer.pos(x,y+yHeight,z).endVertex()
-        worldRenderer.pos(x,y,z).endVertex()
-        worldRenderer.pos(x+xWidth,y,z).endVertex()
-        worldRenderer.pos(x+xWidth,y+yHeight,z).endVertex()
-        worldRenderer.pos(x+xWidth,y,z).endVertex()
-        worldRenderer.pos(x+xWidth,y,z+zWidth).endVertex()
-        worldRenderer.pos(x,y,z+zWidth).endVertex()
-        worldRenderer.pos(x,y+yHeight,z+zWidth).endVertex()
-        worldRenderer.pos(x+xWidth,y+yHeight,z+zWidth).endVertex()
+        worldRenderer.pos(x + xWidth, y + yHeight, z + zWidth).endVertex()
+        worldRenderer.pos(x + xWidth, y + yHeight, z).endVertex()
+        worldRenderer.pos(x, y + yHeight, z).endVertex()
+        worldRenderer.pos(x, y + yHeight, z + zWidth).endVertex()
+        worldRenderer.pos(x + xWidth, y + yHeight, z + zWidth).endVertex()
+        worldRenderer.pos(x + xWidth, y, z + zWidth).endVertex()
+        worldRenderer.pos(x + xWidth, y, z).endVertex()
+        worldRenderer.pos(x, y, z).endVertex()
+        worldRenderer.pos(x, y, z + zWidth).endVertex()
+        worldRenderer.pos(x, y, z).endVertex()
+        worldRenderer.pos(x, y + yHeight, z).endVertex()
+        worldRenderer.pos(x, y, z).endVertex()
+        worldRenderer.pos(x + xWidth, y, z).endVertex()
+        worldRenderer.pos(x + xWidth, y + yHeight, z).endVertex()
+        worldRenderer.pos(x + xWidth, y, z).endVertex()
+        worldRenderer.pos(x + xWidth, y, z + zWidth).endVertex()
+        worldRenderer.pos(x, y, z + zWidth).endVertex()
+        worldRenderer.pos(x, y + yHeight, z + zWidth).endVertex()
+        worldRenderer.pos(x + xWidth, y + yHeight, z + zWidth).endVertex()
 
         tessellator.draw()
 

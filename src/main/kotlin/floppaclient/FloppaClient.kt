@@ -155,15 +155,16 @@ class FloppaClient {
         val extras = ExtrasConfig(File(mc.mcDataDir, "config/$CONFIG_DOMAIN/extras"))
         val moduleConfig = ModuleConfig(File(mc.mcDataDir, "config/$CONFIG_DOMAIN"))
 
-        val MODULES_PATH = File(mc.mcDataDir,"config/$CONFIG_DOMAIN/modules")
+        val MODULES_PATH = File(mc.mcDataDir, "config/$CONFIG_DOMAIN/modules")
 
         lateinit var clickGUI: ClickGUI
 
         //TODO remove these
         var currentRegionPair: Pair<Room, Int>? by LocationManager::currentRegionPair
-        var onHypixel: Boolean  by LocationManager::onHypixel
-        var inSkyblock: Boolean  by LocationManager::inSkyblock
-        var inDungeons: Boolean  by LocationManager::inDungeons
+        var onHypixel: Boolean by LocationManager::onHypixel
+        var inSkyblock: Boolean by LocationManager::inSkyblock
+        var inDungeons: Boolean by LocationManager::inDungeons
+
         /**
          * Keeps track of elapsed ticks, gets reset at 20
          */

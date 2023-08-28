@@ -18,8 +18,8 @@ class AdvancedElementAction(parent: AdvancedMenu, module: Module, setting: Actio
     /**
      * Render the element
      */
-    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int{
-        FontUtil.drawString(setting.name,  1,  2, -0x1)
+    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
+        FontUtil.drawString(setting.name, 1, 2, -0x1)
         return this.settingHeight
     }
 
@@ -39,6 +39,6 @@ class AdvancedElementAction(parent: AdvancedMenu, module: Module, setting: Actio
      * Checks whether this element is hovered
      */
     private fun isButtonHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y  && mouseY <= parent.y + y + settingHeight
+        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y && mouseY <= parent.y + y + settingHeight
     }
 }

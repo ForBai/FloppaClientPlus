@@ -20,8 +20,8 @@ import java.nio.file.StandardCopyOption
  */
 class ExtrasConfig(path: File) {
     private val gson = GsonBuilder()
-        .registerTypeAdapter(object : TypeToken<MutableSet<BlockPos>>(){}.type, SetBlockPosSerializer())
-        .registerTypeAdapter(object : TypeToken<MutableSet<BlockPos>>(){}.type, SetBlockPosDeserializer())
+        .registerTypeAdapter(object : TypeToken<MutableSet<BlockPos>>() {}.type, SetBlockPosSerializer())
+        .registerTypeAdapter(object : TypeToken<MutableSet<BlockPos>>() {}.type, SetBlockPosDeserializer())
         .setPrettyPrinting().create()
 
     private val configFile = File(path, "extrasConfig.json")

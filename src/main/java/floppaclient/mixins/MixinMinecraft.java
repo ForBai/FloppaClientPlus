@@ -58,7 +58,7 @@ public class MixinMinecraft {
     }
 
     @Inject(method = {"setIngameNotInFocus"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/util/MouseHelper;ungrabMouseCursor()V", shift = At.Shift.BEFORE), cancellable = true)
-    public void skipUngrab(CallbackInfo ci){
+    public void skipUngrab(CallbackInfo ci) {
         if (InvActions.INSTANCE.shouldSkipUngrabMouse()) {
             Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
             ci.cancel();

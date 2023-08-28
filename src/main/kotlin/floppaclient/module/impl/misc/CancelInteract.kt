@@ -5,8 +5,8 @@ import floppaclient.FloppaClient.Companion.mc
 import floppaclient.module.Category
 import floppaclient.module.Module
 import floppaclient.module.settings.impl.BooleanSetting
-import floppaclient.utils.inventory.ItemUtils.hasAbility
 import floppaclient.utils.inventory.InventoryUtils.isHolding
+import floppaclient.utils.inventory.ItemUtils.hasAbility
 import net.minecraft.block.Block
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.init.Blocks
@@ -26,9 +26,14 @@ object CancelInteract : Module(
             "Will always cancel interactions with pearls. \n" +
             "Will cancel interaction with blacklisted blocks. This can be limited to only take place when holding an " +
             "item with ability."
-){
-    private val onlyInDungen = BooleanSetting("Only In Dungeon", true, description = "Only enable this module in dungeons.")
-    private val onlyWithAbility = BooleanSetting("Only Ability", false, description = "Check whether the item has an ability before cancelling interactions.")
+) {
+    private val onlyInDungen =
+        BooleanSetting("Only In Dungeon", true, description = "Only enable this module in dungeons.")
+    private val onlyWithAbility = BooleanSetting(
+        "Only Ability",
+        false,
+        description = "Check whether the item has an ability before cancelling interactions."
+    )
 
     /**
      * Block which should always be interacted with.
@@ -80,7 +85,7 @@ object CancelInteract : Module(
         if (this.enabled && (inDungeons || !onlyInDungen.enabled)) {
             if (interactionWhielist.contains(instance.getBlockState(blockPos).block)) return false
             if (mc.thePlayer.isHolding("Ender Pearl")) return true
-            if (!onlyWithAbility.enabled || mc.thePlayer.heldItem.hasAbility )
+            if (!onlyWithAbility.enabled || mc.thePlayer.heldItem.hasAbility)
                 return interactionBlakclist.contains(instance.getBlockState(blockPos).block) || instance.isAirBlock(
                     blockPos
                 )

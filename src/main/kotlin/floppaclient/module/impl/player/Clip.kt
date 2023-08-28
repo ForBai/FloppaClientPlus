@@ -16,9 +16,20 @@ object Clip : Module(
     "3D Clip",
     category = Category.PLAYER,
     description = "Clips you with the specified settings."
-){
-    private val allow3DClip  = BooleanSetting("Use 3D Clip", true, description = "Toggles between purely horizontal and omnidirectional clip for the clip key bind.")
-    private val clipDistance = NumberSetting("Clip Distance",9.5, 0.0, 10.0,0.1, description = "Distance that the clip key bind will teleport you. Default 9.5.")
+) {
+    private val allow3DClip = BooleanSetting(
+        "Use 3D Clip",
+        true,
+        description = "Toggles between purely horizontal and omnidirectional clip for the clip key bind."
+    )
+    private val clipDistance = NumberSetting(
+        "Clip Distance",
+        9.5,
+        0.0,
+        10.0,
+        0.1,
+        description = "Distance that the clip key bind will teleport you. Default 9.5."
+    )
 
     init {
         this.addSettings(
@@ -31,7 +42,7 @@ object Clip : Module(
         if (this.enabled) {
             if (allow3DClip.enabled) {
                 dClip(clipDistance.value, yaw(), pitch())
-            }else {
+            } else {
                 dClip(clipDistance.value)
             }
         }

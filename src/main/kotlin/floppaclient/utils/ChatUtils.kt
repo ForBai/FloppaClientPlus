@@ -3,12 +3,12 @@ package floppaclient.utils
 import floppaclient.FloppaClient
 import floppaclient.FloppaClient.Companion.mc
 import floppaclient.module.impl.render.ClickGui
+import floppaclient.utils.ChatUtils.chatMessage
+import floppaclient.utils.ChatUtils.command
+import floppaclient.utils.ChatUtils.modMessage
+import floppaclient.utils.ChatUtils.sendChat
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.ChatStyle
-import net.minecraft.util.EnumChatFormatting
-import net.minecraft.util.IChatComponent
-import net.minecraft.util.StringUtils
+import net.minecraft.util.*
 import net.minecraftforge.client.ClientCommandHandler
 
 /**
@@ -26,28 +26,28 @@ import net.minecraftforge.client.ClientCommandHandler
  */
 @Suppress("unused")
 object ChatUtils {
-    val BLACK         = EnumChatFormatting.BLACK.toString()
-    val DARK_BLUE     = EnumChatFormatting.DARK_BLUE.toString()
-    val DARK_GREEN    = EnumChatFormatting.DARK_GREEN.toString()
-    val DARK_AQUA     = EnumChatFormatting.DARK_AQUA.toString()
-    val DARK_RED      = EnumChatFormatting.DARK_RED.toString()
-    val DARK_PURPLE   = EnumChatFormatting.DARK_PURPLE.toString()
-    val GOLD          = EnumChatFormatting.GOLD.toString()
-    val GRAY          = EnumChatFormatting.GRAY.toString()
-    val DARK_GRAY     = EnumChatFormatting.DARK_GRAY.toString()
-    val BLUE          = EnumChatFormatting.BLUE.toString()
-    val GREEN         = EnumChatFormatting.GREEN.toString()
-    val AQUA          = EnumChatFormatting.AQUA.toString()
-    val RED           = EnumChatFormatting.RED.toString()
-    val LIGHT_PURPLE  = EnumChatFormatting.LIGHT_PURPLE.toString()
-    val YELLOW        = EnumChatFormatting.YELLOW.toString()
-    val WHITE         = EnumChatFormatting.WHITE.toString()
-    val OBFUSCATED    = EnumChatFormatting.OBFUSCATED.toString()
-    val BOLD          = EnumChatFormatting.BOLD.toString()
+    val BLACK = EnumChatFormatting.BLACK.toString()
+    val DARK_BLUE = EnumChatFormatting.DARK_BLUE.toString()
+    val DARK_GREEN = EnumChatFormatting.DARK_GREEN.toString()
+    val DARK_AQUA = EnumChatFormatting.DARK_AQUA.toString()
+    val DARK_RED = EnumChatFormatting.DARK_RED.toString()
+    val DARK_PURPLE = EnumChatFormatting.DARK_PURPLE.toString()
+    val GOLD = EnumChatFormatting.GOLD.toString()
+    val GRAY = EnumChatFormatting.GRAY.toString()
+    val DARK_GRAY = EnumChatFormatting.DARK_GRAY.toString()
+    val BLUE = EnumChatFormatting.BLUE.toString()
+    val GREEN = EnumChatFormatting.GREEN.toString()
+    val AQUA = EnumChatFormatting.AQUA.toString()
+    val RED = EnumChatFormatting.RED.toString()
+    val LIGHT_PURPLE = EnumChatFormatting.LIGHT_PURPLE.toString()
+    val YELLOW = EnumChatFormatting.YELLOW.toString()
+    val WHITE = EnumChatFormatting.WHITE.toString()
+    val OBFUSCATED = EnumChatFormatting.OBFUSCATED.toString()
+    val BOLD = EnumChatFormatting.BOLD.toString()
     val STRIKETHROUGH = EnumChatFormatting.STRIKETHROUGH.toString()
-    val UNDERLINE     = EnumChatFormatting.UNDERLINE.toString()
-    val ITALIC        = EnumChatFormatting.ITALIC.toString()
-    val RESET         = EnumChatFormatting.RESET.toString()
+    val UNDERLINE = EnumChatFormatting.UNDERLINE.toString()
+    val ITALIC = EnumChatFormatting.ITALIC.toString()
+    val RESET = EnumChatFormatting.RESET.toString()
 
     /**
      * Pattern to replace formatting codes with & with the § equivalent.
@@ -93,7 +93,7 @@ object ChatUtils {
         ChatComponentText(
             when (ClickGui.prefixStyle.index) {
                 0 -> FloppaClient.CHAT_PREFIX; 1 -> FloppaClient.SHORT_PREFIX
-                else -> reformatString( ClickGui.customPrefix.text)
+                else -> reformatString(ClickGui.customPrefix.text)
             } + " "
         ).appendSibling(iChatComponent)
     )

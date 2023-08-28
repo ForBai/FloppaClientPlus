@@ -28,14 +28,14 @@ class Room(x: Int, z: Int, var data: RoomData) : Tile(x, z) {
         get() = if (DungeonMap.legitMode.enabled && this.state == RoomState.QUESTION_MARK && !visited)
             MapRooms.colorUnexplored.value
         else when (data.type) {
-            RoomType.UNKNOWN ->   MapRooms.colorUnexplored.value
-            RoomType.BLOOD ->     MapRooms.colorBlood.value
-            RoomType.CHAMPION ->  MapRooms.colorMiniboss.value
-            RoomType.ENTRANCE ->  MapRooms.colorEntrance.value
-            RoomType.FAIRY ->     MapRooms.colorFairy.value
-            RoomType.PUZZLE ->    MapRooms.colorPuzzle.value
-            RoomType.RARE ->      MapRooms.colorRare.value
-            RoomType.TRAP ->      MapRooms.colorTrap.value
+            RoomType.UNKNOWN -> MapRooms.colorUnexplored.value
+            RoomType.BLOOD -> MapRooms.colorBlood.value
+            RoomType.CHAMPION -> MapRooms.colorMiniboss.value
+            RoomType.ENTRANCE -> MapRooms.colorEntrance.value
+            RoomType.FAIRY -> MapRooms.colorFairy.value
+            RoomType.PUZZLE -> MapRooms.colorPuzzle.value
+            RoomType.RARE -> MapRooms.colorRare.value
+            RoomType.TRAP -> MapRooms.colorTrap.value
             else -> if (data.hasMimic) MapRooms.colorRoomMimic.value else MapRooms.colorRoom.value
         }
 }

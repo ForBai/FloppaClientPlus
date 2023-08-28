@@ -3,33 +3,33 @@ package floppaclient.module.impl.dungeon
 import floppaclient.FloppaClient.Companion.inDungeons
 import floppaclient.FloppaClient.Companion.mc
 import floppaclient.events.TeleportEventPre
-import floppaclient.utils.ClipTools
 import floppaclient.module.Category
 import floppaclient.module.Module
 import floppaclient.module.settings.impl.BooleanSetting
 import floppaclient.module.settings.impl.NumberSetting
 import floppaclient.module.settings.impl.StringSelectorSetting
 import floppaclient.utils.ChatUtils.modMessage
+import floppaclient.utils.ClipTools
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import java.util.Timer
+import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.floor
 
-object InstaCrystal : Module (
+object InstaCrystal : Module(
     "Insta Crystal",
     category = Category.DUNGEON,
     description = "Instantly clips to the selected crystal on f7 boss entry."
-){
+) {
     /**
      * Position on boss entry should be 73.5,221.0,14.5
      * Left crystal target block: 80,237,49
      * Right crystal target block: 66,237,49
      */
 
-    private val targetCrystal = StringSelectorSetting("Target","right", arrayListOf("right", "left"))
-    private val delay = NumberSetting("Delay",150.0, 0.0, 300.0,10.0)
+    private val targetCrystal = StringSelectorSetting("Target", "right", arrayListOf("right", "left"))
+    private val delay = NumberSetting("Delay", 150.0, 0.0, 300.0, 10.0)
     private val showInfo = BooleanSetting("Chat message", true)
 
     private var tpTicks = 0
@@ -70,7 +70,7 @@ object InstaCrystal : Module (
         ) {
             if (tpTicks <= 0) {
                 tpTicks = 10
-                Timer().schedule( delay.value.toLong()) {
+                Timer().schedule(delay.value.toLong()) {
                     crystalClip()
                 }
 
@@ -83,17 +83,17 @@ object InstaCrystal : Module (
      * Count down tp cooldown ticks
      */
     @SubscribeEvent
-    fun onTick(event: ClientTickEvent){
+    fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        if (tpTicks> 0) tpTicks--
+        if (tpTicks > 0) tpTicks--
     }
 
     private fun crystalClip() {
         if (showInfo.enabled) modMessage("Attempting clip to ${targetCrystal.selected} crystal")
         val route = if (targetCrystal.selected == "right") {
-            mutableListOf(64.5,241.0,49.0)
+            mutableListOf(64.5, 241.0, 49.0)
         } else {
-            mutableListOf(82.5,241.0,49.0)
+            mutableListOf(82.5, 241.0, 49.0)
         }
         val start = mc.thePlayer.positionVector.run {
             mutableListOf(this.xCoord, this.yCoord, this.zCoord)

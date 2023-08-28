@@ -20,16 +20,20 @@ import net.minecraft.client.renderer.GlStateManager
  */
 class ModuleButton(val module: Module, val panel: Panel) {
     val menuElements: ArrayList<Element<*>> = ArrayList()
+
     /** Relative position of this button in respect to [panel]. */
     var x = 0
+
     /** Relative position of this button in respect to [panel]. */
     var y = 0
     val width = panel.width
     val height = (mc.fontRendererObj.FONT_HEIGHT + 2)
     var extended = false
+
     /** Absolute position of the panel on the screen. */
     val xAbsolute: Int
         get() = x + panel.x
+
     /** Absolute position of the panel on the screen. */
     val yAbsolute: Int
         get() = y + panel.y
@@ -54,17 +58,17 @@ class ModuleButton(val module: Module, val panel: Panel) {
                 position++
                 if (menuElements.any { it.setting === setting }) return@addElement
                 val newElement = when (setting) {
-                    is BooleanSetting ->    ElementCheckBox(this, setting)
-                    is NumberSetting ->     ElementSlider(this, setting)
-                    is StringSelectorSetting ->   ElementStringSelector(this, setting)
-                    is SelectorSetting ->   ElementSelector(this, setting)
-                    is StringSetting ->     ElementTextField(this, setting)
-                    is ColorSetting ->      ElementColor(this, setting)
-                    is ActionSetting ->     ElementAction(this, setting)
+                    is BooleanSetting -> ElementCheckBox(this, setting)
+                    is NumberSetting -> ElementSlider(this, setting)
+                    is StringSelectorSetting -> ElementStringSelector(this, setting)
+                    is SelectorSetting -> ElementSelector(this, setting)
+                    is StringSetting -> ElementTextField(this, setting)
+                    is ColorSetting -> ElementColor(this, setting)
+                    is ActionSetting -> ElementAction(this, setting)
                     else -> return@addElement
                 }
                 menuElements.add(position, newElement)
-            }else {
+            } else {
                 menuElements.removeIf {
                     it.setting === setting
                 }
@@ -73,10 +77,10 @@ class ModuleButton(val module: Module, val panel: Panel) {
     }
 
     /**
-	 * Render the Button.
+     * Render the Button.
      * Dispatches rendering of its [menuElements].
-	 */
-    fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) : Int {
+     */
+    fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(x.toFloat(), y.toFloat(), 0f)
@@ -94,13 +98,13 @@ class ModuleButton(val module: Module, val panel: Panel) {
         /** Change color on hover */
         if (isButtonHovered(mouseX, mouseY)) {
             if (module.enabled)
-                Gui.drawRect(0, 0,  width, height + 1, 0x55111111)
+                Gui.drawRect(0, 0, width, height + 1, 0x55111111)
             else
-                Gui.drawRect(0, 0, width , height + 1, ColorUtil.hoverColor)
+                Gui.drawRect(0, 0, width, height + 1, ColorUtil.hoverColor)
         }
 
         /** Rendering the name in the middle */
-        val displayName = if (module is KeyBind){
+        val displayName = if (module is KeyBind) {
             module.bindName.text
         } else {
             module.name
@@ -124,10 +128,10 @@ class ModuleButton(val module: Module, val panel: Panel) {
     }
 
     /**
-	 * Handles mouse clicks for this element and dispatches them to its [menuElements].
+     * Handles mouse clicks for this element and dispatches them to its [menuElements].
      * @return true if an action was performed.
      * @see Element.mouseClicked
-	 */
+     */
     fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
         if (isButtonHovered(mouseX, mouseY)) {
             /** Toggle the mod on left click, expand its settings on right click and show an info screen on middle click */
@@ -150,7 +154,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
                 panel.clickgui.advancedMenu = AdvancedMenu(module)
                 return true
             }
-        }else if (isMouseUnderButton(mouseX, mouseY)) {
+        } else if (isMouseUnderButton(mouseX, mouseY)) {
             for (menuElement in menuElements.reversed()) {
                 if (menuElement.mouseClicked(mouseX, mouseY, mouseButton)) {
                     updateElements()

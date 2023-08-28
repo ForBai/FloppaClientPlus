@@ -17,13 +17,13 @@ object ExtraStats : Module(
     "Extra Stats",
     category = Category.DUNGEON,
     description = "Automatically clicks > EXTRA STATS < at the end of a run."
-){
+) {
     /**
      * Checks incoming chat messages for the extra stats message and if found runs the command.
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if ( !inDungeons || event.type.toInt() == 2) return
+        if (!inDungeons || event.type.toInt() == 2) return
         when (stripControlCodes(event.message.unformattedText)) {
             "                             > EXTRA STATS <" -> {
                 ChatUtils.command("showextrastats")

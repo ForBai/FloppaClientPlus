@@ -52,15 +52,21 @@ object AutoBlaze : Module(
     "Auto Blaze",
     category = Category.DUNGEON,
     description = "Automatically completes the blaze puzzle. Activated by left clicking withe either AOTV or terminator after walking far enough into the room."
-){
+) {
 
     private val fastSleep = NumberSetting("Sleep at 100 ats", 310.0, 200.0, 1000.0, 10.0)
     private val mediumSleep = NumberSetting("Sleep above 50 ats", 610.0, 200.0, 1000.0, 10.0)
     private val slowSleep = NumberSetting("Sleep below 50 ats", 810.0, 450.0, 1000.0, 10.0)
     private val offset = NumberSetting("y offset", 0.25, -1.0, 1.0, 0.01)
-    private val checkPosition = BooleanSetting("Check Pos", false, description = "Interrupts the process if you move out of the correct position.")
-    private val forceRotate = BooleanSetting("Pre rotate", false, description = "Rotates to the next blaze before doing the shot.")
-    private val realRotate = BooleanSetting("Real rotate", false, description = "Rotates to the next blaze before doing the shot.")
+    private val checkPosition = BooleanSetting(
+        "Check Pos",
+        false,
+        description = "Interrupts the process if you move out of the correct position."
+    )
+    private val forceRotate =
+        BooleanSetting("Pre rotate", false, description = "Rotates to the next blaze before doing the shot.")
+    private val realRotate =
+        BooleanSetting("Real rotate", false, description = "Rotates to the next blaze before doing the shot.")
 
     /**
      * Determines the order in which the blazes have to be sorted.
@@ -94,7 +100,7 @@ object AutoBlaze : Module(
     private val behindCornerBottom = Vec3(0.0, 75.0, -1.0)
     private val behindCornerTop = Vec3(-1.0, 110.0, -3.0)
 
-    init{
+    init {
         this.addSettings(
             fastSleep,
             mediumSleep,
@@ -152,7 +158,7 @@ object AutoBlaze : Module(
 
         val areBlazeObscured = kotlin.run {
             blazes.forEach {
-                if(!it.canEntityBeSeen(fakePlayer)) return@run true
+                if (!it.canEntityBeSeen(fakePlayer)) return@run true
             }
             return@run false
         }
@@ -200,14 +206,31 @@ object AutoBlaze : Module(
                 angle = 0
                 mutableListOf(-0.1, 0.0, -0.1, -0.1, 0.0, -0.1, -0.1, 0.0, -0.1, -0.1, 0.0, -0.1, -0.1, 0.0, -0.1)
             } else if (startPos2.contains(key)) {
-                 angle = 48
-                mutableListOf(-0.1, 0.0, -0.125, -0.05, 0.0, -0.125, 0.0, 0.0, -0.125, 0.0, 0.0, -0.125, 0.0, 0.0, -0.125)
+                angle = 48
+                mutableListOf(
+                    -0.1,
+                    0.0,
+                    -0.125,
+                    -0.05,
+                    0.0,
+                    -0.125,
+                    0.0,
+                    0.0,
+                    -0.125,
+                    0.0,
+                    0.0,
+                    -0.125,
+                    0.0,
+                    0.0,
+                    -0.125
+                )
             } else return
 
             modMessage("Starting Auto Blaze.")
             // clip to the correct position
             val expDelay = ClipTools.executeClipRoute(route, -rotation, startDelay = 50)
-            bowSlot = InventoryUtils.findItem(SkyblockItem.Attribute.SHORTBOW) ?: return modMessage("No Shortbow found in your hotbar!")
+            bowSlot = InventoryUtils.findItem(SkyblockItem.Attribute.SHORTBOW)
+                ?: return modMessage("No Shortbow found in your hotbar!")
             mc.thePlayer.inventory.currentItem = bowSlot
             startTime = System.currentTimeMillis()
             mc.thePlayer.rotationYaw = 155f - rotation.toFloat() + angle
@@ -232,23 +255,38 @@ object AutoBlaze : Module(
 
         // detect the order if not already done
         if (topDown == null) {
-            topDown = when (mc.theWorld.getBlockState(BlockPos( room.first.x, 68, room.first.z)).block) {
+            topDown = when (mc.theWorld.getBlockState(BlockPos(room.first.x, 68, room.first.z)).block) {
                 Blocks.air, Blocks.iron_bars -> true
                 else -> false
             }
-            val yLevel = if(topDown == true) {
+            val yLevel = if (topDown == true) {
                 68
             } else {
                 118
             }
-            rotation = if (mc.theWorld.getBlockState(BlockPos(room.first.x, yLevel, room.first.z-7)).block != Blocks.air)
-                270
-            else if (mc.theWorld.getBlockState(BlockPos(room.first.x+7, yLevel, room.first.z)).block != Blocks.air)
-                180
-            else if (mc.theWorld.getBlockState(BlockPos(room.first.x, yLevel, room.first.z+7)).block != Blocks.air)
-                90
-            else
-                0
+            rotation =
+                if (mc.theWorld.getBlockState(BlockPos(room.first.x, yLevel, room.first.z - 7)).block != Blocks.air)
+                    270
+                else if (mc.theWorld.getBlockState(
+                        BlockPos(
+                            room.first.x + 7,
+                            yLevel,
+                            room.first.z
+                        )
+                    ).block != Blocks.air
+                )
+                    180
+                else if (mc.theWorld.getBlockState(
+                        BlockPos(
+                            room.first.x,
+                            yLevel,
+                            room.first.z + 7
+                        )
+                    ).block != Blocks.air
+                )
+                    90
+                else
+                    0
 
             // set the start block to diamond
             val position = DataHandler.getRotatedCoords(blockVec, -rotation)
@@ -306,7 +344,7 @@ object AutoBlaze : Module(
         if (!doingBlaze || !inDungeons) return
 
         // check whether the player is a good position, and if not abort
-        if (checkPosition.enabled && mc.thePlayer.posX.getDecimals() in 0.15 .. 0.85) {
+        if (checkPosition.enabled && mc.thePlayer.posX.getDecimals() in 0.15..0.85) {
             doingBlaze = false
             modMessage("Aborted Auto Blaze due to failed positioning.")
             return
@@ -315,7 +353,7 @@ object AutoBlaze : Module(
         // check whether there are blazes left, if not stop
         if (orderedBlazes.minus(shotBlazes.toSet()).isEmpty()) {
             doingBlaze = false
-            modMessage("Finished Auto Blaze in ${DecimalFormat("#.##").format((System.currentTimeMillis() - startTime).toDouble()/1000.0)} seconds.")
+            modMessage("Finished Auto Blaze in ${DecimalFormat("#.##").format((System.currentTimeMillis() - startTime).toDouble() / 1000.0)} seconds.")
             return
         }
 
@@ -325,17 +363,17 @@ object AutoBlaze : Module(
         if (FakeActionManager.doAction) return
 
         val sorting = topDown ?: return
-        val shootableBlaze = when(sorting){
+        val shootableBlaze = when (sorting) {
             true -> orderedBlazes.minus(shotBlazes.toSet()).last()
             false -> orderedBlazes.minus(shotBlazes.toSet()).first()
         }
         val target = shootableBlaze.blaze
         val direction = getDirection(
-            mc.thePlayer.posX,mc.thePlayer.posY,mc.thePlayer.posZ,
+            mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ,
             target.posX, target.posY + offset.value, target.posZ
         )
 
-        if (forceRotate.enabled){
+        if (forceRotate.enabled) {
             mc.thePlayer.rotationYaw = direction[1].toFloat()
             mc.thePlayer.rotationPitch = direction[2].toFloat()
         }
@@ -346,13 +384,13 @@ object AutoBlaze : Module(
             fastSleep.value
         } else if ((attackSpeed ?: 0) >= 50) {
             mediumSleep.value
-        }else {
+        } else {
             slowSleep.value
         }
         val delay = max(100 + expectedTimeToHit - flightTime(direction[0]), minDelay)
         if (System.currentTimeMillis() - lastShot < delay) return
 
-        if (realRotate.enabled){
+        if (realRotate.enabled) {
             mc.thePlayer.rotationYaw = direction[1].toFloat()
             mc.thePlayer.rotationPitch = direction[2].toFloat()
         }
@@ -386,10 +424,10 @@ object AutoBlaze : Module(
      * Gravity and drag are neglected.
      */
     private fun flightTime(distance: Double): Double {
-    // reference values:
-    // initial speed: 3.0 blocks per tick
-    // drag: velocity multiplied by 0.99 each tick
-    // gravity: accelerated with 1 block / second^2
+        // reference values:
+        // initial speed: 3.0 blocks per tick
+        // drag: velocity multiplied by 0.99 each tick
+        // gravity: accelerated with 1 block / second^2
         return (distance * 50.0 / 3.0)
     }
 

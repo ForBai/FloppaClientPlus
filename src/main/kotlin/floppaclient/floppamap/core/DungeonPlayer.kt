@@ -24,11 +24,12 @@ import net.minecraft.util.Vec4b
  *
  * @author Aton
  */
-class DungeonPlayer(var player: EntityPlayer, var name: String,
-                    /**
-                     * True when the field player is not the correct entity corresponding to this Player.
-                     */
-                    var fakeEntity: Boolean = false
+class DungeonPlayer(
+    var player: EntityPlayer, var name: String,
+    /**
+     * True when the field player is not the correct entity corresponding to this Player.
+     */
+    var fakeEntity: Boolean = false
 ) {
     var mapX = 0.0
     var mapZ = 0.0
@@ -58,7 +59,7 @@ class DungeonPlayer(var player: EntityPlayer, var name: String,
      * Not to be confused with [Dungeon.currentRoom].
      */
     val currentRoom: Room?
-        get() = (currentRoomIndex?.let{Dungeon.getDungeonTileList()[it]} as? Room)
+        get() = (currentRoomIndex?.let { Dungeon.getDungeonTileList()[it] } as? Room)
 
     /**
      * Maps the index of the tile in [Dungeon.dungeonList] to the count of ticks the player spent in that Tile.
@@ -85,12 +86,14 @@ class DungeonPlayer(var player: EntityPlayer, var name: String,
         // when the player is in render distance, use that data instead of the map item
         if (player != null) {
             // check whether the player is in the map; probably not needed
-            if ( player.posX > -200 && player.posX < -10 && player.posZ > -200 && player.posZ < -10) {
-                this.mapX = (player.posX - Dungeon.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first - 2
-                this.mapZ = (player.posZ - Dungeon.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second - 2
+            if (player.posX > -200 && player.posX < -10 && player.posZ > -200 && player.posZ < -10) {
+                this.mapX =
+                    (player.posX - Dungeon.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first - 2
+                this.mapZ =
+                    (player.posZ - Dungeon.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second - 2
                 this.yaw = player.rotationYawHead
             }
-        }else {
+        } else {
             //if no data from the map item is present go to the next player
             if (decor != null) {
                 decor.entries.find { (icon, _) -> icon == this.icon }?.let { (_, vec4b) ->
@@ -104,12 +107,12 @@ class DungeonPlayer(var player: EntityPlayer, var name: String,
         // Update the current room and info about it.
         val newIndex = getCurrentRoomIndex()
         val oldRoom = currentRoom
-        val shouldUpdateSecrets = DungeonMap.trackSecrets.enabled &&  Dungeon.hasRunStarted &&  !pending &&
+        val shouldUpdateSecrets = DungeonMap.trackSecrets.enabled && Dungeon.hasRunStarted && !pending &&
                 (System.currentTimeMillis() > lastSecretCheck.timeMS + 5000
-                        || ( newIndex != currentRoomIndex && oldRoom?.data?.name != (newIndex?.let{Dungeon.getDungeonTileList()[it]} as? Room)?.data?.name ))
+                        || (newIndex != currentRoomIndex && oldRoom?.data?.name != (newIndex?.let { Dungeon.getDungeonTileList()[it] } as? Room)?.data?.name))
         currentRoomIndex = newIndex
         updateVisitedTileTimes()
-        if (shouldUpdateSecrets ) {
+        if (shouldUpdateSecrets) {
             updateRoomSecrets(oldRoom)
         }
     }
@@ -168,9 +171,9 @@ class DungeonPlayer(var player: EntityPlayer, var name: String,
         if (Dungeon.inBoss) return null
         // Note the shr 5 ( / 32 ) instead of the usual shr 4 here. This ensures that only rooms can be pointed to.
         // But also means that the x and z values here are half of the column and row.
-        val x = (((mapX + 2 - MapUtils.startCorner.first) / MapUtils.coordMultiplier ).toInt() shr 5)
+        val x = (((mapX + 2 - MapUtils.startCorner.first) / MapUtils.coordMultiplier).toInt() shr 5)
         val z = (((mapZ + 2 - MapUtils.startCorner.second) / MapUtils.coordMultiplier).toInt() shr 5)
-        if (x<0 || x > 5 || z < 0 || z > 5) return null
+        if (x < 0 || x > 5 || z < 0 || z > 5) return null
         return x * 22 + z * 2
     }
 

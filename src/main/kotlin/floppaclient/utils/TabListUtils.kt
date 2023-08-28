@@ -1,7 +1,7 @@
 package floppaclient.utils
 
-import floppaclient.FloppaClient
 import com.google.common.collect.ComparisonChain
+import floppaclient.FloppaClient
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.world.WorldSettings
 

@@ -93,7 +93,7 @@ object EditMode {
                 mc.objectMouseOver.sideHit,
                 f, f1, f2, meta, mc.thePlayer
             )
-        }catch (e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             Block.getStateById(blockID)
         }
     }

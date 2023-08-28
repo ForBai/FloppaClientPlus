@@ -3,16 +3,19 @@ package floppaclient.floppamap.dungeon
 import floppaclient.FloppaClient.Companion.RESOURCE_DOMAIN
 import floppaclient.FloppaClient.Companion.inDungeons
 import floppaclient.FloppaClient.Companion.mc
-import floppaclient.floppamap.core.*
+import floppaclient.floppamap.core.Door
+import floppaclient.floppamap.core.Room
+import floppaclient.floppamap.core.RoomState
+import floppaclient.floppamap.core.RoomType
 import floppaclient.floppamap.utils.MapUtils
 import floppaclient.floppamap.utils.MapUtils.roomSize
-import floppaclient.utils.render.HUDRenderUtils
 import floppaclient.module.impl.render.DungeonMap
 import floppaclient.module.impl.render.MapRooms
 import floppaclient.shaders.impl.Chroma2D
 import floppaclient.ui.hud.EditHudGUI
 import floppaclient.ui.hud.HudElement
 import floppaclient.utils.Utils.equalsOneOf
+import floppaclient.utils.render.HUDRenderUtils
 import gg.essential.elementa.utils.withAlpha
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -21,13 +24,13 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 
-object MapRender: HudElement(
+object MapRender : HudElement(
     DungeonMap.xHud,
     DungeonMap.yHud,
     128,
     138,
     DungeonMap.mapScale
-){
+) {
     override fun renderHud() {
 
         if (!inDungeons) return
@@ -59,12 +62,12 @@ object MapRender: HudElement(
         }
         // Scissor
         GlStateManager.pushMatrix()
-        val scale = mc.displayHeight /  ScaledResolution(mc).scaledHeight.toDouble()
+        val scale = mc.displayHeight / ScaledResolution(mc).scaledHeight.toDouble()
         GL11.glScissor(
-            (x*scale).toInt(),
-            (mc.displayHeight - y*scale - 128*scale*this.scale.value).toInt() ,
-            (128*scale*this.scale.value).toInt(),
-            (128*scale*this.scale.value).toInt()
+            (x * scale).toInt(),
+            (mc.displayHeight - y * scale - 128 * scale * this.scale.value).toInt(),
+            (128 * scale * this.scale.value).toInt(),
+            (128 * scale * this.scale.value).toInt()
         )
         GL11.glEnable(GL11.GL_SCISSOR_TEST)
         // Spinny map
@@ -81,7 +84,7 @@ object MapRender: HudElement(
                 -((mc.thePlayer.posZ - Dungeon.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second - 2),
                 0.0
             )
-        }else if (DungeonMap.spinnyMap.enabled){
+        } else if (DungeonMap.spinnyMap.enabled) {
             GlStateManager.translate(-64.0, -64.0, 0.0)
         }
 
@@ -117,9 +120,9 @@ object MapRender: HudElement(
                 val color = if (MapRooms.darkenUndiscovered.enabled && !tile.state.revealed) {
                     tile.color.run {
                         Color(
-                            (red   * (1 - MapRooms.mapDarkenPercent.value)).toInt(),
+                            (red * (1 - MapRooms.mapDarkenPercent.value)).toInt(),
                             (green * (1 - MapRooms.mapDarkenPercent.value)).toInt(),
-                            (blue  * (1 - MapRooms.mapDarkenPercent.value)).toInt(),
+                            (blue * (1 - MapRooms.mapDarkenPercent.value)).toInt(),
                             (alpha * MapRooms.mapRoomTransparency.value).toInt()
                         )
                     }
@@ -135,6 +138,7 @@ object MapRender: HudElement(
                             color
                         )
                     }
+
                     !xEven && !yEven -> {
                         HUDRenderUtils.renderRect(
                             xOffset.toDouble(),
@@ -144,6 +148,7 @@ object MapRender: HudElement(
                             color
                         )
                     }
+
                     else -> drawRoomConnector(
                         xOffset,
                         yOffset,
@@ -201,20 +206,20 @@ object MapRender: HudElement(
                     val showName = if (DungeonMap.legitMode.enabled) {
                         (MapRooms.mapRoomNames.index != 0 && room.data.type == RoomType.PUZZLE
                                 || (MapRooms.mapRoomNames.index == 2 && room.data.type.equalsOneOf(
-                                    RoomType.NORMAL,
-                                    RoomType.RARE,
-                                    RoomType.CHAMPION,
-                                    RoomType.TRAP
-                                ) && room.visited))
+                            RoomType.NORMAL,
+                            RoomType.RARE,
+                            RoomType.CHAMPION,
+                            RoomType.TRAP
+                        ) && room.visited))
                                 && (room.state.revealed || room.visited)
-                    }else {
+                    } else {
                         MapRooms.mapRoomNames.index != 0 && room.data.type.equalsOneOf(RoomType.PUZZLE, RoomType.TRAP)
                                 || MapRooms.mapRoomNames.index == 2 && room.data.type.equalsOneOf(
                             RoomType.NORMAL,
                             RoomType.RARE,
                             RoomType.CHAMPION
                         )
-                    }  && !room.data.name.startsWith("Unknown")
+                    } && !room.data.name.startsWith("Unknown")
 
                     if (showName) {
                         name.addAll(room.data.name.split(" "))
@@ -231,7 +236,12 @@ object MapRender: HudElement(
                     } else 0xffffff
 
                     // Offset + half of roomsize
-                    HUDRenderUtils.renderCenteredText(name, xOffset + (roomSize shr 1), yOffset + (roomSize shr 1), color)
+                    HUDRenderUtils.renderCenteredText(
+                        name,
+                        xOffset + (roomSize shr 1),
+                        yOffset + (roomSize shr 1),
+                        color
+                    )
                 }
             }
         }
@@ -254,8 +264,10 @@ object MapRender: HudElement(
                         defaultQuestion
                     else null
                 }
+
                 else -> null
             }
+
             2 -> when (room.state) {
                 RoomState.CLEARED -> neuWhite
                 RoomState.GREEN -> neuGreen
@@ -265,8 +277,10 @@ object MapRender: HudElement(
                         neuQuestion
                     else null
                 }
+
                 else -> null
             }
+
             else -> null
         }
     }
@@ -278,7 +292,7 @@ object MapRender: HudElement(
     private fun getRoomSecerts(room: Room): String? {
         val shouldShowSecrets = if (DungeonMap.legitMode.enabled && room.state == RoomState.QUESTION_MARK) {
             false
-        } else when(room.data.type) {
+        } else when (room.data.type) {
             RoomType.NORMAL, RoomType.RARE, RoomType.TRAP -> true
             RoomType.PUZZLE -> room.data.name.contains(puzzleWithSecretsRegex)
             else -> false
@@ -301,7 +315,8 @@ object MapRender: HudElement(
             for (player in Dungeon.dungeonTeammates) {
                 HUDRenderUtils.drawPlayerHead(player)
             }
-        }catch (_: ConcurrentModificationException) {}
+        } catch (_: ConcurrentModificationException) {
+        }
     }
 
     private fun drawRoomConnector(x: Int, y: Int, doorWidth: Int, doorway: Boolean, vertical: Boolean, color: Color) {
@@ -328,11 +343,11 @@ object MapRender: HudElement(
         GlStateManager.translate(0f, 128f, 0f)
         GlStateManager.scale(0.66, 0.66, 1.0)
         val totalSecrets =
-        if (DungeonMap.legitMode.enabled || !Dungeon.fullyScanned) {
-            RunInformation.totalSecrets ?: "?"
-        }else {
-            Dungeon.totalSecrets
-        }
+            if (DungeonMap.legitMode.enabled || !Dungeon.fullyScanned) {
+                RunInformation.totalSecrets ?: "?"
+            } else {
+                Dungeon.totalSecrets
+            }
         mc.fontRendererObj.drawString("Secrets: ${RunInformation.secretCount}/${totalSecrets}", 5, 0, 0xffffff)
         mc.fontRendererObj.drawString("Crypts: ${RunInformation.cryptsCount}", 85, 0, 0xffffff)
         mc.fontRendererObj.drawString("Deaths: ${RunInformation.deathCount}", 140, 0, 0xffffff)
@@ -343,10 +358,10 @@ object MapRender: HudElement(
 
     private val puzzleWithSecretsRegex = Regex("Higher|Blaze|Tic")
 
-    private val neuGreen     = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/green_check.png")
-    private val neuWhite     = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/white_check.png")
-    private val neuCross     = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/cross.png")
-    private val neuQuestion     = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/question.png")
+    private val neuGreen = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/green_check.png")
+    private val neuWhite = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/white_check.png")
+    private val neuCross = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/cross.png")
+    private val neuQuestion = ResourceLocation(RESOURCE_DOMAIN, "floppamap/neu/question.png")
     private val defaultGreen = ResourceLocation(RESOURCE_DOMAIN, "floppamap/default/green_check.png")
     private val defaultWhite = ResourceLocation(RESOURCE_DOMAIN, "floppamap/default/white_check.png")
     private val defaultCross = ResourceLocation(RESOURCE_DOMAIN, "floppamap/default/cross.png")

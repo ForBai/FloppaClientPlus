@@ -24,7 +24,7 @@ public abstract class MixinGuiMainMenu extends GuiScreen implements GuiYesNoCall
         int day = calendar.get(Calendar.DAY_OF_WEEK);
         if (day == 6) {
             this.splashText = "Floppa Friday!";
-        }else {
+        } else {
             this.splashText = "MILF (Man I love Floppa)";
         }
     }

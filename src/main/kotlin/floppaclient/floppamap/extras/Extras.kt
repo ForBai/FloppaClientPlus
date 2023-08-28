@@ -25,7 +25,7 @@ object Extras {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !ExtraBlocks.enabled ) return
+        if (event.phase != TickEvent.Phase.START || !ExtraBlocks.enabled) return
         // Alternate run of the extras data. No more looping through all rooms. This also works for the boss room when
         // the dungeon is not scanned.
         (currentRoomPair ?: currentRegionPair)?.run roomPair@{
@@ -51,7 +51,7 @@ object Extras {
      * Returns the blockstate for the given blockID. Also rotates the state corresponding to the given rotation if it
      * has rotation data.
      */
-    private fun getStateFromIDWithRotation(blockID: Int, rotation: Int) : IBlockState {
+    private fun getStateFromIDWithRotation(blockID: Int, rotation: Int): IBlockState {
         val blockstate = Block.getStateById(blockID)
         return getStateFromIDWithRotation(blockstate, rotation)
     }
@@ -60,28 +60,25 @@ object Extras {
      * Returns the blockstate for the given blockID. Also rotates the state corresponding to the given rotation if it
      * has rotation data.
      */
-    fun getStateFromIDWithRotation(iblockstate: IBlockState, rotation: Int) : IBlockState {
+    fun getStateFromIDWithRotation(iblockstate: IBlockState, rotation: Int): IBlockState {
         var blockstate = iblockstate
         // rotate if block has rotation data. this is really scuffed unfortunately
-        if (blockstate.properties.containsKey(FACING_HORIZONTAL)){
+        if (blockstate.properties.containsKey(FACING_HORIZONTAL)) {
             val facing = blockstate.getValue(FACING_HORIZONTAL)
             if (facing.axis.isHorizontal) {
                 blockstate = blockstate.withProperty(FACING_HORIZONTAL, getRotatedFacing(facing, rotation))
             }
-        }
-        else if (blockstate.properties.containsKey(FACING_OMNI)){
+        } else if (blockstate.properties.containsKey(FACING_OMNI)) {
             val facing = blockstate.getValue(FACING_OMNI)
             if (facing.axis.isHorizontal) {
                 blockstate = blockstate.withProperty(FACING_OMNI, getRotatedFacing(facing, rotation))
             }
-        }
-        else if (blockstate.properties.containsKey(FACING_DOWN)){
+        } else if (blockstate.properties.containsKey(FACING_DOWN)) {
             val facing = blockstate.getValue(FACING_DOWN)
             if (facing.axis.isHorizontal) {
                 blockstate = blockstate.withProperty(FACING_DOWN, getRotatedFacing(facing, rotation))
             }
-        }
-        else if (blockstate.properties.containsKey(FACING_UP)){
+        } else if (blockstate.properties.containsKey(FACING_UP)) {
             val facing = blockstate.getValue(FACING_UP)
             if (facing.axis.isHorizontal) {
                 blockstate = blockstate.withProperty(FACING_UP, getRotatedFacing(facing, rotation))

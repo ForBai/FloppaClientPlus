@@ -17,7 +17,7 @@ class SelectorSetting<T>(
     val options: Array<out T>,
     visibility: Visibility = Visibility.VISIBLE,
     description: String? = null,
-) : Setting<T>(name, visibility, description) where T : Options, T: Enum<T> {
+) : Setting<T>(name, visibility, description) where T : Options, T : Enum<T> {
 
     override var value: T = default
         set(input) {
@@ -28,7 +28,7 @@ class SelectorSetting<T>(
         get() = value.ordinal
         set(newVal) {
             // guarantees that index is in bounds and enables cycling behaviour
-            value = options[if (newVal > options.size - 1)  0 else if ( newVal < 0) options.size - 1 else newVal]
+            value = options[if (newVal > options.size - 1) 0 else if (newVal < 0) options.size - 1 else newVal]
         }
 
     /**
@@ -44,7 +44,7 @@ class SelectorSetting<T>(
         }
 
     fun isSelected(option: Options): Boolean {
-        return  this.value === option
+        return this.value === option
     }
 }
 
@@ -55,11 +55,12 @@ class SelectorSetting<T>(
  *
  * If you want to limit the options to be a subset of the available constants, use the main constructor and specify those explicitly.
  */
-inline fun <reified L> SelectorSetting(name: String,
-                                           default: L,
-                                           visibility: Visibility = Visibility.VISIBLE,
-                                           description: String? = null
-) : SelectorSetting<L> where L : Options, L: Enum<L> =
+inline fun <reified L> SelectorSetting(
+    name: String,
+    default: L,
+    visibility: Visibility = Visibility.VISIBLE,
+    description: String? = null
+): SelectorSetting<L> where L : Options, L : Enum<L> =
     SelectorSetting(name, default, enumValues(), visibility, description)
 
 interface Options {

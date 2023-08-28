@@ -8,5 +8,5 @@ import net.minecraftforge.fml.common.eventhandler.Event
  */
 class PreMouseInputEvent constructor(
     val button: Int
-): Event() {
+) : Event() {
 }

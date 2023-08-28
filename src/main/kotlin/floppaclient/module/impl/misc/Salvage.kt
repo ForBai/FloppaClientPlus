@@ -8,15 +8,15 @@ import floppaclient.module.settings.impl.BooleanSetting
 import floppaclient.module.settings.impl.NumberSetting
 import floppaclient.module.settings.impl.StringSetting
 import floppaclient.utils.ChatUtils
+import floppaclient.utils.Utils.containsOneOf
+import floppaclient.utils.Utils.equalsOneOf
+import floppaclient.utils.Utils.leftClickWindow
+import floppaclient.utils.Utils.shiftClickWindow
 import floppaclient.utils.inventory.ItemUtils.isDungeonMobDrop
 import floppaclient.utils.inventory.ItemUtils.isRarityUpgraded
 import floppaclient.utils.inventory.ItemUtils.isStarred
 import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.rarityBoost
-import floppaclient.utils.Utils.containsOneOf
-import floppaclient.utils.Utils.equalsOneOf
-import floppaclient.utils.Utils.leftClickWindow
-import floppaclient.utils.Utils.shiftClickWindow
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
@@ -36,15 +36,29 @@ object Salvage : Module(
     "Auto Salvage",
     category = Category.MISC,
     description = "Automatically salvages all salvageable items in your inventory when you enter the salvage gui."
-){
+) {
     private val sleep = NumberSetting("Sleep", 200.0, 50.0, 1000.0, 10.0, description = "Delay in between clicks.")
-    private val dungeonItems = BooleanSetting("Dugeon Drops", true, description = "Will auto salvage Dungeon mob drops.")
-    private val salgave50 = BooleanSetting("Salvage max stat", false, description = "Will auto salvage items with +50% stat boost.")
-    private val netherItems = BooleanSetting("Nether Items", true, description = "Will also salvage nether fishing items.")
-    private val salvageStarred = BooleanSetting("Salvage Starred", false, description = "When enabled starred items will also be salvaged.")
-    private val salvageRecombed = BooleanSetting("Salvage Recombed", false, description = "When enabled rarity upgraded items will also be salvaged.")
-    private val other = StringSetting("Other","", 100, description = "Name or item id of other items to be salvaged. Separate multiple with a semicolon ;.")
-    private val message = BooleanSetting("Message on Finish", true, description = "Puts a message in chat when it is done.")
+    private val dungeonItems =
+        BooleanSetting("Dugeon Drops", true, description = "Will auto salvage Dungeon mob drops.")
+    private val salgave50 =
+        BooleanSetting("Salvage max stat", false, description = "Will auto salvage items with +50% stat boost.")
+    private val netherItems =
+        BooleanSetting("Nether Items", true, description = "Will also salvage nether fishing items.")
+    private val salvageStarred =
+        BooleanSetting("Salvage Starred", false, description = "When enabled starred items will also be salvaged.")
+    private val salvageRecombed = BooleanSetting(
+        "Salvage Recombed",
+        false,
+        description = "When enabled rarity upgraded items will also be salvaged."
+    )
+    private val other = StringSetting(
+        "Other",
+        "",
+        100,
+        description = "Name or item id of other items to be salvaged. Separate multiple with a semicolon ;."
+    )
+    private val message =
+        BooleanSetting("Message on Finish", true, description = "Puts a message in chat when it is done.")
 
     init {
         this.addSettings(
@@ -58,6 +72,7 @@ object Salvage : Module(
             message
         )
     }
+
     private var nextClick = 0L
     private var inSalvage = false
     private val netherIds = setOf(
@@ -95,11 +110,13 @@ object Salvage : Module(
         val locked = container.inventorySlots[31].stack?.item == Item.getItemFromBlock(Blocks.barrier)
         val itemReady = container.inventorySlots[22].hasStack
         val slotIndex = if (locked) 22 else if (itemReady) 31
-        else container.inventorySlots.subList(54,90).firstOrNull { shouldSalvage(it) }?.slotNumber
-            ?: return (if (message.enabled) ChatUtils.modMessage("Finished auto salvage.") else Unit).also { inSalvage = false }
+        else container.inventorySlots.subList(54, 90).firstOrNull { shouldSalvage(it) }?.slotNumber
+            ?: return (if (message.enabled) ChatUtils.modMessage("Finished auto salvage.") else Unit).also {
+                inSalvage = false
+            }
         if (slotIndex == 31) {
             leftClickWindow(container.windowId, slotIndex)
-        }else {
+        } else {
             shiftClickWindow(container.windowId, slotIndex)
         }
         nextClick = System.currentTimeMillis() + sleep.value.toLong()
@@ -112,13 +129,13 @@ object Salvage : Module(
         if (!salvageRecombed.enabled && stack.isRarityUpgraded) return false
         if (!salvageStarred.enabled && stack.isStarred) return false
         if (netherItems.enabled && stack.itemID.equalsOneOf(netherIds)) return true
-        if (dungeonItems.enabled && stack.isDungeonMobDrop){
+        if (dungeonItems.enabled && stack.isDungeonMobDrop) {
             return if (salgave50.enabled) true
             else (stack.rarityBoost ?: 0) < 50
         }
         if (other.text != "") {
             val options = other.text.split(";")
-            if( stack.run { displayName.containsOneOf(options, ignoreCase = true) || itemID.equalsOneOf(options) })
+            if (stack.run { displayName.containsOneOf(options, ignoreCase = true) || itemID.equalsOneOf(options) })
                 return true
         }
         return false

@@ -19,12 +19,20 @@ import org.lwjgl.input.Mouse
  * @author Aton
  */
 object GhostBlocks : Module(
- "Ghost Blocks",
+    "Ghost Blocks",
     category = Category.MISC,
     description = "Creates ghost blocks where you are looking when the key bind is pressed."
-){
-    private val ghostBlockSkulls = BooleanSetting("Ghost Skulls", true, description = "If enabled skulls will also be turned into ghost blocks.")
-    private val gbRange = NumberSetting("Range", 4.5,4.5,60.0,0.5, description = "Maximum range at which ghost blocks will be created.")
+) {
+    private val ghostBlockSkulls =
+        BooleanSetting("Ghost Skulls", true, description = "If enabled skulls will also be turned into ghost blocks.")
+    private val gbRange = NumberSetting(
+        "Range",
+        4.5,
+        4.5,
+        60.0,
+        0.5,
+        description = "Maximum range at which ghost blocks will be created."
+    )
 
     init {
         this.addSettings(
@@ -43,7 +51,7 @@ object GhostBlocks : Module(
     /**
      * Prevent the key bind from toggling the module, so that it can be used here.
      */
-    override fun onKeyBind() { }
+    override fun onKeyBind() {}
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
@@ -60,7 +68,8 @@ object GhostBlocks : Module(
         if (blockPos != null) {
             val block = mc.theWorld.getBlockState(blockPos).block
             if (!blacklist.contains(block) && (block !== Blocks.skull || (ghostBlockSkulls.enabled
-                        && (mc.theWorld.getTileEntity(blockPos) as? TileEntitySkull)?.playerProfile?.id?.toString() != "26bb1a8d-7c66-31c6-82d5-a9c04c94fb02"))) {
+                        && (mc.theWorld.getTileEntity(blockPos) as? TileEntitySkull)?.playerProfile?.id?.toString() != "26bb1a8d-7c66-31c6-82d5-a9c04c94fb02"))
+            ) {
                 mc.theWorld.setBlockToAir(blockPos)
                 return true
             }

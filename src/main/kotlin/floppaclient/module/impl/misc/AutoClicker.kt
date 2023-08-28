@@ -27,19 +27,29 @@ object AutoClicker : Module(
             "When ${TerminatorClicker.name} is active the right click auto clicker will not activate for shortbows. "
 ) {
     private val leftClick = BooleanSetting("Left Click", true, description = "Toggles the auto clicker for left click.")
-    private val maxCps: NumberSetting = NumberSetting("Max CPS", 12.0, 1.0, 20.0, 1.0, description = "Maximum cps for left click.")
-        .withInputTransform { input, setting ->
-            MathHelper.clamp_double(input, minCps.value, setting.max)
-        }.withDependency { leftClick.enabled }
+    private val maxCps: NumberSetting =
+        NumberSetting("Max CPS", 12.0, 1.0, 20.0, 1.0, description = "Maximum cps for left click.")
+            .withInputTransform { input, setting ->
+                MathHelper.clamp_double(input, minCps.value, setting.max)
+            }.withDependency { leftClick.enabled }
 
-    private val minCps: NumberSetting = NumberSetting("Min CPS", 10.0, 1.0, 20.0, 1.0, description = "Minimum CPS for left click.")
-        .withInputTransform { input, setting ->
+    private val minCps: NumberSetting =
+        NumberSetting("Min CPS", 10.0, 1.0, 20.0, 1.0, description = "Minimum CPS for left click.")
+            .withInputTransform { input, setting ->
                 MathHelper.clamp_double(input, setting.min, maxCps.value)
-        }.withDependency { leftClick.enabled }
+            }.withDependency { leftClick.enabled }
 
-    private val rightClick = BooleanSetting("Right Click", false, description = "Toggles the auto clicker for right click.")
-    private val rightClickSleep = NumberSetting("RC Sleep", 100.0, 20.0, 200.0, 5.0, description = "Delay in between right clicks in milliseconds.")
-            .withDependency { rightClick.enabled }
+    private val rightClick =
+        BooleanSetting("Right Click", false, description = "Toggles the auto clicker for right click.")
+    private val rightClickSleep = NumberSetting(
+        "RC Sleep",
+        100.0,
+        20.0,
+        200.0,
+        5.0,
+        description = "Delay in between right clicks in milliseconds."
+    )
+        .withDependency { rightClick.enabled }
 
     private var nextLeftClick = System.currentTimeMillis()
     private var nextRightClick = System.currentTimeMillis()
@@ -60,7 +70,7 @@ object AutoClicker : Module(
      */
     @SubscribeEvent
     fun onLeftClick(event: ClickEvent.LeftClickEvent) {
-        if(leftClick.enabled) {
+        if (leftClick.enabled) {
             val nowMillis = System.currentTimeMillis()
             nextLeftClick = nowMillis + Random.nextDouble(1000.0 / maxCps.value, 1000.0 / minCps.value).toInt()
         }
@@ -72,9 +82,9 @@ object AutoClicker : Module(
      */
     @SubscribeEvent
     fun onRightClick(event: ClickEvent.RightClickEvent) {
-        if(rightClick.enabled) {
+        if (rightClick.enabled) {
             val nowMillis = System.currentTimeMillis()
-            val overshoot =  (nowMillis - nextRightClick).takeIf { it < 200 } ?: 0L
+            val overshoot = (nowMillis - nextRightClick).takeIf { it < 200 } ?: 0L
             nextRightClick = nowMillis + (rightClickSleep.value.toLong() - overshoot).coerceAtLeast(0L)
         }
     }

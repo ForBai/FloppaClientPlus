@@ -3,10 +3,10 @@ package floppaclient.utils.inventory
 import floppaclient.FloppaClient.Companion.mc
 import floppaclient.utils.inventory.ItemUtils.itemID
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.item.ItemStack
-
+import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.client.gui.inventory.*
+import net.minecraft.item.ItemStack
 
 /**
  * # A collection of methods for finding items in inventories.
@@ -172,13 +172,15 @@ object InventoryUtils {
      * @param mode Specify what to check. 0: display name and item id. 1: only display name. 2: only itemID.
      */
     fun EntityPlayerSP?.isHolding(regex: Regex, mode: Int = 0): Boolean {
-        return this.isHolding { it?.run {
-            when (mode) {
-                0 -> displayName.contains(regex) || itemID.matches(regex)
-                1 -> displayName.contains(regex)
-                2 -> itemID.matches(regex)
-                else -> false
-            } } == true
+        return this.isHolding {
+            it?.run {
+                when (mode) {
+                    0 -> displayName.contains(regex) || itemID.matches(regex)
+                    1 -> displayName.contains(regex)
+                    2 -> itemID.matches(regex)
+                    else -> false
+                }
+            } == true
         }
     }
 

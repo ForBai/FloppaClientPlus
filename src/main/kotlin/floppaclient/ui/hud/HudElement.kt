@@ -13,7 +13,7 @@ import java.awt.Color
  * Provides functionality for game overlay elements.
  * @author Aton
  */
-abstract class HudElement{
+abstract class HudElement {
 
     private val xSett: NumberSetting
     private val ySett: NumberSetting
@@ -28,10 +28,10 @@ abstract class HudElement{
      * Use these instead of a direct reference to the NumberSetting
      */
     var x: Int
-     get() = xSett.value.toInt()
-     set(value) {
-         xSett.value = value.toDouble()
-     }
+        get() = xSett.value.toInt()
+        set(value) {
+            xSett.value = value.toDouble()
+        }
 
     var y: Int
         get() = ySett.value.toInt()
@@ -44,11 +44,18 @@ abstract class HudElement{
      * This constructor takes care of creating the [NumberSetting]s required to save the position and scale of the hud
      * element to the config.
      */
-    constructor(module: Module, xDefault: Int = 0, yDefault: Int = 0, width: Int = 10, height: Int = 10, defaultScale: Double = 1.0) {
+    constructor(
+        module: Module,
+        xDefault: Int = 0,
+        yDefault: Int = 0,
+        width: Int = 10,
+        height: Int = 10,
+        defaultScale: Double = 1.0
+    ) {
         val id = module.settings.count { it.name.startsWith("xHud") }
         val xHud = NumberSetting("xHud_$id", default = xDefault.toDouble(), visibility = Visibility.HIDDEN)
         val yHud = NumberSetting("yHud_$id", default = yDefault.toDouble(), visibility = Visibility.HIDDEN)
-        val scaleHud = NumberSetting("scaleHud_$id",defaultScale,0.1,4.0, 0.01, visibility = Visibility.HIDDEN)
+        val scaleHud = NumberSetting("scaleHud_$id", defaultScale, 0.1, 4.0, 0.01, visibility = Visibility.HIDDEN)
 
         module.addSettings(xHud, yHud, scaleHud)
 

@@ -43,8 +43,10 @@ enum class SkyblockItem(
     TRIBAL_SPEAR("Tribal Spear", "TRIBAL_SPEAR"),
     BONEMERANG("Bonemerang", "BONE_BOOMERANG"),
     JERRY_GUN("Jerry-chine Gun", "JERRY_STAFF"),
+
     /** @see BONZO_STAFF_FRAGGED */
     BONZO_STAFF("Bonzo's Staff", "BONZO_STAFF"),
+
     /**
      * The actual Item name will be "⚚ Reforge Bonzo's Staff". The ⚚ is omitted here so that the name can still match an item name even when a reforge is present.
      * @see BONZO_STAFF*/

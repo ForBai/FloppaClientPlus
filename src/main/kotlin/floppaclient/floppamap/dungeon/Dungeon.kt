@@ -70,6 +70,7 @@ object Dungeon {
     val puzzles = mutableListOf<String>()
     var trapType = ""
     var witherDoors = 0
+
     /**
      * @see [RunInformation.totalSecrets]
      */
@@ -121,10 +122,10 @@ object Dungeon {
         // added check to determine whether in boss based on coordinates. This is relevant when blood is being skipped.
         // this also makes the chat message based detection obsolete
         if (FloppaClient.tickRamp % 20 == 0) {
-            when ( RunInformation.currentFloor?.floorNumber ) {
+            when (RunInformation.currentFloor?.floorNumber) {
                 1 -> inBoss = mc.thePlayer.posX > -71 && mc.thePlayer.posZ > -39
-                2,3,4 -> inBoss = mc.thePlayer.posX > -39 && mc.thePlayer.posZ > -39
-                5,6 -> inBoss = mc.thePlayer.posX > -39 && mc.thePlayer.posZ > -7
+                2, 3, 4 -> inBoss = mc.thePlayer.posX > -39 && mc.thePlayer.posZ > -39
+                5, 6 -> inBoss = mc.thePlayer.posX > -39 && mc.thePlayer.posZ > -7
                 7 -> inBoss = mc.thePlayer.posX > -7 && mc.thePlayer.posZ > -7
             }
             if (hasRunStarted && !MapUtils.calibrated) MapUpdate.calibrate()
@@ -145,10 +146,12 @@ object Dungeon {
                     MapUpdate.calibrate()
                     hasRunStarted = true
                 }
+
                 entryMessages.any { it == text } -> inBoss = true
                 text == "                             > EXTRA STATS <" -> {
                     MinecraftForge.EVENT_BUS.post(DungeonEndEvent())
                 }
+
                 text.contains("☠") -> {
                     val matcher = deathPattern.find(text)
                     val deadName = matcher?.groups?.get("name")?.value
@@ -157,7 +160,7 @@ object Dungeon {
                     }?.apply { deaths++ }
                 }
             }
-        }else if (event.type.toInt() == 2) { //Action bar
+        } else if (event.type.toInt() == 2) { //Action bar
             val matcher = secretsPattern.find(text)
             if (matcher != null) {
                 /*
@@ -184,7 +187,7 @@ object Dungeon {
         if (event.newRoomPair.first.data.type == RoomType.BOSS || event.newRoomPair.first.data.type == RoomType.REGION) return
         // Update all of the connected rooms and separators to visited.
         dungeonList.forEach {
-            if ((it is Room) && it.data.type != RoomType.UNKNOWN && it.data === event.newRoomPair.first.data){
+            if ((it is Room) && it.data.type != RoomType.UNKNOWN && it.data === event.newRoomPair.first.data) {
                 it.visited = true
             }
         }
@@ -236,9 +239,9 @@ object Dungeon {
     private fun getCurrentRoomPair(): Pair<Room, Int>? {
         val room = getCurrentRoom()
         if (room !is Room) return null
-        return if(room.data.type == RoomType.BOSS) {
+        return if (room.data.type == RoomType.BOSS) {
             Pair(room, 0)
-        }else {
+        } else {
             ExtrasScan.rooms.entries.find { it.key.data.name == room.data.name }?.toPair()
         }
     }
@@ -253,13 +256,13 @@ object Dungeon {
             val floor = RunInformation.currentFloor?.floorNumber
             if (floor != null) {
                 RoomUtils.instanceBossRoom(floor)
-            }else {
+            } else {
                 null
             }
-        }else {
+        } else {
             val x = ((mc.thePlayer.posX - startX + 15).toInt() shr 5)
             val z = ((mc.thePlayer.posZ - startZ + 15).toInt() shr 5)
-            getDungeonTile(x*2, z*2)
+            getDungeonTile(x * 2, z * 2)
         }
         if (room !is Room) return null
         return room
@@ -269,25 +272,25 @@ object Dungeon {
      * Gets the corresponding Tile from [dungeonList] but first performs a check whether the indices are in range.
      */
     @JvmName("getDungeonTileDefault")
-    fun getDungeonTile(column: Int, row: Int) : Tile?{
+    fun getDungeonTile(column: Int, row: Int): Tile? {
         if (row !in 0..10 || column !in 0..10) return null
-        return dungeonList[column*11 + row]
+        return dungeonList[column * 11 + row]
     }
 
     /**
      * Gets the corresponding Tile from [dungeonList] but first performs a check whether the indices are in range.
      * It is attempted to cast the Tile to [T], if not possible returns null.
      */
-    inline fun <reified T : Tile> getDungeonTile(column: Int, row: Int) : T?{
+    inline fun <reified T : Tile> getDungeonTile(column: Int, row: Int): T? {
         return (getDungeonTile(column, row) as? T)
     }
 
     /**
      * Sets the corresponding value from [dungeonList] but first performs a check whether the indices are in range.
      */
-    fun setDungeonTile(column: Int, row: Int, tile: Tile?): Boolean{
+    fun setDungeonTile(column: Int, row: Int, tile: Tile?): Boolean {
         if (row !in 0..10 || column !in 0..10) return false
-        dungeonList[column*11 + row] = tile
+        dungeonList[column * 11 + row] = tile
         return true
     }
 
@@ -295,14 +298,14 @@ object Dungeon {
      * Returns the [dungeonList] as an immutable List.
      */
     @JvmName("getDungeonTileListDefault")
-    fun getDungeonTileList(): List<Tile?>{
+    fun getDungeonTileList(): List<Tile?> {
         return dungeonList.asList()
     }
 
     /**
      * Returns the [dungeonList] filtered for the supplied Tile Type.
      */
-    inline fun <reified T : Tile> getDungeonTileList(): List<T>{
+    inline fun <reified T : Tile> getDungeonTileList(): List<T> {
         return getDungeonTileList().filterIsInstance<T>()
     }
 

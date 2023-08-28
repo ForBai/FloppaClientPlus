@@ -93,7 +93,7 @@ abstract class Module(
     toggled: Boolean = false,
     settings: ArrayList<Setting<*>> = ArrayList(),
     description: String = ""
-){
+) {
     @Expose
     @SerializedName("name")
     val name: String
@@ -115,6 +115,7 @@ abstract class Module(
     @SerializedName("enabled")
     var enabled: Boolean = toggled
         private set
+
     @Expose
     @SerializedName("settings")
     val settings: ArrayList<Setting<*>>
@@ -141,7 +142,7 @@ abstract class Module(
         name: String,
         category: Category = Category.MISC,
         description: String = ""
-    ) : this(name, 0,  category =  category, description =  description)
+    ) : this(name, 0, category = category, description = description)
 
     /**
      * Will toggle the module.
@@ -256,7 +257,7 @@ abstract class Module(
      *
      *     private val distance = register(NumberSetting("Distance", 4.0, 1.0,10.0,0.1))
      */
-    fun <K: Setting<*>> register(setting: K): K{
+    fun <K : Setting<*>> register(setting: K): K {
         addSettings(setting)
         return setting
     }
@@ -268,7 +269,7 @@ abstract class Module(
      *     private val distance = +NumberSetting("Distance", 4.0, 1.0,10.0,0.1)
      * @see register
      */
-    operator fun <K: Setting<*>> K.unaryPlus(): K = register(this)
+    operator fun <K : Setting<*>> K.unaryPlus(): K = register(this)
 
     fun getSettingByName(name: String): Setting<*>? {
         return settings.find { it.name.equals(name, ignoreCase = true) }

@@ -24,27 +24,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerControllerMP.class)
 abstract class PlayerControllerMixin {
 
-    @Shadow @Final private Minecraft mc;
+    @Shadow
+    @Final
+    private Minecraft mc;
 
-    @Shadow private float curBlockDamageMP;
+    @Shadow
+    private float curBlockDamageMP;
 
-    @Shadow private float stepSoundTickCounter;
+    @Shadow
+    private float stepSoundTickCounter;
 
-    @Shadow private int blockHitDelay;
+    @Shadow
+    private int blockHitDelay;
 
     @Inject(method = {"onPlayerDestroyBlock"}, at = @At("HEAD"))
-    public void onBlockDestroy(BlockPos pos, EnumFacing side, CallbackInfoReturnable<Boolean> cir){
+    public void onBlockDestroy(BlockPos pos, EnumFacing side, CallbackInfoReturnable<Boolean> cir) {
         IBlockState state = this.mc.theWorld.getBlockState(pos);
         MinecraftForge.EVENT_BUS.post(new BlockDestroyEvent(pos, side, state));
     }
 
     @Redirect(method = "onPlayerDamageBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;getPlayerRelativeBlockHardness(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)F"))
-    private float tweakBlockDamage(Block instance, EntityPlayer playerIn, World worldIn, BlockPos posBlock){
+    private float tweakBlockDamage(Block instance, EntityPlayer playerIn, World worldIn, BlockPos posBlock) {
 
         Block block = this.mc.theWorld.getBlockState(posBlock).getBlock();
 
         float relHardness = block.getPlayerRelativeBlockHardness(playerIn, worldIn, posBlock);
-        if (FastMine.INSTANCE.shouldTweakVanillaMining()){
+        if (FastMine.INSTANCE.shouldTweakVanillaMining()) {
             float threshold = FastMine.INSTANCE.getThreshold();
             if (this.curBlockDamageMP + relHardness >= threshold) {
                 return relHardness + 1f - threshold;
@@ -54,7 +59,7 @@ abstract class PlayerControllerMixin {
     }
 
     @Inject(method = "onPlayerDamageBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/WorldClient;sendBlockBreakProgress(ILnet/minecraft/util/BlockPos;I)V"))
-    private void preBreakBlock(BlockPos posBlock, EnumFacing directionFacing, CallbackInfoReturnable<Boolean> cir){
+    private void preBreakBlock(BlockPos posBlock, EnumFacing directionFacing, CallbackInfoReturnable<Boolean> cir) {
         if (FastMine.INSTANCE.shouldPreBreakBlock(this.stepSoundTickCounter, this.curBlockDamageMP)) {
             this.mc.theWorld.setBlockToAir(posBlock); // Maybe instead use: this.onPlayerDestroyBlock(posBlock, directionFacing);
             // The following is probably not required.

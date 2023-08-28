@@ -20,13 +20,13 @@ import java.util.*
 class AdvancedElementSelector<T>(
     parent: AdvancedMenu, module: Module, setting: SelectorSetting<T>,
 ) : AdvancedElement<SelectorSetting<T>>(parent, module, setting, AdvancedElementType.SELECTOR)
-        where T : Options, T: Enum<T> {
+        where T : Options, T : Enum<T> {
 
 
     /**
-	 * Renders the element
-	 */
-    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int {
+     * Renders the element
+     */
+    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
         val temp = ColorUtil.clickGUIColor
         val color = Color(temp.red, temp.green, temp.blue, 150).rgb
         val displayValue = setting.selected
@@ -38,7 +38,7 @@ class AdvancedElementSelector<T>(
             FontUtil.drawString(displayValue, settingWidth - FontUtil.getStringWidth(displayValue), 2, -0x1)
         } else {
             if (isButtonHovered(mouseX, mouseY)) {
-                FontUtil.drawCenteredStringWithShadow(displayValue,  settingWidth / 2.0, 2.0, -0x1)
+                FontUtil.drawCenteredStringWithShadow(displayValue, settingWidth / 2.0, 2.0, -0x1)
             } else {
                 FontUtil.drawCenteredString(setting.name, settingWidth / 2.0, 2.0, -0x1)
             }
@@ -51,7 +51,7 @@ class AdvancedElementSelector<T>(
             (settingWidth * 0.6).toInt(),
             15,
             color
-            )
+        )
 
         var ay = 15
         if (comboextended) {
@@ -63,7 +63,10 @@ class AdvancedElementSelector<T>(
                 val optionName = option.displayName
                 Gui.drawRect(0, ay, settingWidth, ay + increment, -0x55ededee)
                 val elementtitle =
-                    optionName.substring(0, 1).uppercase(Locale.getDefault()) + optionName.substring(1, optionName.length)
+                    optionName.substring(0, 1).uppercase(Locale.getDefault()) + optionName.substring(
+                        1,
+                        optionName.length
+                    )
                 FontUtil.drawCenteredString(elementtitle, settingWidth / 2.0, ay + 2.0, -0x1)
 
                 /** Highlights the element if it is selected */
@@ -71,7 +74,7 @@ class AdvancedElementSelector<T>(
                     Gui.drawRect(x, ay, 2, ay + increment, color)
                 }
                 /** Highlights the element when it is hovered */
-                if (mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y +  ay && mouseY < parent.y + y + ay + increment) {
+                if (mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y + ay && mouseY < parent.y + y + ay + increment) {
                     Gui.drawRect(settingWidth - 1, ay, settingWidth, ay + increment, clr2)
                 }
 
@@ -103,7 +106,7 @@ class AdvancedElementSelector<T>(
                 }
                 ay += increment
             }
-        } else if( mouseButton == 1) {
+        } else if (mouseButton == 1) {
             if (isButtonHovered(mouseX, mouseY)) {
                 comboextended = !comboextended
                 return true

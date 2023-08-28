@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin({EntityPlayer.class})
 public abstract class MixinPlayer extends MixinEntityLivingBase {
     @Inject(method = {"isEntityInsideOpaqueBlock"}, at = @At("HEAD"), cancellable = true)
-    public void inOpaque(CallbackInfoReturnable<Boolean> cir){
-        if (QOL.INSTANCE.cancelHeadInBlock()){
+    public void inOpaque(CallbackInfoReturnable<Boolean> cir) {
+        if (QOL.INSTANCE.cancelHeadInBlock()) {
             cir.setReturnValue(false);
         }
     }

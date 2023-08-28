@@ -84,7 +84,7 @@ class ElementStringSelector(parent: ModuleButton, setting: StringSelectorSetting
                 }
                 ay += increment
             }
-        } else if( mouseButton == 1) {
+        } else if (mouseButton == 1) {
             if (isButtonHovered(mouseX, mouseY)) {
                 extended = !extended
                 return true

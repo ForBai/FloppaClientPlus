@@ -1,7 +1,8 @@
 package floppaclient.utils
 
-import floppaclient.module.impl.render.ClickGui
 import com.google.gson.JsonParser
+import floppaclient.module.impl.render.ClickGui
+import floppaclient.utils.HypixelApiUtils.getSecrets
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
@@ -37,9 +38,9 @@ object HypixelApiUtils {
             if (jsonObject.getAsJsonPrimitive("success")?.asBoolean == true) {
                 jsonObject.getAsJsonObject("player")?.getAsJsonObject("achievements")
                     ?.getAsJsonPrimitive("skyblock_treasure_hunter")?.asInt
-            }else
+            } else
                 null
-        }catch (_: Exception){
+        } catch (_: Exception) {
             null
         }
     }
@@ -50,7 +51,7 @@ object HypixelApiUtils {
             try {
                 val httpGet = HttpGet(uri)
                 return EntityUtils.toString(it.execute(httpGet).entity)
-            }catch (_: Exception) {
+            } catch (_: Exception) {
                 return null
             }
         }

@@ -4,13 +4,13 @@ import floppaclient.FloppaClient.Companion.inDungeons
 import floppaclient.FloppaClient.Companion.mc
 import floppaclient.events.BlockStateChangeEvent
 import floppaclient.events.PositionUpdateEvent
+import floppaclient.floppamap.dungeon.RunInformation.inF7Boss
 import floppaclient.module.Category
 import floppaclient.module.Module
 import floppaclient.module.settings.impl.BooleanSetting
 import floppaclient.module.settings.impl.NumberSetting
 import floppaclient.module.settings.impl.StringSetting
 import floppaclient.utils.GeometryUtils.getDirection
-import floppaclient.floppamap.dungeon.RunInformation.inF7Boss
 import floppaclient.utils.fakeactions.FakeActionManager
 import floppaclient.utils.fakeactions.FakeActionUtils
 import floppaclient.utils.inventory.InventoryUtils.isHolding
@@ -30,18 +30,52 @@ object AutoDevices : Module(
     "Auto Devices",
     category = Category.DUNGEON,
     description = "Automatically completes floor 7 devices."
-){
+) {
     private val simonSays = BooleanSetting("Simon Says", true, description = "Toggle the Simon Says solver.")
-    val lights = BooleanSetting("Lights", true, description = "Toggle the Lights solver. §cRequires Secret Aura to be enabled.")
+    val lights =
+        BooleanSetting("Lights", true, description = "Toggle the Lights solver. §cRequires Secret Aura to be enabled.")
     private val alignment = BooleanSetting("Alignment", true, description = "Toggle the Alignment solver.")
     private val aiming = BooleanSetting("Aiming", true, description = "Toggle the Aiming solver.")
-    val lightFixTime = NumberSetting("Fix Time", 400.0, 0.0, 1000.0, 1.0, description = "Delay until it retries to do the device in case it failed. §cMust be greater than your ping.")
-    val slot = NumberSetting("Lights Slot", 5.0, 0.0, 7.0, 1.0, description = "The default slot that will be used to click the lights lever when the Item setting is left empty or not found in the hotbar.")
-    val itemName = StringSetting("Lights Item", description = "Item to use to click the lights lever. This will take priority over the slot, but if the item is not found the item in the specified slot will be used.")
-    private val alignmentReach = NumberSetting("Align Reach", 4.0, 2.0, 6.0, 0.1, description = "Once within this reach the Arrow Alignment device will automatically be solved.")
-    private val clicksPerTick = NumberSetting("Clicks Per Tick", 1.0, 1.0, 10.0, 1.0, description = "Determines how fast the arrow align frames will be clicked.")
-    private val ssReach = NumberSetting("SS Reach", 6.0, 2.0, 6.0, 0.1, description = "Block reach for the Auto Simon Says solver.")
-    private val ssDelay = NumberSetting("SS Delay", 200.0, 50.0, 500.0, 10.0, description = "Delay between Auto SS clicks.")
+    val lightFixTime = NumberSetting(
+        "Fix Time",
+        400.0,
+        0.0,
+        1000.0,
+        1.0,
+        description = "Delay until it retries to do the device in case it failed. §cMust be greater than your ping."
+    )
+    val slot = NumberSetting(
+        "Lights Slot",
+        5.0,
+        0.0,
+        7.0,
+        1.0,
+        description = "The default slot that will be used to click the lights lever when the Item setting is left empty or not found in the hotbar."
+    )
+    val itemName = StringSetting(
+        "Lights Item",
+        description = "Item to use to click the lights lever. This will take priority over the slot, but if the item is not found the item in the specified slot will be used."
+    )
+    private val alignmentReach = NumberSetting(
+        "Align Reach",
+        4.0,
+        2.0,
+        6.0,
+        0.1,
+        description = "Once within this reach the Arrow Alignment device will automatically be solved."
+    )
+    private val clicksPerTick = NumberSetting(
+        "Clicks Per Tick",
+        1.0,
+        1.0,
+        10.0,
+        1.0,
+        description = "Determines how fast the arrow align frames will be clicked."
+    )
+    private val ssReach =
+        NumberSetting("SS Reach", 6.0, 2.0, 6.0, 0.1, description = "Block reach for the Auto Simon Says solver.")
+    private val ssDelay =
+        NumberSetting("SS Delay", 200.0, 50.0, 500.0, 10.0, description = "Delay between Auto SS clicks.")
 
     init {
         this.addSettings(
@@ -69,11 +103,11 @@ object AutoDevices : Module(
             if (a.y > b.y) return@sortedWith -1
             return@sortedWith 0
         }
-    private val neededRotations = HashMap<Pair<Int, Int>, Pair<EntityItemFrame,Int>>()
+    private val neededRotations = HashMap<Pair<Int, Int>, Pair<EntityItemFrame, Int>>()
     private var ticks = 0
 
     @SubscribeEvent
-    fun onPositionUpdate(event: PositionUpdateEvent.Post){
+    fun onPositionUpdate(event: PositionUpdateEvent.Post) {
         if (!inDungeons || !alignment.enabled || !inF7Boss()) return
 
         if (mc.thePlayer.getDistanceSq(BlockPos(-2, 122, 76)) <= 15 * 15) {
@@ -87,11 +121,11 @@ object AutoDevices : Module(
                 if (avaliableClicks <= 0) break
                 if (mc.thePlayer.getDistanceToEntity(entry.value.first) > alignmentReach.value) continue
                 val clicks = entry.value.second.coerceAtMost(avaliableClicks)
-                if (clicks <= 0 ) continue
+                if (clicks <= 0) continue
                 for (ii in 1..clicks) {
                     FakeActionUtils.legitClickEntity(entry.value.first)
                 }
-                entry.setValue(entry.value.let { Pair(it.first, it.second - clicks) } )
+                entry.setValue(entry.value.let { Pair(it.first, it.second - clicks) })
                 avaliableClicks -= clicks
             }
         }
@@ -122,6 +156,7 @@ object AutoDevices : Module(
                             else -> 0
                         }
                     }
+
                     else -> 0
                 }
                 when (maze[x][y]) {
@@ -160,12 +195,13 @@ object AutoDevices : Module(
     //<editor-fold desc="Aiming">
 
     @SubscribeEvent
-    fun onBlockChange(event: BlockStateChangeEvent){
+    fun onBlockChange(event: BlockStateChangeEvent) {
         if (!inDungeons || !aiming.enabled || !inF7Boss()) return
         if (event.pos.z != 50) return
         if (!mc.thePlayer.isHolding(SkyblockItem.Attribute.SHORTBOW)) return
         if (event.newState.block !== Blocks.emerald_block || event.oldState.block !== Blocks.stained_hardened_clay) return
-        val direction = mc.thePlayer.getDirection(Vec3(event.pos).addVector(0.5, 1.15, 0.0), -mc.thePlayer.eyeHeight.toDouble())
+        val direction =
+            mc.thePlayer.getDirection(Vec3(event.pos).addVector(0.5, 1.15, 0.0), -mc.thePlayer.eyeHeight.toDouble())
         FakeActionManager.stageRightClickSlot(direction[1], direction[2])
     }
 
@@ -180,7 +216,7 @@ object AutoDevices : Module(
     private var lastSSUpdate = 0L
 
     @SubscribeEvent
-    fun onBlockChange2(event: BlockStateChangeEvent){
+    fun onBlockChange2(event: BlockStateChangeEvent) {
         if (!inDungeons || !simonSays.enabled || !inF7Boss()) return
         if (event.newState.block !== Blocks.sea_lantern || event.pos.x != 111) return
         // Prevent duplicate
@@ -203,7 +239,7 @@ object AutoDevices : Module(
             mc.theWorld.loadedEntityList
                 .filterIsInstance<EntityArmorStand>()
                 .filter { entity -> entity.name.contains("Inactive") }
-                .firstOrNull { entity -> entity.getDistanceSq(startButton) < 3*3 }
+                .firstOrNull { entity -> entity.getDistanceSq(startButton) < 3 * 3 }
                 ?.run {
                     started = SecretAura.interactWith(startButton, ssReach.value)
                 }
@@ -211,7 +247,7 @@ object AutoDevices : Module(
 
         //Click the blocks
         if (ssOrder.isNotEmpty() && mc.theWorld.getBlockState(startButton.south()).block === Blocks.stone_button
-            && mc.thePlayer.getDistanceSq(startButton.south(3)) < 8*8
+            && mc.thePlayer.getDistanceSq(startButton.south(3)) < 8 * 8
         ) {
             if (System.currentTimeMillis() >= nextSSClick) {
                 val success = SecretAura.interactWith(ssOrder.first(), ssReach.value)
@@ -225,7 +261,7 @@ object AutoDevices : Module(
     //</editor-fold>
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload){
+    fun onWorldChange(event: WorldEvent.Unload) {
         ssOrder.clear()
         ticks = 0
         neededRotations.clear()

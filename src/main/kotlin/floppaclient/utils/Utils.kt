@@ -78,7 +78,7 @@ object Utils {
      * Test whether the String contains one of the stings in the list.
      */
     fun String.containsOneOf(options: List<String>, ignoreCase: Boolean = false): Boolean {
-        return this.containsOneOf(options.toSet(),ignoreCase)
+        return this.containsOneOf(options.toSet(), ignoreCase)
 
     }
 
@@ -86,13 +86,13 @@ object Utils {
      * Test whether the String contains one of the stings in the list.
      */
     fun String.containsOneOf(options: Set<String>, ignoreCase: Boolean = false): Boolean {
-        options.forEach{
+        options.forEach {
             if (this.contains(it, ignoreCase)) return true
         }
         return false
     }
 
-    fun <K, V> MutableMap<K, V>.removeIf(filter: (Map.Entry<K, V>) -> Boolean) : Boolean {
+    fun <K, V> MutableMap<K, V>.removeIf(filter: (Map.Entry<K, V>) -> Boolean): Boolean {
         Objects.requireNonNull(filter)
         var removed = false
         val each: MutableIterator<Map.Entry<K, V>> = this.iterator()
@@ -105,7 +105,10 @@ object Utils {
         return removed
     }
 
-    fun getDungeonClass(tabEntries: List<Pair<NetworkPlayerInfo, String>>, playerName: String = mc.thePlayer.name): String? {
+    fun getDungeonClass(
+        tabEntries: List<Pair<NetworkPlayerInfo, String>>,
+        playerName: String = mc.thePlayer.name
+    ): String? {
         for (i in listOf(5, 9, 13, 17, 1)) {
             val tabText = StringUtils.stripControlCodes(tabEntries[i].second).trim()
             val name = tabText.split(" ").getOrNull(1) ?: ""
@@ -125,7 +128,7 @@ object Utils {
      * Returns the first dungeon Teammate with the chose class. Or null if not found / dead
      */
     fun dungeonTeammateWithClass(targetClass: String, allowSelf: Boolean = false): DungeonPlayer? {
-        Dungeon.getDungeonTabList()?.let{ tabList ->
+        Dungeon.getDungeonTabList()?.let { tabList ->
             Dungeon.dungeonTeammates.forEach {
                 if (!allowSelf && it.name == mc.thePlayer.name) return@forEach
                 if (getDungeonClass(tabList, it.name) == targetClass) return it
@@ -193,7 +196,7 @@ object Utils {
     fun isInTerminal(): Boolean {
         if (mc.thePlayer == null) return false
         val container: Container = mc.thePlayer.openContainer
-        if (container !is ContainerChest) return  false
+        if (container !is ContainerChest) return false
         val name = container.lowerChestInventory.name
         return name.contains("Correct all the panes!") || name.contains("Navigate the maze!") || name.contains(
             "Click in order!"
@@ -237,21 +240,21 @@ object Utils {
     /**
      * Shift left clicks the specified slot.
      */
-    fun shiftClickWindow(windowId: Int, index : Int) {
+    fun shiftClickWindow(windowId: Int, index: Int) {
         windowClick(windowId, index, 0, 1)
     }
 
     /**
      * Middle clicks the specified slot.
      */
-    fun middleClickWindow(windowId: Int, index : Int) {
+    fun middleClickWindow(windowId: Int, index: Int) {
         windowClick(windowId, index, 2, 3)
     }
 
     /**
      * Left clicks the specified slot.
      */
-    fun leftClickWindow(windowId: Int, index : Int) {
+    fun leftClickWindow(windowId: Int, index: Int) {
         windowClick(windowId, index, 0, 0)
     }
 

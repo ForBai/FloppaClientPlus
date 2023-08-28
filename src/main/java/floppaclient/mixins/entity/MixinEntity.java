@@ -8,9 +8,11 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(value = {Entity.class}, priority = 800)
 public abstract class MixinEntity {
 
-    @Shadow public boolean noClip;
+    @Shadow
+    public boolean noClip;
 
-    @Shadow public abstract boolean interactFirst(EntityPlayer playerIn);
+    @Shadow
+    public abstract boolean interactFirst(EntityPlayer playerIn);
 
     @Shadow
     public float rotationPitch;

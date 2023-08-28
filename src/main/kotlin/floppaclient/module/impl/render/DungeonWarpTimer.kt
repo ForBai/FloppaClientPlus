@@ -25,13 +25,17 @@ object DungeonWarpTimer : Module(
     "Warp Timer",
     category = Category.RENDER,
     description = "Renders a timer for when you can join the next dungeon."
-){
+) {
 
     /**
      * To toggle whether it should play a sound once the own warp cooldown is over.
      */
     private val alerts = BooleanSetting("Alerts", false, description = "Plays a sound when your cooldown is over.")
-    val trackInBackground = BooleanSetting("Track when off", false, description = "If enabled will keep tracking cooldowns in the background so that you can disable / enable the HUD whenever.")
+    val trackInBackground = BooleanSetting(
+        "Track when off",
+        false,
+        description = "If enabled will keep tracking cooldowns in the background so that you can disable / enable the HUD whenever."
+    )
 
     private val volume = NumberSetting("Volume", 1.0, 0.0, 1.0, 0.01, description = "Volume of the alert.")
 
@@ -42,7 +46,7 @@ object DungeonWarpTimer : Module(
 
     private val xHud = NumberSetting("x", default = 0.0, visibility = Visibility.HIDDEN)
     private val yHud = NumberSetting("y", default = 128.0, visibility = Visibility.HIDDEN)
-    private val scaleHud = NumberSetting("scale",1.0,0.1,4.0, 0.01, visibility = Visibility.HIDDEN)
+    private val scaleHud = NumberSetting("scale", 1.0, 0.1, 4.0, 0.01, visibility = Visibility.HIDDEN)
 
     private var warps: MutableMap<String, Int> = mutableMapOf()
 
@@ -61,7 +65,7 @@ object DungeonWarpTimer : Module(
      * Register this class to the event bus if [trackInBackground] is enabled.
      */
     override fun onInitialize() {
-        if(!this.enabled && trackInBackground.enabled) {
+        if (!this.enabled && trackInBackground.enabled) {
             MinecraftForge.EVENT_BUS.register(DungeonWarpTimer)
         }
         super.onInitialize()
@@ -87,13 +91,14 @@ object DungeonWarpTimer : Module(
                 val regex = Regex("(.+) warped the party to a SkyBlock dungeon!")
                 val player = regex.find(text)?.groupValues?.get(1)
                 if (player != null) {
-                    warps[player] = 70*20
+                    warps[player] = 70 * 20
                 }
             }
+
             text.startsWith("SkyBlock Dungeon Warp") -> {
                 val regex = Regex("SkyBlock Dungeon Warp \\(\\d players\\)")
                 if (regex.matches(text)) {
-                    warps["§6You"] = 70*20
+                    warps["§6You"] = 70 * 20
                 }
             }
         }
@@ -111,8 +116,8 @@ object DungeonWarpTimer : Module(
             warps[name] = warps[name]?.minus(1) ?: 0
             if (warps[name]!! <= 0) {
                 warps.remove(name)
-                if(name == "§6You" && alerts.enabled) {
-                    playLoudSound("random.orb", volume.value.toFloat(),0f)
+                if (name == "§6You" && alerts.enabled) {
+                    playLoudSound("random.orb", volume.value.toFloat(), 0f)
                 }
             }
         }
@@ -124,13 +129,13 @@ object DungeonWarpTimer : Module(
         yHud,
         mc.fontRendererObj.getStringWidth("Warp Cooldowns") + 2,
         scale = scaleHud
-    ){
+    ) {
         override fun renderHud() {
 
             if (warps.isEmpty()) return
             val lines = mutableListOf("Warp Cooldowns")
             lines.addAll(warps.map {
-                "${it.key}§r: ${ceil( it.value / 20.0).toInt()} s"
+                "${it.key}§r: ${ceil(it.value / 20.0).toInt()} s"
             })
 
             var yOffs = 0

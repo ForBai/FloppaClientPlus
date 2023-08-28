@@ -8,15 +8,15 @@ import floppaclient.events.PlaySoundEventPre
 import floppaclient.events.PositionUpdateEvent
 import floppaclient.events.TeleportEventPre
 import floppaclient.floppamap.dungeon.Dungeon
+import floppaclient.floppamap.dungeon.RunInformation.inF7Boss
 import floppaclient.floppamap.utils.RoomUtils
 import floppaclient.module.Category
+import floppaclient.module.Module
 import floppaclient.module.settings.impl.BooleanSetting
 import floppaclient.module.settings.impl.NumberSetting
-import floppaclient.utils.DataHandler
-import floppaclient.floppamap.dungeon.RunInformation.inF7Boss
 import floppaclient.utils.ChatUtils.modMessage
 import floppaclient.utils.ClipTools.executeClipRoute
-import floppaclient.module.Module
+import floppaclient.utils.DataHandler
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
@@ -43,22 +43,46 @@ object AutoClip : Module(
     description = "Automatically initiates a clip route when teleported to predefined start position. Use /addc and /remc " +
             "to edit routes. Use the delay settings to change with which delay it will start." +
             "§eWith clip being basically patched in general there is little use left for this module."
-){
+) {
 
     private val chatInfo = BooleanSetting("Chat Info", true, description = "Show a chat message when auto clipping")
     private val onEtherwarp = BooleanSetting("Etherwarp", true, description = "Activate on Etherwarp.")
     private val onPearlTp = BooleanSetting("Pearl", true, description = "Activate on Ender Pearl teleport.")
-    private val onSinSeeker = BooleanSetting("Sin Seeker", false, description = "Activate on SinSeeker Scythe teleport.")
+    private val onSinSeeker =
+        BooleanSetting("Sin Seeker", false, description = "Activate on SinSeeker Scythe teleport.")
     private val onLava = BooleanSetting("Lava", false, description = "Activate when touching lava. Only in Boss.")
     private val onLeap = BooleanSetting("Leap", false, description = "Activate on Spirit Leap. Only in Boss.")
-    private val pearlDetectionRange = NumberSetting("Det. Range", 2.0, 1.0,5.0, description = "Max distance from the clip start for Pearls to register.")
-    private val bossDetectionRange = NumberSetting("Det. Range Boss", 2.0, 1.0,5.0, description = "Max distance from the clip start for lava and Leaps to register.")
-    private val hopperDelay = NumberSetting("Hopper Delay", 200.0, 0.0, 500.0,10.0, description = "Delay when Etherwarping to a Hopper.")
-    private val fenceDelay = NumberSetting("Fence Delay", 150.0, 0.0, 500.0,10.0, description = "Delay when Etherwapred to a fence.")
-    private val lavaDelay = NumberSetting("Lava Delay", 0.0, 0.0, 200.0,10.0, description = "Activation delay when touching lava.")
-    private val defaultDelay = NumberSetting("Default Delay", 30.0, 0.0, 500.0,10.0, description = "Default delay for all other situations.")
-    val delayOffset = NumberSetting("Delay Offset", 1.0, 0.0, 5.0,1.0, description = "Start index in the delay chain.")
-    val preset = NumberSetting("Boss Preset", 0.0,0.0,9.0,1.0, description = "Choose in between different configs for the boss room.")
+    private val pearlDetectionRange = NumberSetting(
+        "Det. Range",
+        2.0,
+        1.0,
+        5.0,
+        description = "Max distance from the clip start for Pearls to register."
+    )
+    private val bossDetectionRange = NumberSetting(
+        "Det. Range Boss",
+        2.0,
+        1.0,
+        5.0,
+        description = "Max distance from the clip start for lava and Leaps to register."
+    )
+    private val hopperDelay =
+        NumberSetting("Hopper Delay", 200.0, 0.0, 500.0, 10.0, description = "Delay when Etherwarping to a Hopper.")
+    private val fenceDelay =
+        NumberSetting("Fence Delay", 150.0, 0.0, 500.0, 10.0, description = "Delay when Etherwapred to a fence.")
+    private val lavaDelay =
+        NumberSetting("Lava Delay", 0.0, 0.0, 200.0, 10.0, description = "Activation delay when touching lava.")
+    private val defaultDelay =
+        NumberSetting("Default Delay", 30.0, 0.0, 500.0, 10.0, description = "Default delay for all other situations.")
+    val delayOffset = NumberSetting("Delay Offset", 1.0, 0.0, 5.0, 1.0, description = "Start index in the delay chain.")
+    val preset = NumberSetting(
+        "Boss Preset",
+        0.0,
+        0.0,
+        9.0,
+        1.0,
+        description = "Choose in between different configs for the boss room."
+    )
 
     private val fences = listOf(
         Blocks.cobblestone_wall,
@@ -122,21 +146,23 @@ object AutoClip : Module(
     @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
     fun onSoundPlay(event: PlaySoundEventPre) {
         if (doClip) return
-        when(event.p_sound.soundLocation.resourcePath) {
-            "mob.enderdragon.hit" -> if(onEtherwarp.enabled) {
+        when (event.p_sound.soundLocation.resourcePath) {
+            "mob.enderdragon.hit" -> if (onEtherwarp.enabled) {
                 doClip = true
                 clipType = ClipType.DEFAULT
             }
+
             "random.burp" -> if (onSinSeeker.enabled) {
                 if (event.p_sound.volume == 0.4f && event.p_sound.pitch == 0.61904764f) {
                     doClip = true
                     clipType = ClipType.DEFAULT
                 }
             }
+
             "random.bow" -> {
                 /** Pearl detection */
                 if (!onPearlTp.enabled) return
-                if(event.p_sound.pitch < 0.5 && event.p_sound.volume == 0.5f) {
+                if (event.p_sound.pitch < 0.5 && event.p_sound.volume == 0.5f) {
                     pearlTicks = pearlMaxTicks
                 }
             }
@@ -164,7 +190,7 @@ object AutoClip : Module(
      */
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if (!onLava.enabled)  return
+        if (!onLava.enabled) return
         if (event.phase != TickEvent.Phase.START) return
         if (!inF7Boss()) return
         if (doClip) return
@@ -232,16 +258,17 @@ object AutoClip : Module(
                     room.first.z,
                     room.second
                 )
+
                 /** check for the start pos in config
                  * Note here the use of .toMutablelist() to force the creation of a new list, so that the clip data does not get overwritten.*/
                 var route = this.clips[key]?.toMutableList() ?: mutableListOf()
                 /** if it's not in there check adjacent blocks */
-                if(clipType.ordinal > 0) kotlin.run adjustClip@{
+                if (clipType.ordinal > 0) kotlin.run adjustClip@{
                     if (!this.clips.containsKey(key)) {
                         // this start position was not found in the config -> check all blocks in range
                         val range = if (clipType == ClipType.PEARL) pearlDetectionRange.value
-                                    else bossDetectionRange.value
-                        val point1 = BlockPos(pos).add( range,  range,  range)
+                        else bossDetectionRange.value
+                        val point1 = BlockPos(pos).add(range, range, range)
                         val point2 = BlockPos(pos).add(-range, -range, -range)
                         for (blockPos in BlockPos.getAllInBox(point1, point2)
                             .sortedBy { mc.thePlayer.getDistanceSqToCenter(it) }
@@ -281,7 +308,7 @@ object AutoClip : Module(
                 /** return if no clip route was found */
                 if (route.isEmpty()) return
                 /** a route is defined for this position */
-                if(chatInfo.enabled) modMessage("Attempting clip")
+                if (chatInfo.enabled) modMessage("Attempting clip")
                 /** setting correct delay */
                 startDelay = getStartDelay(pos)
                 Timer().schedule(startDelay.toLong()) {
@@ -295,22 +322,24 @@ object AutoClip : Module(
                         KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.keyCode, false)
                     }
                 }
-                val eta = executeClipRoute(route,room.second,startDelay)
+                val eta = executeClipRoute(route, room.second, startDelay)
                 Timer().schedule(eta) {
                     MinecraftForge.EVENT_BUS.post(ClipFinishEvent())
                 }
             }
-        }catch (e: Throwable){ return }
+        } catch (e: Throwable) {
+            return
+        }
     }
 
     /**
      * Checks which delay to use according to the block you are on.
      */
-    fun getStartDelay (pos: Vec3): Int {
+    fun getStartDelay(pos: Vec3): Int {
         if (clipType == ClipType.LAVA) return lavaDelay.value.toInt()
-        else if(clipType.ordinal > 0) return defaultDelay.value.toInt()
-        val position = BlockPos(pos.subtract(0.0,1.0,0.0))
-        return when(mc.theWorld.getBlockState(position).block) {
+        else if (clipType.ordinal > 0) return defaultDelay.value.toInt()
+        val position = BlockPos(pos.subtract(0.0, 1.0, 0.0))
+        return when (mc.theWorld.getBlockState(position).block) {
             Blocks.hopper -> hopperDelay.value.toInt()
             in fences -> fenceDelay.value.toInt()
             else -> defaultDelay.value.toInt()

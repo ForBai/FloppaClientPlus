@@ -17,13 +17,13 @@ object JerryRocket : Module(
     "Jerry Rocket",
     category = Category.PLAYER,
     description = "Cancels horizontal kb when holding the jerry chine gun."
-){
+) {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun handleEntityVelocity(event: VelocityUpdateEvent){
+    fun handleEntityVelocity(event: VelocityUpdateEvent) {
         if (mc.theWorld.getEntityByID(event.packet.entityID) == mc.thePlayer) {
             if (mc.thePlayer.isHolding(SkyblockItem.JERRY_GUN) && event.packet.motionY == 4800) {
-                mc.thePlayer.motionY = event.packet.motionY/8000.0
+                mc.thePlayer.motionY = event.packet.motionY / 8000.0
                 event.isCanceled = true
             }
         }

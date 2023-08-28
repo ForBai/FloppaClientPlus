@@ -15,12 +15,12 @@ object MapUtils {
      */
     var roomSize = 16
     var calibrated = false
-    var coordMultiplier = 20.0/32.0
+    var coordMultiplier = 20.0 / 32.0
 
     private val colorString: String?
         get() {
             val mapData = getMapData() ?: return null
-            return  mapData.colors.map{it.toInt().toChar()}.joinToString("")
+            return mapData.colors.map { it.toInt().toChar() }.joinToString("")
         }
 
     private val regex16 = Regex("${30.toChar()}{16}")
@@ -39,8 +39,8 @@ object MapUtils {
     fun getRoomSizeFromMap(): Int? {
         val mapColorString = colorString ?: return null
 
-        return if(regex18.find(mapColorString) != null) 18
-        else if(regex16.find(mapColorString) != null) 16
+        return if (regex18.find(mapColorString) != null) 18
+        else if (regex16.find(mapColorString) != null) 16
         else null
     }
 
@@ -59,7 +59,7 @@ object MapUtils {
 
         // make sure to update that value before using this function
         val increment = roomSize + 4
-        val greenX = greenCorner.mod( 128)
+        val greenX = greenCorner.mod(128)
         val greenZ = greenCorner shr 7 // Division by 128
 
         val startX = greenX.mod(increment)

@@ -23,9 +23,9 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
         if (FontUtil.getStringWidth(displayValue + "00" + displayName) <= width) {
             FontUtil.drawString(displayName, 1, 2)
             FontUtil.drawString(displayValue, width - FontUtil.getStringWidth(displayValue), 2)
-        }else {
+        } else {
             if (isTextHovered(mouseX, mouseY) || listening) {
-                FontUtil.drawCenteredStringWithShadow(displayValue, width / 2.0,  2.0)
+                FontUtil.drawCenteredStringWithShadow(displayValue, width / 2.0, 2.0)
             } else {
                 FontUtil.drawCenteredString(displayName, width / 2.0, 2.0)
             }
@@ -55,7 +55,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
                 listening = false
             } else if (keyCode == Keyboard.KEY_BACK) {
                 setting.text = setting.text.dropLast(1)
-            }else if (!keyBlackList.contains(keyCode)) {
+            } else if (!keyBlackList.contains(keyCode)) {
                 setting.text = setting.text + typedChar.toString()
             }
             return true
@@ -67,7 +67,7 @@ class ElementTextField(parent: ModuleButton, setting: StringSetting) :
      * Checks whether the mouse is hovering the text field
      */
     private fun isTextHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseX >= xAbsolute && mouseX <= xAbsolute + width && mouseY >= yAbsolute  && mouseY <= yAbsolute + height
+        return mouseX >= xAbsolute && mouseX <= xAbsolute + width && mouseY >= yAbsolute && mouseY <= yAbsolute + height
     }
 
     private val keyBlackList = intArrayOf(

@@ -17,8 +17,26 @@ open class PositionUpdateEvent constructor(
 
 
     @Cancelable
-    class Pre(x: Double, y: Double, z: Double, yaw: Float, pitch: Float, onGround: Boolean, sprinting: Boolean, sneaking: Boolean) : PositionUpdateEvent(x, y, z, yaw, pitch, onGround, sprinting, sneaking)
+    class Pre(
+        x: Double,
+        y: Double,
+        z: Double,
+        yaw: Float,
+        pitch: Float,
+        onGround: Boolean,
+        sprinting: Boolean,
+        sneaking: Boolean
+    ) : PositionUpdateEvent(x, y, z, yaw, pitch, onGround, sprinting, sneaking)
 
     @Cancelable
-    class Post(x: Double, y: Double, z: Double, yaw: Float, pitch: Float, onGround: Boolean, sprinting: Boolean, sneaking: Boolean) : PositionUpdateEvent(x, y, z, yaw, pitch, onGround, sprinting, sneaking)
+    class Post(
+        x: Double,
+        y: Double,
+        z: Double,
+        yaw: Float,
+        pitch: Float,
+        onGround: Boolean,
+        sprinting: Boolean,
+        sneaking: Boolean
+    ) : PositionUpdateEvent(x, y, z, yaw, pitch, onGround, sprinting, sneaking)
 }

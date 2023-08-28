@@ -12,7 +12,7 @@ import floppaclient.ui.clickgui.util.FontUtil
  * @author Aton
  */
 class ElementAction(parent: ModuleButton, setting: ActionSetting) :
-    Element<ActionSetting>(parent, setting, ElementType.ACTION)  {
+    Element<ActionSetting>(parent, setting, ElementType.ACTION) {
 
     override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
         FontUtil.drawString(displayName, 1, 2)
@@ -24,7 +24,7 @@ class ElementAction(parent: ModuleButton, setting: ActionSetting) :
      * Used to activate the elements action.
      */
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
-        if (mouseButton == 0 && isButtonHovered(mouseX, mouseY) ) {
+        if (mouseButton == 0 && isButtonHovered(mouseX, mouseY)) {
             (setting as? ActionSetting)?.doAction()
             return true
         }
@@ -35,6 +35,6 @@ class ElementAction(parent: ModuleButton, setting: ActionSetting) :
      * Checks whether this element is hovered
      */
     private fun isButtonHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseX >= xAbsolute && mouseX <= xAbsolute + width && mouseY >= yAbsolute  && mouseY <= yAbsolute + height
+        return mouseX >= xAbsolute && mouseX <= xAbsolute + width && mouseY >= yAbsolute && mouseY <= yAbsolute + height
     }
 }

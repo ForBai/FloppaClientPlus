@@ -6,10 +6,10 @@ import floppaclient.events.ClickEvent
 import floppaclient.module.Category
 import floppaclient.module.Module
 import floppaclient.utils.ChatUtils.modMessage
-import floppaclient.utils.inventory.ItemUtils.itemID
-import floppaclient.utils.inventory.ItemUtils.lore
 import floppaclient.utils.Utils
 import floppaclient.utils.fakeactions.FakeActionUtils
+import floppaclient.utils.inventory.ItemUtils.itemID
+import floppaclient.utils.inventory.ItemUtils.lore
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -17,7 +17,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
-import java.util.Calendar
+import java.util.*
 
 /**
  * A macro to automatically open all jerry boxes in the inventory.
@@ -29,7 +29,7 @@ object JerryBoxOpener : Module(
     category = Category.MISC,
     description = "Opens all the jerry boxes you have in your inventory. To start the opening process right click a jerry box.\n" +
             "To abort run the command \"/fcl stop\""
-){
+) {
     private var nextItemUse = 0L
     private var nextOpen = 0L
     private var nextClaim = 0L
@@ -71,7 +71,7 @@ object JerryBoxOpener : Module(
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
-        if(event.phase != TickEvent.Phase.START || !opening) return
+        if (event.phase != TickEvent.Phase.START || !opening) return
         // If in the gui handle that
         val container = mc.thePlayer.openContainer
         if (inJerryGui) run boxGUi@{
@@ -87,6 +87,7 @@ object JerryBoxOpener : Module(
                         nextOpen = System.currentTimeMillis() + 1000L
                     }
                 }
+
                 "§eClick to claim!" -> {
                     if (System.currentTimeMillis() >= nextClaim) {
                         Utils.leftClickWindow(container.windowId, 22)
@@ -101,12 +102,13 @@ object JerryBoxOpener : Module(
             if (mc.thePlayer?.heldItem?.itemID?.matches(jerryIDMatcher) == true) {
                 Utils.rightClick()
                 nextItemUse = System.currentTimeMillis() + 1000L
-            }else if (System.currentTimeMillis() >= pendingTime){
-                val keepGoing = FakeActionUtils.swapItemToSlot(jerryIDMatcher, mc.thePlayer.inventory.currentItem, matchMode = 2)
+            } else if (System.currentTimeMillis() >= pendingTime) {
+                val keepGoing =
+                    FakeActionUtils.swapItemToSlot(jerryIDMatcher, mc.thePlayer.inventory.currentItem, matchMode = 2)
                 if (keepGoing) {
                     // Theoretically we could already queue a click on the jerry box here, but we can also just wait for the next tick.
                     pendingTime = System.currentTimeMillis() + 500L
-                }else {
+                } else {
                     opening = false
                     val calendar = Calendar.getInstance()
                     val hour = calendar.get(Calendar.HOUR_OF_DAY)

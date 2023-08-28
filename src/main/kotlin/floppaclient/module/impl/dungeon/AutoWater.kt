@@ -35,15 +35,27 @@ object AutoWater : Module(
     "Auto Water",
     category = Category.DUNGEON,
     description = "Automatically solves the water puzzle. Start by flicking the water flow start lever."
-){
+) {
 
-    private val etherCd = NumberSetting("EtherCD",10.0,5.0,40.0,1.0, description = "Cooldown between successive etherwarp attempts in ticks.")
-    private val completionSound = BooleanSetting("Comp. Sound", true, description = "Play a sound upon finishing the solving process.")
+    private val etherCd = NumberSetting(
+        "EtherCD",
+        10.0,
+        5.0,
+        40.0,
+        1.0,
+        description = "Cooldown between successive etherwarp attempts in ticks."
+    )
+    private val completionSound =
+        BooleanSetting("Comp. Sound", true, description = "Play a sound upon finishing the solving process.")
     private val volume = NumberSetting("Volume", 1.0, 0.0, 1.0, 0.01, description = "Volume for the completion sound.")
-    private val advancedEther = BooleanSetting("Advanced tp",false, description = "The etherwarp positions will be optimized, can break the solver, WIP.")
+    private val advancedEther = BooleanSetting(
+        "Advanced tp",
+        false,
+        description = "The etherwarp positions will be optimized, can break the solver, WIP."
+    )
 
     var variant = -1
-     private set
+        private set
 
     private var inWater = false
 
@@ -55,300 +67,300 @@ object AutoWater : Module(
     private val variant3Solutions: Map<GateState, List<Step>> = mapOf(
         GateState.RGB to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.CLAY,    Condition.WaterState(-1,74)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(-9,65)),
-            Step(Lever.EMERALD, Condition.WaterState(-5,63)),
-            Step(Lever.CLAY,    Condition.WaterState(-0,65)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.CLAY, Condition.WaterState(-1, 74)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(-9, 65)),
+            Step(Lever.EMERALD, Condition.WaterState(-5, 63)),
+            Step(Lever.CLAY, Condition.WaterState(-0, 65)),
         ),
         GateState.RGO to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.WaterState(true, BlockPos(-4, 78, 11))),
-            Step(Lever.CLAY,    Condition.Delay(60)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.WaterState(true, BlockPos(-4, 78, 11))),
+            Step(Lever.CLAY, Condition.Delay(60)),
             // -7,73,-11
-            Step(Lever.CLAY,    Condition.WaterState(true, BlockPos(7,73,11))),
-            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(7,65,11)))
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(7, 73, 11))),
+            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(7, 65, 11)))
         ),
         GateState.RGP to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.WaterState(true, BlockPos(-4, 78, 11))),
-            Step(Lever.CLAY,    Condition.Delay(60)),
-            Step(Lever.CLAY,    Condition.WaterState(true, BlockPos(7,73,11))),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.WaterState(true, BlockPos(-4, 78, 11))),
+            Step(Lever.CLAY, Condition.Delay(60)),
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(7, 73, 11))),
         ),
         GateState.RBO to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.WaterState(true, BlockPos(-4, 78, 11))),
-            Step(Lever.CLAY,    Condition.Delay(60)),
-            Step(Lever.CLAY,    Condition.WaterState(true, BlockPos(7,73,11))),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.WaterState(true, BlockPos(-4, 78, 11))),
+            Step(Lever.CLAY, Condition.Delay(60)),
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(7, 73, 11))),
             //-5,69,-11
-            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(5,69,11))),
-            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(7,65,11)))
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(5, 69, 11))),
+            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(7, 65, 11)))
         ),
         GateState.RBP to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.WaterState(true, BlockPos(-4, 78, 11))),
-            Step(Lever.CLAY,    Condition.Delay(60)),
-            Step(Lever.CLAY,    Condition.WaterState(true, BlockPos(7,73,11))),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.WaterState(true, BlockPos(-4, 78, 11))),
+            Step(Lever.CLAY, Condition.Delay(60)),
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(7, 73, 11))),
             //-5,69,-11
-            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(5,69,11))),
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(5, 69, 11))),
         ),
         GateState.ROP to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.WaterState(true, BlockPos(-4, 78, 11))),
-            Step(Lever.CLAY,    Condition.Delay(60)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.WaterState(true, BlockPos(-4, 78, 11))),
+            Step(Lever.CLAY, Condition.Delay(60)),
             //-9,63,-11
-            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(9,63,-11)))
+            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(9, 63, -11)))
         ),
         GateState.GBO to listOf(
             Step(Lever.GOLD, Condition.Delay(10)),
-            Step(Lever.QUARTZ,    Condition.Delay(20)),
+            Step(Lever.QUARTZ, Condition.Delay(20)),
             // 4,64,-11
-            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(-4,64,11)))
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(-4, 64, 11)))
         ),
         GateState.GBP to listOf(
             Step(Lever.GOLD, Condition.Delay(10)),
-            Step(Lever.QUARTZ,    Condition.Delay(20)),
-            Step(Lever.EMERALD,    Condition.Delay(40)),
+            Step(Lever.QUARTZ, Condition.Delay(20)),
+            Step(Lever.EMERALD, Condition.Delay(40)),
             // 4,64,-11
-            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(-4,64,11)))
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(-4, 64, 11)))
         ),
         GateState.GOP to listOf(
             Step(Lever.GOLD, Condition.Delay(10)),
-            Step(Lever.QUARTZ,    Condition.Delay(20)),
+            Step(Lever.QUARTZ, Condition.Delay(20)),
             // -7,62,-11
             // moved it one further to the right for consistency
-            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(6,62,11)))
+            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(6, 62, 11)))
         ),
         GateState.BOP to listOf(
             Step(Lever.GOLD, Condition.Delay(10)),
-            Step(Lever.QUARTZ,    Condition.Delay(20)),
-            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(5,69,11))),
-            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(6,62,11)))
+            Step(Lever.QUARTZ, Condition.Delay(20)),
+            Step(Lever.CLAY, Condition.WaterState(true, BlockPos(5, 69, 11))),
+            Step(Lever.EMERALD, Condition.WaterState(true, BlockPos(6, 62, 11)))
         ),
     )
     private val variant2Solutions: Map<GateState, List<Step>> = mapOf(
         GateState.RGB to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.WaterState(-1,76)),
-            Step(Lever.EMERALD, Condition.WaterState(2,73)),
-            Step(Lever.WATER,   Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(-5,60)),
+            Step(Lever.GOLD, Condition.WaterState(-1, 76)),
+            Step(Lever.EMERALD, Condition.WaterState(2, 73)),
+            Step(Lever.WATER, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(-5, 60)),
         ),
         GateState.RGO to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.WaterState(-2,76)),
-            Step(Lever.EMERALD, Condition.WaterState(1,65, false, 155)),
+            Step(Lever.GOLD, Condition.WaterState(-2, 76)),
+            Step(Lever.EMERALD, Condition.WaterState(1, 65, false, 155)),
         ),
         GateState.RGP to listOf(
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.WATER,   Condition.WaterState(-3,76)),
-            Step(Lever.DIAMOND, Condition.WaterState(-2,76)),
-            Step(Lever.DIAMOND, Condition.WaterState(-0,78, false)),
-            Step(Lever.DIAMOND, Condition.WaterState(-5,60)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.WATER, Condition.WaterState(-3, 76)),
+            Step(Lever.DIAMOND, Condition.WaterState(-2, 76)),
+            Step(Lever.DIAMOND, Condition.WaterState(-0, 78, false)),
+            Step(Lever.DIAMOND, Condition.WaterState(-5, 60)),
             Step(Lever.EMERALD, Condition.Delay(0)),
         ),
         GateState.RBO to listOf(
-            Step(Lever.EMERALD, Condition.WaterState(-1,70)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(-4,70)),
+            Step(Lever.EMERALD, Condition.WaterState(-1, 70)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(-4, 70)),
         ),
         GateState.RBP to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.WaterState(-1,76)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.GOLD, Condition.WaterState(-1, 76)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(6,78)),
-            Step(Lever.EMERALD, Condition.WaterState(1,65, false, 155)),
+            Step(Lever.EMERALD, Condition.WaterState(6, 78)),
+            Step(Lever.EMERALD, Condition.WaterState(1, 65, false, 155)),
         ),
         GateState.ROP to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(-6,76)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(6,78)),
-            Step(Lever.EMERALD, Condition.WaterState(9,76)),
-            Step(Lever.WATER,   Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(7,67)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(-6, 76)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(6, 78)),
+            Step(Lever.EMERALD, Condition.WaterState(9, 76)),
+            Step(Lever.WATER, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(7, 67)),
         ),
         GateState.GBO to listOf(
-            Step(Lever.EMERALD, Condition.WaterState(-3,70)),
-            Step(Lever.EMERALD, Condition.WaterState(-8,67)),
-            Step(Lever.EMERALD, Condition.WaterState(0,63)),
+            Step(Lever.EMERALD, Condition.WaterState(-3, 70)),
+            Step(Lever.EMERALD, Condition.WaterState(-8, 67)),
+            Step(Lever.EMERALD, Condition.WaterState(0, 63)),
         ),
         GateState.GBP to listOf(
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.WaterState(-1,70)),
-            Step(Lever.DIAMOND, Condition.WaterState(-8,70)),
-            Step(Lever.DIAMOND, Condition.WaterState(-8,63)),
-            Step(Lever.DIAMOND, Condition.WaterState(4,68)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.GOLD, Condition.WaterState(-1, 70)),
+            Step(Lever.DIAMOND, Condition.WaterState(-8, 70)),
+            Step(Lever.DIAMOND, Condition.WaterState(-8, 63)),
+            Step(Lever.DIAMOND, Condition.WaterState(4, 68)),
         ),
         GateState.GOP to listOf(
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.WaterState(-1,76)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.GOLD, Condition.WaterState(-1, 76)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(-4,70)),
-            Step(Lever.DIAMOND, Condition.WaterState(5,64)),
+            Step(Lever.DIAMOND, Condition.WaterState(-4, 70)),
+            Step(Lever.DIAMOND, Condition.WaterState(5, 64)),
         ),
         GateState.BOP to listOf(
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.WaterState(5,75)),
-            Step(Lever.DIAMOND, Condition.WaterState(7,67)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.GOLD, Condition.WaterState(5, 75)),
+            Step(Lever.DIAMOND, Condition.WaterState(7, 67)),
         ),
     )
     private val variant1Solutions: Map<GateState, List<Step>> = mapOf(
         GateState.RGB to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(-6,71)),
-            Step(Lever.CLAY,    Condition.WaterState(2,66)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(-6, 71)),
+            Step(Lever.CLAY, Condition.WaterState(2, 66)),
         ),
         GateState.RGO to listOf(
-            Step(Lever.QUARTZ,  Condition.WaterState(3,74)),
+            Step(Lever.QUARTZ, Condition.WaterState(3, 74)),
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.CLAY,    Condition.WaterState(-5,59)),
+            Step(Lever.CLAY, Condition.WaterState(-5, 59)),
         ),
         GateState.RGP to listOf(
-            Step(Lever.QUARTZ,  Condition.WaterState(3,74)),
+            Step(Lever.QUARTZ, Condition.WaterState(3, 74)),
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(7,67)),
-            Step(Lever.CLAY,    Condition.WaterState(-5,59)),
+            Step(Lever.EMERALD, Condition.WaterState(7, 67)),
+            Step(Lever.CLAY, Condition.WaterState(-5, 59)),
         ),
         GateState.RBO to listOf(
-            Step(Lever.COAL,    Condition.Delay(0)),
+            Step(Lever.COAL, Condition.Delay(0)),
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(-6,78)),
-            Step(Lever.DIAMOND, Condition.WaterState(0,63)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(-6, 78)),
+            Step(Lever.DIAMOND, Condition.WaterState(0, 63)),
+            Step(Lever.GOLD, Condition.Delay(0)),
         ),
         GateState.RBP to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.COAL,    Condition.WaterState(-6,71)),
-            Step(Lever.GOLD,    Condition.WaterState(-9,73)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.COAL, Condition.WaterState(-6, 71)),
+            Step(Lever.GOLD, Condition.WaterState(-9, 73)),
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.WaterState(4,78)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.WaterState(4, 78)),
         ),
         GateState.ROP to listOf(
-            Step(Lever.EMERALD, Condition.WaterState(5,74)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(2,64)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(5, 74)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(2, 64)),
+            Step(Lever.CLAY, Condition.Delay(0)),
         ),
         GateState.GBO to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(-6,78)),
-            Step(Lever.DIAMOND, Condition.WaterState(0,76)),
-            Step(Lever.COAL,    Condition.WaterState(-5,61)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(-6, 78)),
+            Step(Lever.DIAMOND, Condition.WaterState(0, 76)),
+            Step(Lever.COAL, Condition.WaterState(-5, 61)),
         ),
         GateState.GBP to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(-6,78)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.COAL,    Condition.WaterState(-5,61)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(-6, 78)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.COAL, Condition.WaterState(-5, 61)),
         ),
         GateState.GOP to listOf(
-            Step(Lever.EMERALD, Condition.WaterState(5,74)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(2,64)),
+            Step(Lever.EMERALD, Condition.WaterState(5, 74)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(2, 64)),
         ),
         GateState.BOP to listOf(
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.QUARTZ, Condition.WaterState(0,75)),
-            Step(Lever.DIAMOND, Condition.WaterState(0,72)),
-            Step(Lever.GOLD,    Condition.WaterState(2,61)),
+            Step(Lever.QUARTZ, Condition.WaterState(0, 75)),
+            Step(Lever.DIAMOND, Condition.WaterState(0, 72)),
+            Step(Lever.GOLD, Condition.WaterState(2, 61)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(0,63)),
+            Step(Lever.DIAMOND, Condition.WaterState(0, 63)),
         ),
     )
     private val variant0Solutions: Map<GateState, List<Step>> = mapOf(
         GateState.RGB to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.COAL,    Condition.WaterState(-6,77)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(-6,64)),
+            Step(Lever.COAL, Condition.WaterState(-6, 77)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(-6, 64)),
         ),
         GateState.RGO to listOf(
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.COAL,    Condition.WaterState(-6,77)),
-            Step(Lever.EMERALD, Condition.WaterState(-6,64)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
+            Step(Lever.COAL, Condition.WaterState(-6, 77)),
+            Step(Lever.EMERALD, Condition.WaterState(-6, 64)),
+            Step(Lever.GOLD, Condition.Delay(0)),
         ),
         GateState.RGP to listOf(
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.GOLD, Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.GOLD,    Condition.WaterState(6,68)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(9,66)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(-9,61)),
+            Step(Lever.GOLD, Condition.WaterState(6, 68)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(9, 66)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(-9, 61)),
         ),
         GateState.RBO to listOf(
-            Step(Lever.COAL,    Condition.WaterState(-6,77)),
-            Step(Lever.GOLD,    Condition.WaterState(1,66)),
-            Step(Lever.CLAY,    Condition.WaterState(5,63)),
+            Step(Lever.COAL, Condition.WaterState(-6, 77)),
+            Step(Lever.GOLD, Condition.WaterState(1, 66)),
+            Step(Lever.CLAY, Condition.WaterState(5, 63)),
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.QUARTZ,  Condition.Delay(0)),
+            Step(Lever.QUARTZ, Condition.Delay(0)),
         ),
         GateState.RBP to listOf(
-            Step(Lever.CLAY,    Condition.WaterState(-6,77)),
-            Step(Lever.COAL,    Condition.WaterState(-6,70)),
+            Step(Lever.CLAY, Condition.WaterState(-6, 77)),
+            Step(Lever.COAL, Condition.WaterState(-6, 70)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(9,66)),
+            Step(Lever.DIAMOND, Condition.WaterState(9, 66)),
         ),
         GateState.ROP to listOf(
-            Step(Lever.CLAY,    Condition.WaterState(-6,77)),
-            Step(Lever.COAL,    Condition.WaterState(-6,70)),
+            Step(Lever.CLAY, Condition.WaterState(-6, 77)),
+            Step(Lever.COAL, Condition.WaterState(-6, 70)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(9,66)),
+            Step(Lever.EMERALD, Condition.WaterState(9, 66)),
         ),
         GateState.GBO to listOf(
-            Step(Lever.COAL,    Condition.Delay(0)),
+            Step(Lever.COAL, Condition.Delay(0)),
             //TODO test faster alternative in two commented lines below
 //            Step(Lever.DIAMOND, Condition.Delay(0)),
 //            Step(Lever.DIAMOND, Condition.WaterState(2,72)),
-            Step(Lever.GOLD,    Condition.WaterState(-5,63)),
-            Step(Lever.CLAY,    Condition.WaterState(5,63)),
+            Step(Lever.GOLD, Condition.WaterState(-5, 63)),
+            Step(Lever.CLAY, Condition.WaterState(5, 63)),
         ),
         GateState.GBP to listOf(
             //TODO additional clay flick in middle might save a second
-            Step(Lever.COAL,    Condition.Delay(0)),
+            Step(Lever.COAL, Condition.Delay(0)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(9,66)),
-            Step(Lever.CLAY, Condition.WaterState(0,61)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(9, 66)),
+            Step(Lever.CLAY, Condition.WaterState(0, 61)),
         ),
         GateState.GOP to listOf(
-            Step(Lever.COAL,    Condition.Delay(0)),
+            Step(Lever.COAL, Condition.Delay(0)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(9,66)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(9, 66)),
             Step(Lever.EMERALD, Condition.Delay(0)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.EMERALD, Condition.WaterState(-2,63)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.EMERALD, Condition.WaterState(-2, 63)),
         ),
         GateState.BOP to listOf(
-            Step(Lever.COAL,    Condition.Delay(0)),
+            Step(Lever.COAL, Condition.Delay(0)),
             Step(Lever.DIAMOND, Condition.Delay(0)),
-            Step(Lever.CLAY,    Condition.Delay(0)),
-            Step(Lever.DIAMOND, Condition.WaterState(9,66)),
+            Step(Lever.CLAY, Condition.Delay(0)),
+            Step(Lever.DIAMOND, Condition.WaterState(9, 66)),
             Step(Lever.EMERALD, Condition.Delay(0)),
         ),
     )
@@ -383,15 +395,15 @@ object AutoWater : Module(
      */
     @SubscribeEvent
     fun onInteract(event: PlayerInteractEvent) {
-        if ( !FloppaClient.inDungeons || doingWater) return
+        if (!FloppaClient.inDungeons || doingWater) return
         if (Dungeon.currentRoomPair?.first?.data?.name != "Water Board") return
         val roomPair = Dungeon.currentRoomPair ?: return
         val blockPos = event.pos
         try { // for some reason getBlockState can throw null pointer exception
             val block = mc.theWorld?.getBlockState(blockPos)?.block ?: return
 
-            if ( block == Blocks.lever){
-                if(RoomUtils.getRelativePos(blockPos,roomPair) == BlockPos(0,60,-10)) {
+            if (block == Blocks.lever) {
+                if (RoomUtils.getRelativePos(blockPos, roomPair) == BlockPos(0, 60, -10)) {
                     modMessage("Water started.")
 
                     //TODO CLEAN THIS UP
@@ -402,15 +414,19 @@ object AutoWater : Module(
                         3 -> {
                             solutionSteps.addAll(variant3Solutions[state]!!)
                         }
+
                         2 -> {
                             solutionSteps.addAll(variant2Solutions[state]!!)
                         }
-                        1-> {
+
+                        1 -> {
                             solutionSteps.addAll(variant1Solutions[state]!!)
                         }
+
                         0 -> {
                             solutionSteps.addAll(variant0Solutions[state]!!)
                         }
+
                         else -> {
                             modMessage("Water layout not recognized.")
                             return
@@ -421,7 +437,8 @@ object AutoWater : Module(
                     modMessage("Attempting to solve water board Variant $variant, in configuration ${state.name}")
                 }
             }
-        } catch (_: Exception) { }
+        } catch (_: Exception) {
+        }
     }
 
     /**
@@ -432,7 +449,7 @@ object AutoWater : Module(
         if (event.phase != TickEvent.Phase.START) return
         // Update flow ticks
         if (doingWater) flowTicks += 1
-        if (doingWater && flowTicks > 20*20){
+        if (doingWater && flowTicks > 20 * 20) {
             modMessage("Auto Water timed out.")
             stop()
         }
@@ -443,8 +460,16 @@ object AutoWater : Module(
         val roomPair = Dungeon.currentRoomPair ?: return
 
         /** Update which gates are open once per tick */
-        for (color in GateColor.values()){
-            Gates.setColorState(color,mc.theWorld.getBlockState(getRealPos(BlockPos(0,55,color.ordinal), roomPair)).block == Blocks.piston_head)
+        for (color in GateColor.values()) {
+            Gates.setColorState(
+                color,
+                mc.theWorld.getBlockState(
+                    getRealPos(
+                        BlockPos(0, 55, color.ordinal),
+                        roomPair
+                    )
+                ).block == Blocks.piston_head
+            )
         }
 
         /** If the variant has not been determined so far find it */
@@ -455,7 +480,7 @@ object AutoWater : Module(
             var foundQuartz = false
             var foundDiamond = false
 
-            val waterPos = getRealPos(BlockPos(0,78,11),roomPair)
+            val waterPos = getRealPos(BlockPos(0, 78, 11), roomPair)
 
             val x = waterPos.x
             val z = waterPos.z
@@ -471,15 +496,19 @@ object AutoWater : Module(
                     block === Blocks.gold_block -> {
                         foundGold = true
                     }
+
                     block === Blocks.hardened_clay -> {
                         foundClay = true
                     }
+
                     block === Blocks.emerald_block -> {
                         foundEmerald = true
                     }
+
                     block === Blocks.quartz_block -> {
                         foundQuartz = true
                     }
+
                     block === Blocks.diamond_block -> {
                         foundDiamond = true
                     }
@@ -504,8 +533,8 @@ object AutoWater : Module(
      */
     @SubscribeEvent
     fun onPreMove(event: PositionUpdateEvent.Pre) {
-        if(!doingWater || !inWater) return
-        if(solutionSteps.isEmpty()) {
+        if (!doingWater || !inWater) return
+        if (solutionSteps.isEmpty()) {
             finish()
             return
         }
@@ -513,9 +542,9 @@ object AutoWater : Module(
         val secondLever = solutionSteps.getOrNull(1)?.lever
         if (!nextLever.canReach() && etherCDTicks <= 0) {
             etherCDTicks = etherCd.value.toInt()
-            val successful = if( advancedEther.enabled) {
+            val successful = if (advancedEther.enabled) {
                 nextLever.etherwarpToLever(secondLever)
-            }else {
+            } else {
                 nextLever.etherwarpToLever()
             }
             if (!successful) stop()
@@ -528,7 +557,7 @@ object AutoWater : Module(
     @SubscribeEvent
     fun onPostMove(event: PositionUpdateEvent.Post) {
         if (!doingWater) return
-        if(solutionSteps.isEmpty()) {
+        if (solutionSteps.isEmpty()) {
             finish()
             return
         }
@@ -566,7 +595,7 @@ object AutoWater : Module(
          */
         fun etherwarpToLever(lever: Lever?): Boolean {
             val roomPair = Dungeon.currentRoomPair ?: return false
-            return FakeActionUtils.etherwarpTo(this.etherPos(roomPair,lever))
+            return FakeActionUtils.etherwarpTo(this.etherPos(roomPair, lever))
         }
 
         /**
@@ -582,21 +611,21 @@ object AutoWater : Module(
          * Returns the absolute blockPos for this lever in the given roomPair.
          */
         private fun leverPos(roomPair: Pair<Room, Int>): BlockPos {
-            return getRealPos(this.relLeverPos(),roomPair)
+            return getRealPos(this.relLeverPos(), roomPair)
         }
 
         /**
          * returns the room relative blockPos for this lever.
          */
         private fun relLeverPos(): BlockPos {
-            return when(this) {
-                COAL    -> BlockPos(5,61,-5)
-                GOLD    -> BlockPos(5,61,0)
-                QUARTZ  -> BlockPos(5,61,5)
-                DIAMOND -> BlockPos(-5,61,5)
-                EMERALD -> BlockPos(-5,61,0)
-                CLAY    -> BlockPos(-5,61,-5)
-                WATER   -> BlockPos(0,60,-10)
+            return when (this) {
+                COAL -> BlockPos(5, 61, -5)
+                GOLD -> BlockPos(5, 61, 0)
+                QUARTZ -> BlockPos(5, 61, 5)
+                DIAMOND -> BlockPos(-5, 61, 5)
+                EMERALD -> BlockPos(-5, 61, 0)
+                CLAY -> BlockPos(-5, 61, -5)
+                WATER -> BlockPos(0, 60, -10)
             }
         }
 
@@ -604,17 +633,17 @@ object AutoWater : Module(
          * Returns the absolute blockPos to etherwarp to, to reach this lever.
          */
         private fun etherPos(roomPair: Pair<Room, Int>): BlockPos {
-            return getRealPos(this.relEtherPos(),roomPair)
+            return getRealPos(this.relEtherPos(), roomPair)
         }
 
         /**
          * Returs the etherwarp target blockpos in room relative coords.
          */
         private fun relEtherPos(): BlockPos {
-            return when(this) {
-                COAL, CLAY, WATER -> BlockPos(0,58,-6)
-                GOLD, EMERALD     -> BlockPos(0,58,0)
-                QUARTZ, DIAMOND   -> BlockPos(0,58,5)
+            return when (this) {
+                COAL, CLAY, WATER -> BlockPos(0, 58, -6)
+                GOLD, EMERALD -> BlockPos(0, 58, 0)
+                QUARTZ, DIAMOND -> BlockPos(0, 58, 5)
             }
         }
 
@@ -622,7 +651,7 @@ object AutoWater : Module(
          * Returns the absolute blockPos to etherwarp to reach given lever pair if possible or just this lever otherwise.
          */
         private fun etherPos(roomPair: Pair<Room, Int>, lever: Lever?): BlockPos {
-            return getRealPos(this.relEtherPos(lever),roomPair)
+            return getRealPos(this.relEtherPos(lever), roomPair)
         }
 
         /**
@@ -630,11 +659,11 @@ object AutoWater : Module(
          * this lever otherwise.
          */
         private fun relEtherPos(lever: Lever?): BlockPos {
-            return when(setOf(this, lever)){
-                setOf(COAL,GOLD)        -> BlockPos(3,58,-2)
-                setOf(QUARTZ,GOLD)      -> BlockPos(3,58,2)
-                setOf(DIAMOND,EMERALD)  -> BlockPos(-3,58,2)
-                setOf(CLAY,EMERALD)     -> BlockPos(-3,58,-2)
+            return when (setOf(this, lever)) {
+                setOf(COAL, GOLD) -> BlockPos(3, 58, -2)
+                setOf(QUARTZ, GOLD) -> BlockPos(3, 58, 2)
+                setOf(DIAMOND, EMERALD) -> BlockPos(-3, 58, 2)
+                setOf(CLAY, EMERALD) -> BlockPos(-3, 58, -2)
                 else -> this.relEtherPos()
             }
         }
@@ -645,7 +674,11 @@ object AutoWater : Module(
         fun canReach(): Boolean {
             val roomPair = Dungeon.currentRoomPair ?: return false
             val blockPos = this.leverPos(roomPair)
-            return mc.thePlayer.getDistance(blockPos.x.toDouble(), blockPos.y.toDouble() - mc.thePlayer.eyeHeight, blockPos.z.toDouble()) < 6
+            return mc.thePlayer.getDistance(
+                blockPos.x.toDouble(),
+                blockPos.y.toDouble() - mc.thePlayer.eyeHeight,
+                blockPos.z.toDouble()
+            ) < 6
         }
     }
 
@@ -660,7 +693,7 @@ object AutoWater : Module(
             /**
              * Returns true when the water has been flowing for at least the in the condition specified amount of ticks.
              */
-            override fun isMet():Boolean {
+            override fun isMet(): Boolean {
                 return flowTicks >= ticks
             }
         }
@@ -669,12 +702,17 @@ object AutoWater : Module(
          * onWater determines whether the change to water or the change to air is expected.
          * When set to true it will trigger once water appears.
          */
-        class WaterState(private val onWater: Boolean, val blockPos: BlockPos, private val minDelay: Int = 0) : Condition() {
+        class WaterState(private val onWater: Boolean, val blockPos: BlockPos, private val minDelay: Int = 0) :
+            Condition() {
 
             /**
              * Simplified constructor that expects water at x,y on the board.
              */
-            constructor(x: Int, y: Int, onWater: Boolean = true, minDelay: Int = 0) : this(onWater,BlockPos(x,y,11), minDelay)
+            constructor(x: Int, y: Int, onWater: Boolean = true, minDelay: Int = 0) : this(
+                onWater,
+                BlockPos(x, y, 11),
+                minDelay
+            )
 
             /**
              * Checks whether the specified block is Water (or air if onWater is false) and the water has been
@@ -682,7 +720,7 @@ object AutoWater : Module(
              */
             override fun isMet(): Boolean {
                 val roomPair = Dungeon.currentRoomPair ?: return false
-                val block = mc.theWorld.getBlockState(getRealPos(blockPos,roomPair)).block
+                val block = mc.theWorld.getBlockState(getRealPos(blockPos, roomPair)).block
                 val isCorrectBlock = if (onWater) {
                     block == Blocks.water || block == Blocks.flowing_water
                 } else {
@@ -696,32 +734,34 @@ object AutoWater : Module(
          * Checks whether the condition is met.
          * Overridden in members.
          */
-        open fun isMet(): Boolean {return false}
+        open fun isMet(): Boolean {
+            return false
+        }
     }
 
     /**
      * Contains and manages information about the gates.
      */
     object Gates {
-        var red:    Boolean = false
-         private set
-        var green:  Boolean = false
-         private set
-        var blue:   Boolean = false
-         private set
+        var red: Boolean = false
+            private set
+        var green: Boolean = false
+            private set
+        var blue: Boolean = false
+            private set
         var orange: Boolean = false
-         private set
+            private set
         var purple: Boolean = false
-         private set
+            private set
 
         /**
          * Sets the extended state for the specified color to the given state.
          */
         fun setColorState(color: GateColor, state: Boolean) {
-            when(color) {
-                GateColor.RED    -> red    = state
-                GateColor.GREEN  -> green  = state
-                GateColor.BLUE   -> blue   = state
+            when (color) {
+                GateColor.RED -> red = state
+                GateColor.GREEN -> green = state
+                GateColor.BLUE -> blue = state
                 GateColor.ORANGE -> orange = state
                 GateColor.PURPLE -> purple = state
             }
@@ -731,10 +771,10 @@ object AutoWater : Module(
          * Gets the extended state for the specified color.
          */
         fun getColorState(color: GateColor): Boolean {
-            return when(color) {
-                GateColor.RED    -> red
-                GateColor.GREEN  -> green
-                GateColor.BLUE   -> blue
+            return when (color) {
+                GateColor.RED -> red
+                GateColor.GREEN -> green
+                GateColor.BLUE -> blue
                 GateColor.ORANGE -> orange
                 GateColor.PURPLE -> purple
             }
@@ -744,17 +784,17 @@ object AutoWater : Module(
          * Returns the corresponding start state for the current state, or null if not exactly 3 gates are closed.
          */
         fun getGateState(): GateState? {
-            return when(listOf(red, green, blue, orange, purple)) {
-                listOf(true,true,true,false,false) -> GateState.RGB
-                listOf(true,true,false,true,false) -> GateState.RGO
-                listOf(true,true,false,false,true) -> GateState.RGP
-                listOf(true,false,true,true,false) -> GateState.RBO
-                listOf(true,false,true,false,true) -> GateState.RBP
-                listOf(true,false,false,true,true) -> GateState.ROP
-                listOf(false,true,true,true,false) -> GateState.GBO
-                listOf(false,true,true,false,true) -> GateState.GBP
-                listOf(false,true,false,true,true) -> GateState.GOP
-                listOf(false,false,true,true,true) -> GateState.BOP
+            return when (listOf(red, green, blue, orange, purple)) {
+                listOf(true, true, true, false, false) -> GateState.RGB
+                listOf(true, true, false, true, false) -> GateState.RGO
+                listOf(true, true, false, false, true) -> GateState.RGP
+                listOf(true, false, true, true, false) -> GateState.RBO
+                listOf(true, false, true, false, true) -> GateState.RBP
+                listOf(true, false, false, true, true) -> GateState.ROP
+                listOf(false, true, true, true, false) -> GateState.GBO
+                listOf(false, true, true, false, true) -> GateState.GBP
+                listOf(false, true, false, true, true) -> GateState.GOP
+                listOf(false, false, true, true, true) -> GateState.BOP
                 else -> null
             }
         }
@@ -775,17 +815,23 @@ object AutoWater : Module(
      * All 10 possible configuration that have exactly 3 gates closed. also contains the gate states as values,
      * but that is probably not necessary
      */
-    enum class GateState(val redState: Boolean, val greenState: Boolean, val blueState: Boolean, val orangeState: Boolean, val purpleState: Boolean) {
-        RGB(true,true,true,false,false),
-        RGO(true,true,false,true,false),
-        RGP(true,true,false,false,true),
-        RBO(true,false,true,true,false),
-        RBP(true,false,true,false,true),
-        ROP(true,false,false,true,true),
-        GBO(false,true,true,true,false),
-        GBP(false,true,true,false,true),
-        GOP(false,true,false,true,true),
-        BOP(false,false,true,true,true)
+    enum class GateState(
+        val redState: Boolean,
+        val greenState: Boolean,
+        val blueState: Boolean,
+        val orangeState: Boolean,
+        val purpleState: Boolean
+    ) {
+        RGB(true, true, true, false, false),
+        RGO(true, true, false, true, false),
+        RGP(true, true, false, false, true),
+        RBO(true, false, true, true, false),
+        RBP(true, false, true, false, true),
+        ROP(true, false, false, true, true),
+        GBO(false, true, true, true, false),
+        GBP(false, true, true, false, true),
+        GOP(false, true, false, true, true),
+        BOP(false, false, true, true, true)
     }
 
     /**
@@ -801,9 +847,12 @@ object AutoWater : Module(
      */
     private fun finish() {
         doingWater = false
-        modMessage("Finished Auto Water in ${
-            DecimalFormat("#.##").format(flowTicks/20.0)} seconds!")
-        if (completionSound.enabled) playLoudSound("random.orb", volume.value.toFloat(),0f)
+        modMessage(
+            "Finished Auto Water in ${
+                DecimalFormat("#.##").format(flowTicks / 20.0)
+            } seconds!"
+        )
+        if (completionSound.enabled) playLoudSound("random.orb", volume.value.toFloat(), 0f)
         return
     }
 

@@ -35,10 +35,10 @@ class AdvancedElementColor(
     /**
      * Renders the element
      */
-    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int{
+    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
         val temp = ColorUtil.clickGUIColor
         val color = Color(temp.red, temp.green, temp.blue, 150).rgb
-        val color2 = Color(temp.red, temp.green, temp.blue,  230).rgb
+        val color2 = Color(temp.red, temp.green, temp.blue, 230).rgb
 
         val colorValue = setting.value.rgb
 
@@ -93,16 +93,21 @@ class AdvancedElementColor(
                 FontUtil.drawString(dispVal, settingWidth - FontUtil.getStringWidth(dispVal), ay + 2, -0x1)
 
                 val maxVal = currentColor.maxValue()
-                val percentage = setting.getNumber(currentColor)  / maxVal
+                val percentage = setting.getNumber(currentColor) / maxVal
                 Gui.drawRect(0, (ay + 12), settingWidth, ay + 14, -0xefeff0)
                 Gui.drawRect(0, (ay + 12), (percentage * settingWidth).toInt(), ay + 14, color)
                 if (percentage > 0 && percentage < 1) Gui.drawRect(
-                    (percentage * settingWidth - 2).toInt(), ay + 12, ((percentage * settingWidth).toInt().coerceAtMost(settingWidth)), ay + 14, color2
+                    (percentage * settingWidth - 2).toInt(),
+                    ay + 12,
+                    ((percentage * settingWidth).toInt().coerceAtMost(settingWidth)),
+                    ay + 14,
+                    color2
                 )
 
                 /** Calculate and set new value when dragging */
                 if (dragging == currentColor.ordinal) {
-                    val newVal = MathHelper.clamp_double((mouseX - parent.x - x) / settingWidth.toDouble(), 0.0, 1.0) * maxVal
+                    val newVal =
+                        MathHelper.clamp_double((mouseX - parent.x - x) / settingWidth.toDouble(), 0.0, 1.0) * maxVal
                     setting.setNumber(currentColor, newVal)
                 }
 
@@ -135,7 +140,7 @@ class AdvancedElementColor(
                 }
                 ay += 15
             }
-        } else if( mouseButton == 1) {
+        } else if (mouseButton == 1) {
             if (isButtonHovered(mouseX, mouseY)) {
                 comboextended = !comboextended
                 return true
@@ -170,11 +175,11 @@ class AdvancedElementColor(
         for (currentColor in setting.colors()) {
 
             if (scaledMouseX >= parent.x + x && scaledMouseX <= parent.x + x + settingWidth && scaledMouseY >= parent.y + ay && scaledMouseY <= parent.y + ay + increment) {
-                if (keyCode == Keyboard.KEY_RIGHT){
-                    setting.setNumber(currentColor, setting.getNumber(currentColor)+currentColor.maxValue()/255.0)
+                if (keyCode == Keyboard.KEY_RIGHT) {
+                    setting.setNumber(currentColor, setting.getNumber(currentColor) + currentColor.maxValue() / 255.0)
                 }
-                if (keyCode == Keyboard.KEY_LEFT){
-                    setting.setNumber(currentColor, setting.getNumber(currentColor)-currentColor.maxValue()/255.0)
+                if (keyCode == Keyboard.KEY_LEFT) {
+                    setting.setNumber(currentColor, setting.getNumber(currentColor) - currentColor.maxValue() / 255.0)
                 }
                 return true
             }

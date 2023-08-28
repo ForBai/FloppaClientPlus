@@ -15,15 +15,20 @@ public abstract class MixinPlayerSP2 extends MixinAbstractClientPlayer {
     @Shadow
     private boolean serverSneakState;
 
-    @Shadow private double lastReportedPosX;
+    @Shadow
+    private double lastReportedPosX;
 
-    @Shadow private double lastReportedPosY;
+    @Shadow
+    private double lastReportedPosY;
 
-    @Shadow private double lastReportedPosZ;
+    @Shadow
+    private double lastReportedPosZ;
 
-    @Shadow private float lastReportedYaw;
+    @Shadow
+    private float lastReportedYaw;
 
-    @Shadow private float lastReportedPitch;
+    @Shadow
+    private float lastReportedPitch;
 
     @Inject(method = {"onUpdateWalkingPlayer"}, at = {@At("RETURN")})
     private void postPlayerWalkUpdate(CallbackInfo ci) {

@@ -16,18 +16,21 @@ import net.minecraft.client.renderer.GlStateManager
  *
  * @author Aton
  */
-abstract class Element<S: Setting<*>>(
+abstract class Element<S : Setting<*>>(
     val parent: ModuleButton,
 //    val module: Module,
     val setting: S,
     val type: ElementType
 ) {
     val clickgui: ClickGUI = parent.panel.clickgui
+
     /** Relative position of this element in respect to [parent]. */
     var x = 2
+
     /** Relative position of this element in respect to [parent]. */
     var y = 0
     val width = parent.width - 2 - x
+
     /** Height of the complete element included optional dropdown. */
     var height: Int
     var displayName: String = setting.name
@@ -37,6 +40,7 @@ abstract class Element<S: Setting<*>>(
     /** Absolute position of the panel on the screen. */
     val xAbsolute: Int
         get() = x + parent.x + parent.panel.x
+
     /** Absolute position of the panel on the screen. */
     val yAbsolute: Int
         get() = y + parent.y + parent.panel.y
@@ -58,19 +62,22 @@ abstract class Element<S: Setting<*>>(
         when (type) {
             ElementType.SELECTOR -> {
                 height = if (extended)
-                    (((setting as? StringSelectorSetting)?.options?.size ?: (setting as SelectorSetting<*>).options.size) * (FontUtil.fontHeight + 2) + DEFAULT_HEIGHT)
+                    (((setting as? StringSelectorSetting)?.options?.size
+                        ?: (setting as SelectorSetting<*>).options.size) * (FontUtil.fontHeight + 2) + DEFAULT_HEIGHT)
                 else
                     DEFAULT_HEIGHT
             }
+
             ElementType.COLOR -> {
                 height = if (extended)
-                    if((setting as ColorSetting).allowAlpha)
+                    if ((setting as ColorSetting).allowAlpha)
                         DEFAULT_HEIGHT * 5
                     else
                         DEFAULT_HEIGHT * 4
                 else
                     DEFAULT_HEIGHT
             }
+
             else -> {}
         }
     }
@@ -80,13 +87,13 @@ abstract class Element<S: Setting<*>>(
      * @return the height of the element.
      * @see renderElement
      */
-    fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) : Int {
+    fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
         GlStateManager.pushMatrix()
         GlStateManager.translate(x.toFloat(), y.toFloat(), 0f)
 
         val color = if (listening) {
             ColorUtil.clickGUIColor.rgb
-        }else {
+        } else {
             ColorUtil.elementColor
         }
 
@@ -108,7 +115,9 @@ abstract class Element<S: Setting<*>>(
      * To be overridden in the implementations.
      * @return the height of the element.
      */
-    protected open fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int{ return height }
+    protected open fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
+        return height
+    }
 
     /**
      * Handles mouse clicks on the Element.
@@ -125,7 +134,9 @@ abstract class Element<S: Setting<*>>(
      * Overridden in the elements to enable key detection.
      * @return true when an action was taken.
      */
-    open fun keyTyped(typedChar: Char, keyCode: Int): Boolean { return false }
+    open fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
+        return false
+    }
 
     private fun isHovered(mouseX: Int, mouseY: Int): Boolean {
         return mouseX >= xAbsolute && mouseX <= xAbsolute + width && mouseY >= yAbsolute && mouseY <= yAbsolute + height

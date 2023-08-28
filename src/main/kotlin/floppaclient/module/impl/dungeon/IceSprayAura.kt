@@ -26,13 +26,21 @@ object IceSprayAura : Module(
     category = Category.DUNGEON,
     description = "Automatically ice sprays the selected mobs when they are in range. " +
             "Keeps track of the ice spray cooldown and uses the item off cooldown."
-){
-    private val range = NumberSetting("Range", 4.0, 1.0,6.0,0.1, description = "Only mobs within this distance will be targeted.")
+) {
+    private val range =
+        NumberSetting("Range", 4.0, 1.0, 6.0, 0.1, description = "Only mobs within this distance will be targeted.")
     private val mimic = BooleanSetting("Mimic", true, description = "Determines whether the minic should be targeted.")
-    private val minis = BooleanSetting("Minis", true, description = "Determines whether mini bosses should be targeted.")
-    private val visiCheck = BooleanSetting("Visibility Check", false, description = "Checks whether the target can be seen.")
-    private val pauseWithHype = BooleanSetting("Hype Check",  true, description = "Disables the module when holding a Wither Blade.")
-    private val pauseWithAOTV = BooleanSetting("AOTV Check",  true, description = "Disables the module when holding a either an AOTE or an AOTV.")
+    private val minis =
+        BooleanSetting("Minis", true, description = "Determines whether mini bosses should be targeted.")
+    private val visiCheck =
+        BooleanSetting("Visibility Check", false, description = "Checks whether the target can be seen.")
+    private val pauseWithHype =
+        BooleanSetting("Hype Check", true, description = "Disables the module when holding a Wither Blade.")
+    private val pauseWithAOTV = BooleanSetting(
+        "AOTV Check",
+        true,
+        description = "Disables the module when holding a either an AOTE or an AOTV."
+    )
 
     private val miniBosses = listOf(
         "Diamond Guy",
@@ -61,7 +69,7 @@ object IceSprayAura : Module(
     @Suppress("UNUSED_PARAMETER")
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun preMove(event: PositionUpdateEvent.Pre) {
-        if(!inDungeons || FakeActionManager.doAction) return
+        if (!inDungeons || FakeActionManager.doAction) return
         if (System.currentTimeMillis() < cooldown) return
         if (pauseWithHype.enabled && mc.thePlayer.isHolding(SkyblockItem.Attribute.WITHERBLADE)) return
         if (pauseWithAOTV.enabled && mc.thePlayer.isHolding(SkyblockItem.AOTV, SkyblockItem.AOTE)) return
@@ -82,8 +90,8 @@ object IceSprayAura : Module(
     private fun getTarget(): Entity? {
         mc.theWorld.loadedEntityList
             .filter {
-                ( mimic.enabled && it is EntityZombie && it.isChild)
-                || ( minis.enabled && it is EntityOtherPlayerMP && it.name.containsOneOf(miniBosses) )
+                (mimic.enabled && it is EntityZombie && it.isChild)
+                        || (minis.enabled && it is EntityOtherPlayerMP && it.name.containsOneOf(miniBosses))
             }
             .filter { mc.thePlayer.getDistanceToEntity(it) < range.value }
             .sortedBy { entity -> mc.thePlayer.getDistanceToEntity(entity) }

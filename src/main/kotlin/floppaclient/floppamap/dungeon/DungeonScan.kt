@@ -60,11 +60,14 @@ object DungeonScan {
 
         if (allLoaded) {
             Dungeon.fullyScanned = true
-            Dungeon.totalSecrets = Dungeon.getDungeonTileList<Room>().filter { it.isUnique }.sumOf { it.data.maxSecrets ?: 0 }
+            Dungeon.totalSecrets =
+                Dungeon.getDungeonTileList<Room>().filter { it.isUnique }.sumOf { it.data.maxSecrets ?: 0 }
             Dungeon.cryptCount = Dungeon.getDungeonTileList<Room>().filter { it.isUnique }.sumOf { it.data.crypts ?: 0 }
-            Dungeon.trapType = Dungeon.getDungeonTileList<Room>().find { it.data.type === RoomType.TRAP }?.data?.name ?: ""
+            Dungeon.trapType =
+                Dungeon.getDungeonTileList<Room>().find { it.data.type === RoomType.TRAP }?.data?.name ?: ""
             Dungeon.witherDoors = Dungeon.getDungeonTileList<Door>().filter { it.type === DoorType.WITHER }.size + 1
-            Dungeon.puzzles.addAll(Dungeon.getDungeonTileList<Room>().filter { it.data.type === RoomType.PUZZLE }.map{it.data.name})
+            Dungeon.puzzles.addAll(Dungeon.getDungeonTileList<Room>().filter { it.data.type === RoomType.PUZZLE }
+                .map { it.data.name })
 
             if (DungeonMap.scanChatInfo.enabled && !DungeonMap.legitMode.enabled) {
                 modMessage(
@@ -96,6 +99,7 @@ object DungeonScan {
                     Room(x, z, data).apply { this.core = core }
                 }
             }
+
             !rowEven && !columnEven -> {  // possible separator (only for 2x2)
                 Dungeon.getDungeonTile(column - 1, row - 1)?.let {
                     if (it is Room) {
@@ -103,6 +107,7 @@ object DungeonScan {
                     } else null
                 }
             }
+
             isDoor(x, z) -> { // Door
                 val bState = mc.theWorld.getBlockState(BlockPos(x, 69, z))
                 val doorType = when {
@@ -111,10 +116,12 @@ object DungeonScan {
                     bState.block == Blocks.stained_hardened_clay && Blocks.stained_hardened_clay.getMetaFromState(
                         bState
                     ) == 14 -> DoorType.BLOOD
+
                     else -> DoorType.NORMAL
                 }
                 Door(x, z, doorType)
             }
+
             else -> { // Possible separator
                 (if (rowEven) Dungeon.getDungeonTile(column - 1, row)
                 else Dungeon.getDungeonTile(column, row - 1))?.let {

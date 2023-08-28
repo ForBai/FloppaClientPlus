@@ -6,7 +6,7 @@ import floppaclient.utils.GeometryUtils
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 
-class Clip3DCommand : CommandBase()  {
+class Clip3DCommand : CommandBase() {
     override fun getCommandName(): String {
         return "clip3d"
     }

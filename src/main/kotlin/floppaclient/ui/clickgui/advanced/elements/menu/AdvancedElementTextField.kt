@@ -19,46 +19,46 @@ import java.awt.Color
 class AdvancedElementTextField(
     parent: AdvancedMenu, module: Module, setting: StringSetting,
 ) : AdvancedElement<StringSetting>(parent, module, setting, AdvancedElementType.TEXT_FIELD) {
-/*
-    private val keyWhitelist = intArrayOf(
-        Keyboard.KEY_W,
-        Keyboard.KEY_Q,
-        Keyboard.KEY_E,
-        Keyboard.KEY_R,
-        Keyboard.KEY_T,
-        Keyboard.KEY_Z,
-        Keyboard.KEY_U,
-        Keyboard.KEY_I,
-        Keyboard.KEY_O,
-        Keyboard.KEY_P,
-        Keyboard.KEY_A,
-        Keyboard.KEY_S,
-        Keyboard.KEY_D,
-        Keyboard.KEY_F,
-        Keyboard.KEY_G,
-        Keyboard.KEY_H,
-        Keyboard.KEY_J,
-        Keyboard.KEY_K,
-        Keyboard.KEY_L,
-        Keyboard.KEY_Y,
-        Keyboard.KEY_X,
-        Keyboard.KEY_C,
-        Keyboard.KEY_V,
-        Keyboard.KEY_B,
-        Keyboard.KEY_N,
-        Keyboard.KEY_M,
-        Keyboard.KEY_0,
-        Keyboard.KEY_1,
-        Keyboard.KEY_2,
-        Keyboard.KEY_3,
-        Keyboard.KEY_4,
-        Keyboard.KEY_5,
-        Keyboard.KEY_6,
-        Keyboard.KEY_7,
-        Keyboard.KEY_8,
-        Keyboard.KEY_9,
-    )
-*/
+    /*
+        private val keyWhitelist = intArrayOf(
+            Keyboard.KEY_W,
+            Keyboard.KEY_Q,
+            Keyboard.KEY_E,
+            Keyboard.KEY_R,
+            Keyboard.KEY_T,
+            Keyboard.KEY_Z,
+            Keyboard.KEY_U,
+            Keyboard.KEY_I,
+            Keyboard.KEY_O,
+            Keyboard.KEY_P,
+            Keyboard.KEY_A,
+            Keyboard.KEY_S,
+            Keyboard.KEY_D,
+            Keyboard.KEY_F,
+            Keyboard.KEY_G,
+            Keyboard.KEY_H,
+            Keyboard.KEY_J,
+            Keyboard.KEY_K,
+            Keyboard.KEY_L,
+            Keyboard.KEY_Y,
+            Keyboard.KEY_X,
+            Keyboard.KEY_C,
+            Keyboard.KEY_V,
+            Keyboard.KEY_B,
+            Keyboard.KEY_N,
+            Keyboard.KEY_M,
+            Keyboard.KEY_0,
+            Keyboard.KEY_1,
+            Keyboard.KEY_2,
+            Keyboard.KEY_3,
+            Keyboard.KEY_4,
+            Keyboard.KEY_5,
+            Keyboard.KEY_6,
+            Keyboard.KEY_7,
+            Keyboard.KEY_8,
+            Keyboard.KEY_9,
+        )
+    */
 
     /* Key Code list?
     3 -- Cancel
@@ -316,7 +316,7 @@ class AdvancedElementTextField(
     /**
      * Rendering the element
      */
-    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float) : Int{
+    override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
         val displayValue = setting.text
         val temp = ColorUtil.clickGUIColor
         if (listening) {
@@ -326,13 +326,13 @@ class AdvancedElementTextField(
 
         /** Rendering the text */
         if (FontUtil.getStringWidth(displayValue + "00" + setting.name) <= settingWidth) {
-            FontUtil.drawString(setting.name, 1,  2, -0x1)
+            FontUtil.drawString(setting.name, 1, 2, -0x1)
             FontUtil.drawString(displayValue, settingWidth - FontUtil.getStringWidth(displayValue), 2, -0x1)
-        }else {
+        } else {
             if (isTextHovered(mouseX, mouseY) || listening) {
                 FontUtil.drawCenteredStringWithShadow(displayValue, settingWidth / 2.0, 2.0, -0x1)
             } else {
-                FontUtil.drawCenteredString(setting.name, settingWidth/ 2.0, 2.0, -0x1)
+                FontUtil.drawCenteredString(setting.name, settingWidth / 2.0, 2.0, -0x1)
             }
         }
 
@@ -361,7 +361,7 @@ class AdvancedElementTextField(
                 listening = false
             } else if (keyCode == Keyboard.KEY_BACK) {
                 setting.text = setting.text.dropLast(1)
-            }else if (!keyBlackList.contains(keyCode)) {
+            } else if (!keyBlackList.contains(keyCode)) {
                 setting.text = setting.text + typedChar.toString()
             }
             return true
@@ -373,7 +373,7 @@ class AdvancedElementTextField(
      * Checks whether the mouse is hovering the text field
      */
     private fun isTextHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y  && mouseY <= parent.y + y + settingHeight
+        return mouseX >= parent.x + x && mouseX <= parent.x + x + settingWidth && mouseY >= parent.y + y && mouseY <= parent.y + y + settingHeight
     }
 
 }

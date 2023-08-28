@@ -3,11 +3,11 @@ package floppaclient.module.impl.render
 import floppaclient.FloppaClient.Companion.mc
 import floppaclient.module.Category
 import floppaclient.module.Module
+import floppaclient.module.RegisterHudElement
 import floppaclient.module.settings.Visibility
 import floppaclient.module.settings.impl.BooleanSetting
 import floppaclient.module.settings.impl.NumberSetting
 import floppaclient.ui.hud.HudElement
-import floppaclient.module.RegisterHudElement
 
 /**
  * Displays a hud showing the age of servers in both (Minecraft) days and minutes.

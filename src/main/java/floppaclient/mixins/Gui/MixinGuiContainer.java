@@ -36,7 +36,7 @@ public abstract class MixinGuiContainer extends GuiScreenMixin {
 
     @Inject(method = {"drawScreen"}, at = @At("HEAD"), cancellable = true)
     public void drawContainer(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        if (MinecraftForge.EVENT_BUS.post(new DrawContainerEvent(mouseX, mouseY))){
+        if (MinecraftForge.EVENT_BUS.post(new DrawContainerEvent(mouseX, mouseY))) {
             //At this point the screen will not be drawn
             // The forge event has to be forged so that auto terms still work
             MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.BackgroundDrawnEvent((GuiScreen) (Object) this));
@@ -55,7 +55,7 @@ public abstract class MixinGuiContainer extends GuiScreenMixin {
     }
 
     @Inject(method = {"checkHotbarKeys"}, at = @At("HEAD"), cancellable = true)
-    public void guiTyped(int keyCode, CallbackInfoReturnable<Boolean> cir){
+    public void guiTyped(int keyCode, CallbackInfoReturnable<Boolean> cir) {
         if (MinecraftForge.EVENT_BUS.post(new ContainerKeyTypedEvent(keyCode))) cir.setReturnValue(true);
     }
 }

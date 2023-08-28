@@ -28,12 +28,20 @@ object SecretChime : Module(
     category = Category.DUNGEON,
     description = "Plays a sound whenever you click a secret. Also plays this sound for aura clicks. \n" +
             "§4Do not use the bat death sound or your game will freeze!"
-){
+) {
 
     private val sound: StringSelectorSetting
-    private val customSound = StringSetting("Custom Sound", "mob.blaze.hit", description = "Name of a custom sound to play. This is used when Custom is selected in the Sound setting.")
+    private val customSound = StringSetting(
+        "Custom Sound",
+        "mob.blaze.hit",
+        description = "Name of a custom sound to play. This is used when Custom is selected in the Sound setting."
+    )
     private val dropSound: StringSelectorSetting
-    private val customDropSound = StringSetting("Custom Drop Sound", "mob.blaze.hit", description = "Name of a custom sound to play for item pickups. This is used when Custom is selected in the DropSound setting.")
+    private val customDropSound = StringSetting(
+        "Custom Drop Sound",
+        "mob.blaze.hit",
+        description = "Name of a custom sound to play for item pickups. This is used when Custom is selected in the DropSound setting."
+    )
     private val volume = NumberSetting("Volume", 1.0, 0.0, 1.0, 0.01, description = "Volume of the sound.")
     private val pitch = NumberSetting("Pitch", 2.0, 0.0, 2.0, 0.01, description = "Pitch of the sound.")
 
@@ -55,17 +63,16 @@ object SecretChime : Module(
     )
 
 
+    /*
+    List of good sound effects:
 
-/*
-List of good sound effects:
+    fire.ignite - pitch 1
+    mob.blaze.hit - pitch 2
+    random.orb - pitch 1
+    random.break - 2
+    mob.guardian.land.hit - 2
 
-fire.ignite - pitch 1
-mob.blaze.hit - pitch 2
-random.orb - pitch 1
-random.break - 2
-mob.guardian.land.hit - 2
-
- */
+     */
 
 
     init {
@@ -78,7 +85,12 @@ mob.guardian.land.hit - 2
             "Custom"
         )
         sound = StringSelectorSetting("Sound", "mob.blaze.hit", soundOptions, description = "Sound selection.")
-        dropSound = StringSelectorSetting("Drop Sound", "mob.blaze.hit", soundOptions, description = "Sound selection for item pickups.")
+        dropSound = StringSelectorSetting(
+            "Drop Sound",
+            "mob.blaze.hit",
+            soundOptions,
+            description = "Sound selection for item pickups."
+        )
 
         this.addSettings(
             sound,
@@ -95,22 +107,23 @@ mob.guardian.land.hit - 2
      */
     @SubscribeEvent
     fun onInteract(event: PlayerInteractEvent) {
-        if ( !inDungeons) return
+        if (!inDungeons) return
         val blockPos = event.pos
         try { // for some reason getBlockState can throw null pointer exception
-        val block = mc.theWorld?.getBlockState(blockPos)?.block ?: return
+            val block = mc.theWorld?.getBlockState(blockPos)?.block ?: return
 
-        if (block == Blocks.chest || block == Blocks.lever ||
-            block == Blocks.trapped_chest
-        ){
-            playSecretSound()
-        }else if (block == Blocks.skull) {
-            val tileEntity: TileEntitySkull = mc.theWorld.getTileEntity(blockPos) as TileEntitySkull
-            if (tileEntity.playerProfile.id.toString() == "26bb1a8d-7c66-31c6-82d5-a9c04c94fb02") {
+            if (block == Blocks.chest || block == Blocks.lever ||
+                block == Blocks.trapped_chest
+            ) {
                 playSecretSound()
+            } else if (block == Blocks.skull) {
+                val tileEntity: TileEntitySkull = mc.theWorld.getTileEntity(blockPos) as TileEntitySkull
+                if (tileEntity.playerProfile.id.toString() == "26bb1a8d-7c66-31c6-82d5-a9c04c94fb02") {
+                    playSecretSound()
+                }
             }
+        } catch (_: Exception) {
         }
-        } catch (_: Exception) { }
     }
 
     /**
@@ -118,9 +131,9 @@ mob.guardian.land.hit - 2
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onSoundPlay(event: PlaySoundSourceEvent) {
-        if ( !inDungeons) return
-        when(event.name) {
-            "mob.bat.death"-> {
+        if (!inDungeons) return
+        when (event.name) {
+            "mob.bat.death" -> {
                 playSecretSound()
             }
         }
@@ -131,16 +144,16 @@ mob.guardian.land.hit - 2
      */
     @SubscribeEvent
     fun onRemoveEntity(event: EntityRemovedEvent) {
-        if(!inDungeons) return
-        if(event.entity !is EntityItem) return
-        if(mc.thePlayer.getDistanceToEntity(event.entity) > 6) return
+        if (!inDungeons) return
+        if (event.entity !is EntityItem) return
+        if (mc.thePlayer.getDistanceToEntity(event.entity) > 6) return
         // Check the item name to filter for secrets.
-        if (event.entity.entityItem.displayName.run isSecret@ {
-            for(drop in drops){
-                if (this.contains(drop)) return@isSecret true
-            }
-            return@isSecret false
-        }) {
+        if (event.entity.entityItem.displayName.run isSecret@{
+                for (drop in drops) {
+                    if (this.contains(drop)) return@isSecret true
+                }
+                return@isSecret false
+            }) {
             playSecretSound(getSound(true))
         }
     }
@@ -149,8 +162,8 @@ mob.guardian.land.hit - 2
      * Returns the sound from the selector setting, or the custom sound when the last element is selected
      */
     private fun getSound(isItemDrop: Boolean = false): String {
-        return if(isItemDrop)
-            if ( dropSound.index < sound.options.size - 1)
+        return if (isItemDrop)
+            if (dropSound.index < sound.options.size - 1)
                 dropSound.selected
             else
                 customDropSound.text

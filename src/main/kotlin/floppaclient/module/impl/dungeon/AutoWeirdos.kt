@@ -29,9 +29,10 @@ object AutoWeirdos : Module(
     description = "Automatically solves the three weirdos puzzle. Removes the chests in the Room, " +
             "clicks the weirdos once in range and places the correct chest back. The solver does not click the " +
             "correct chest for you, enable secret aura for that."
-){
+) {
 
-    private val solutions = listOf("The reward isn't in any of our chests.",
+    private val solutions = listOf(
+        "The reward isn't in any of our chests.",
         "The reward is not in my chest!",
         "My chest doesn't have the reward. We are all telling the truth.",
         "My chest has the reward and I'm telling the truth!",
@@ -93,18 +94,19 @@ object AutoWeirdos : Module(
                 for (direction in EnumFacing.HORIZONTALS) {
                     val potentialPos = entity.position.offset(direction)
                     if (correctBozo?.let { entity.customNameTag.contains(it) } == true) {
-                    // this is the npc with the blessing
+                        // this is the npc with the blessing
                         if (removedChests.contains(potentialPos)
-                            && mc.theWorld.getBlockState(potentialPos).block === Blocks.air) {
+                            && mc.theWorld.getBlockState(potentialPos).block === Blocks.air
+                        ) {
                             // the chest has been removed here
                             mc.theWorld.setBlockState(potentialPos, Blocks.chest.defaultState)
                             correctChest = potentialPos
                         }
-                    }else {
-                    // solution not found yet or wrong npc
-                    // might be good to add a check for CLICK as name, to only create ghost blocks next to the
-                    // actual weirdos. Otherwise, complications with mobs / player in the room or in an adjacent room
-                    // possible
+                    } else {
+                        // solution not found yet or wrong npc
+                        // might be good to add a check for CLICK as name, to only create ghost blocks next to the
+                        // actual weirdos. Otherwise, complications with mobs / player in the room or in an adjacent room
+                        // possible
                         if (mc.theWorld.getBlockState(potentialPos).block === Blocks.chest && correctChest != potentialPos) {
                             mc.theWorld.setBlockToAir(potentialPos)
                             removedChests.add(potentialPos)
@@ -114,11 +116,15 @@ object AutoWeirdos : Module(
                 }
 
                 // only click once on weirdos
-                if (clickedBozos.contains(entity.entityId) || mc.thePlayer.getDistance(entity.posX, entity.posY, entity.posZ) > 5) return@forEach
+                if (clickedBozos.contains(entity.entityId) || mc.thePlayer.getDistance(
+                        entity.posX,
+                        entity.posY,
+                        entity.posZ
+                    ) > 5
+                ) return@forEach
                 FakeActionUtils.interactWithEntity(entity.entityId)
                 clickedBozos.add(entity.entityId)
             }
-
 
 
     }

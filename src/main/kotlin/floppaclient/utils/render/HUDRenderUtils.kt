@@ -197,8 +197,8 @@ object HUDRenderUtils {
         val scale = mc.displayHeight / ScaledResolution(mc).scaledHeight.toDouble()
         GL11.glScissor(
             (x * scale).toInt(),
-            (mc.displayHeight - (height + y) *scale).toInt() ,
-            (width*scale).toInt(),
+            (mc.displayHeight - (height + y) * scale).toInt(),
+            (width * scale).toInt(),
             (height * scale).toInt()
         )
         GL11.glEnable(GL11.GL_SCISSOR_TEST)

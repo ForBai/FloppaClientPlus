@@ -1,7 +1,7 @@
 package floppaclient.commands
 
-import floppaclient.utils.DataHandler
 import floppaclient.utils.ChatUtils.modMessage
+import floppaclient.utils.DataHandler
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 
@@ -29,7 +29,7 @@ class AddCommand : CommandBase() {
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         try {
             DataHandler.addClip(args.map { it.toDouble() })
-        } catch (e: Throwable){
+        } catch (e: Throwable) {
             modMessage("§cArguments error.")
         }
     }

@@ -20,10 +20,15 @@ object CoordinateDisplay : Module(
     category = Category.RENDER,
     description = "Renders your coordinates on your screen."
 ) {
-    private val showLookingAt by BooleanSetting("Looking At", false, description = "Displays the coordinates of the block you are looking at in a second line.")
+    private val showLookingAt by BooleanSetting(
+        "Looking At",
+        false,
+        description = "Displays the coordinates of the block you are looking at in a second line."
+    )
 
     @RegisterHudElement
-    object CoordinateHUD : HudElement(this, 0, 150,
+    object CoordinateHUD : HudElement(
+        this, 0, 150,
         mc.fontRendererObj.getStringWidth("123 / 12 / 123 (12.3 / 12.3)"),
         mc.fontRendererObj.FONT_HEIGHT * 2 + 1,
     ) {

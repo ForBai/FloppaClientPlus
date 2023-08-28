@@ -68,7 +68,7 @@ object DevModule : Module(
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onPacketSent(event: PacketSentEvent) {
         if (mc.thePlayer == null) return
-        when(val packet = event.packet) {
+        when (val packet = event.packet) {
             is C0EPacketClickWindow -> if (showC0E.enabled) {
                 val id = packet.windowId
                 val slot = packet.slotId
@@ -78,6 +78,7 @@ object DevModule : Module(
                 val mode = packet.mode
                 modMessage("§lC0E:§r window: $id; action: $action; slot: $slot; item: $item; button: $button; mode: $mode")
             }
+
             is C03PacketPlayer -> if (showC03.enabled) {
                 val type = packet.javaClass.simpleName
                 val x = packet.positionX
@@ -90,6 +91,7 @@ object DevModule : Module(
                 val rotating = packet.rotating
                 modMessage("§lC03:§r type=$type; $x / $y / $z ($yaw | $pitch); onGround=$onGround; moving=$moving; rotating=$rotating")
             }
+
             else -> if (showAllOtherSent.enabled) {
                 if (packet !is C0FPacketConfirmTransaction && packet !is C00PacketKeepAlive)
                     modMessage(event.packet.javaClass.simpleName)
@@ -101,7 +103,7 @@ object DevModule : Module(
     fun onPacketReceived(event: ReceivePacketEvent) {
         if (mc.thePlayer == null) return
 
-        when(val packet = event.packet) {
+        when (val packet = event.packet) {
             is S08PacketPlayerPosLook -> if (showS08.enabled) {
                 val x = packet.x
                 val y = packet.y
@@ -111,46 +113,60 @@ object DevModule : Module(
                 val flags: String = packet.func_179834_f().joinToString(",") { it.name }
                 modMessage("§lC03:§r $x / $y / $z ($yaw | $pitch); flags=$flags")
             }
+
             is S00PacketKeepAlive -> {}
             is S1BPacketEntityAttach -> if (showS1B.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S1CPacketEntityMetadata -> if (showS1C.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S2APacketParticles -> if (showS2A.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S02PacketChat, is S02PacketLoginSuccess -> if (showS02.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S03PacketTimeUpdate -> if (showS03.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S12PacketEntityVelocity -> if (showS12.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S13PacketDestroyEntities -> if (showS13.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S14PacketEntity -> if (showS14.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S18PacketEntityTeleport -> if (showS18.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S19PacketEntityHeadLook, is S19PacketEntityStatus -> if (showS19.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S23PacketBlockChange -> if (showS23.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S29PacketSoundEffect -> if (showS29.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S32PacketConfirmTransaction -> if (showS32.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }
+
             is S45PacketTitle -> if (showS45.enabled) {
                 modMessage(packet.javaClass.simpleName)
             }

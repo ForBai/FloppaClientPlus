@@ -31,7 +31,7 @@ import java.util.List;
  *
  * <p>It also handles things like setting up the camera and effects.
  * Entities are rendered in {@link net.minecraft.client.renderer.RenderGlobal RenderGlobal}.</p>
- *
+ * <p>
  * The mixins in here are used for
  * {@link FreeCam},
  * {@link Camera},
@@ -41,18 +41,22 @@ import java.util.List;
  *
  * @author Aton
  */
-@Mixin( value = {EntityRenderer.class})
+@Mixin(value = {EntityRenderer.class})
 abstract public class EntityRendererMixin implements IResourceManagerReloadListener {
 
-    @Shadow private float thirdPersonDistance;
+    @Shadow
+    private float thirdPersonDistance;
 
-    @Shadow private float thirdPersonDistanceTemp;
+    @Shadow
+    private float thirdPersonDistanceTemp;
 
-    @Shadow private Minecraft mc;
+    @Shadow
+    private Minecraft mc;
 
     /**
      * Tweaks the third person view distance of the camera.
-     * @see EntityRendererMixin#tweakThirdPersonDistanceTemp(EntityRenderer) 
+     *
+     * @see EntityRendererMixin#tweakThirdPersonDistanceTemp(EntityRenderer)
      * @see Camera#thirdPersonDistanceHook()
      */
     @Redirect(method = {"orientCamera"}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/EntityRenderer;thirdPersonDistance:F"))
@@ -63,8 +67,9 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
 
     /**
      * Tweaks the third person view distance of the camera.
+     *
      * @see EntityRendererMixin#tweakThirdPersonDistance(EntityRenderer)
-     * @see Camera#thirdPersonDistanceHook() 
+     * @see Camera#thirdPersonDistanceHook()
      */
     @Redirect(method = {"orientCamera"}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/EntityRenderer;thirdPersonDistanceTemp:F"))
     public float tweakThirdPersonDistanceTemp(EntityRenderer instance) {
@@ -74,16 +79,18 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
 
     /**
      * Used to enable the camera to clip though walls in third person view.
-     * @see Camera#cameraClipHook(Vec3, Vec3) 
+     *
+     * @see Camera#cameraClipHook(Vec3, Vec3)
      */
     @Redirect(method = {"orientCamera"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Vec3;distanceTo(Lnet/minecraft/util/Vec3;)D"))
     public double cameraDistance(Vec3 instance, Vec3 vec) {
-        return Camera.INSTANCE.cameraClipHook(instance,vec);
+        return Camera.INSTANCE.cameraClipHook(instance, vec);
     }
 
-    /** 
+    /**
      * Used to prevent the blindness effect from rendering.
-     * @see QOL#blindnessHook() 
+     *
+     * @see QOL#blindnessHook()
      */
     @Redirect(method = {"setupFog"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;isPotionActive(Lnet/minecraft/potion/Potion;)Z"))
     public boolean shouldBeBlind(EntityLivingBase instance, Potion potionIn) {
@@ -92,6 +99,7 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
 
     /**
      * Overrides the flag which prevents the camera from moving when in a gui.
+     *
      * @see InvActions#shouldRotateHook()
      */
     @Redirect(method = {"updateCameraAndRender"}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;inGameHasFocus:Z"))
@@ -101,19 +109,21 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
 
     /**
      * Used to signal that the world rendering process is starting.
+     *
      * @see ChestEsp#setDrawingWorld(boolean)
      */
     @Inject(method = {"updateCameraAndRender"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/EntityRenderer;renderWorld(FJ)V", shift = At.Shift.BEFORE))
-    public void onStartWorldRender(float partialTicks, long nanoTime, CallbackInfo ci){
+    public void onStartWorldRender(float partialTicks, long nanoTime, CallbackInfo ci) {
         ChestEsp.INSTANCE.setDrawingWorld(true);
     }
 
     /**
      * Used to signal that the world rendering process is done.
+     *
      * @see ChestEsp#setDrawingWorld(boolean)
      */
     @Inject(method = {"updateCameraAndRender"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V", shift = At.Shift.BEFORE))
-    public void onEndWorldRender(float partialTicks, long nanoTime, CallbackInfo ci){
+    public void onEndWorldRender(float partialTicks, long nanoTime, CallbackInfo ci) {
         ChestEsp.INSTANCE.setDrawingWorld(false);
     }
 
@@ -125,14 +135,14 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
     public void onSetCameraAngle(EntityPlayerSP instance, float yaw, float pitch) {
         if (FreeCam.INSTANCE.shouldTweakMovement()) {
             FreeCam.INSTANCE.setViewAngles(yaw, pitch);
-        }else {
+        } else {
             instance.setAngles(yaw, pitch);
         }
     }
 
     /**
      * Tweak the renderViewEntity for {@link FreeCam}.
-     *
+     * <p>
      * Unfortunately using a regex to target multiple methods with a single Redirect did not work so there are three now.
      * <pre>
      * {@code
@@ -144,7 +154,7 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
     public Entity tweakRenderViewEntity(Minecraft instance) {
         if (FreeCam.INSTANCE.shouldTweakViewEntity()) {
             return FreeCam.INSTANCE.tweakRenderViewEntityHook();
-        }else {
+        } else {
             return instance.getRenderViewEntity();
         }
     }
@@ -156,7 +166,7 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
     public Entity tweakRenderViewEntity2(Minecraft instance) {
         if (FreeCam.INSTANCE.shouldTweakViewEntity()) {
             return FreeCam.INSTANCE.tweakRenderViewEntityHook();
-        }else {
+        } else {
             return instance.getRenderViewEntity();
         }
     }
@@ -168,7 +178,7 @@ abstract public class EntityRendererMixin implements IResourceManagerReloadListe
     public Entity tweakRenderViewEntityMouseOver(Minecraft instance) {
         if (FreeCam.INSTANCE.shouldTweakLookingAt()) {
             return FreeCam.INSTANCE.tweakRenderViewEntityHook();
-        }else {
+        } else {
             return instance.getRenderViewEntity();
         }
     }

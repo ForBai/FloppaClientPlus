@@ -1,8 +1,8 @@
 package floppaclient.utils
 
+import floppaclient.FloppaClient.Companion.mc
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.StringUtils.stripControlCodes
-import floppaclient.FloppaClient.Companion.mc
 
 object ScoreboardUtils {
     fun cleanSB(scoreboard: String?): String {

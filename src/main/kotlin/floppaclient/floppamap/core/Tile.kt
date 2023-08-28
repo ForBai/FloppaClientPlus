@@ -14,6 +14,7 @@ abstract class Tile(val x: Int, val z: Int) {
      */
     val row
         get() = (z - Dungeon.startZ) shr 4
+
     /**
      * Column in the dungeonList
      */

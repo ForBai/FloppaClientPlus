@@ -23,16 +23,16 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) :
 
         /** Rendering the name and the checkbox */
         FontUtil.drawString(displayName, 1, 3)
-        Gui.drawRect(width -13, 2, width - 1, 13, buttonColor)
+        Gui.drawRect(width - 13, 2, width - 1, 13, buttonColor)
         if (isCheckHovered(mouseX, mouseY))
-            Gui.drawRect(width -13, 2, width - 1, 13, ColorUtil.boxHoverColor)
+            Gui.drawRect(width - 13, 2, width - 1, 13, ColorUtil.boxHoverColor)
 
         return super.renderElement(mouseX, mouseY, partialTicks)
     }
 
     /**
      * Handles mouse clicks for this element and returns true if an action was performed
-	 */
+     */
     override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int): Boolean {
         if (mouseButton == 0 && isCheckHovered(mouseX, mouseY)) {
             setting.toggle()
@@ -42,8 +42,8 @@ class ElementCheckBox(parent: ModuleButton, setting: BooleanSetting) :
     }
 
     /**
-	 * Checks whether this element is hovered
-	 */
+     * Checks whether this element is hovered
+     */
     private fun isCheckHovered(mouseX: Int, mouseY: Int): Boolean {
         return mouseX >= xAbsolute + width - 13 && mouseX <= xAbsolute + width - 1 && mouseY >= yAbsolute + 2 && mouseY <= yAbsolute + height - 2
     }

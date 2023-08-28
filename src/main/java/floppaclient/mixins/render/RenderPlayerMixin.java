@@ -16,7 +16,7 @@ abstract public class RenderPlayerMixin {
     public Entity tweakViewEntity(RenderManager instance) {
         if (FreeCam.INSTANCE.shouldTweakViewEntity()) {
             return FloppaClient.mc.thePlayer;
-        }else {
+        } else {
             return instance.livingPlayer;
         }
     }

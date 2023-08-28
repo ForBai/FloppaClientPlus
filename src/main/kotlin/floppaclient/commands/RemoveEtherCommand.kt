@@ -29,7 +29,7 @@ class RemoveEtherCommand : CommandBase() {
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         try {
             DataHandler.removeEther(args.map { it.toDouble() })
-        } catch (e: Throwable){
+        } catch (e: Throwable) {
             ChatUtils.modMessage("&cArguments error.")
         }
     }
