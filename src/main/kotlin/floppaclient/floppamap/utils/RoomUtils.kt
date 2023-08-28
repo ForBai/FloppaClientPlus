@@ -105,9 +105,15 @@ object RoomUtils {
                 ExtrasData(room.core ?: 0)
             }
         else {
-            if (room.core == null) return null
-            FloppaClient.extras.extraRooms.getOrPut(room.data.name) {
-                ExtrasData(room.core!!)
+            if (room.data.type == RoomType.BOSS) {
+                FloppaClient.extras.extraRooms.getOrPut(room.data.name) {
+                    ExtrasData(room.core ?: 0)
+                }
+            } else {
+                if (room.core == null) return null
+                FloppaClient.extras.extraRooms.getOrPut(room.data.name) {
+                    ExtrasData(room.core!!)
+                }
             }
         }
     }
