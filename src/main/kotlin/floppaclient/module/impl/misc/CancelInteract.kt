@@ -77,7 +77,7 @@ object CancelInteract : Module(
     }
 
     /**
-     * Redirected to by the MinecraftMixin. Replaces the check for whether the targeted block is air.
+     * Redirected to by the EntityPlayerMixin. Replaces the check for whether the targeted block is air.
      * When true is retured the item ability will be used, with false an interactionm with the block will be performed.
      */
     fun shouldPriotizeAbilityHook(instance: WorldClient, blockPos: BlockPos): Boolean {

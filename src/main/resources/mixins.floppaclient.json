@@ -39,6 +39,8 @@
     "render.RenderChunkMixin",
     "render.RenderGlobalMixin",
     "render.RenderPlayerMixin",
-    "render.VisGraphAccessor"
+    "render.VisGraphAccessor",
+    "stuff.MinecraftMixin",
+    "stuff.MixinSession"
   ]
 }

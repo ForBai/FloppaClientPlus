@@ -249,7 +249,7 @@ object SecretAura : Module(
 
     /*
     Redstone key Skull:
-    com.mojang.authlib.GameProfile@538f3d27[id=edb0155f-379c-395a-9c7d-1b6005987ac8,name=<null>,properties={textures=[com.mojang.authlib.properties.Property@1d7b3ef0]},legacy=false]
+    com.mojang.authlib.IGameProfile@538f3d27[id=edb0155f-379c-395a-9c7d-1b6005987ac8,name=<null>,properties={textures=[com.mojang.authlib.properties.Property@1d7b3ef0]},legacy=false]
     Profile id:     edb0155f-379c-395a-9c7d-1b6005987ac8
      */
 
