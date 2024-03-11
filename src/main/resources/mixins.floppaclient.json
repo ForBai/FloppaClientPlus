@@ -12,7 +12,8 @@
     "entity.MixinEntity",
     "entity.MixinEntityLivingBase",
     "entity.MixinPlayer",
-    "packet.C02Accessor"
+    "packet.C02Accessor",
+    "stuff.URLMixin"
   ],
   "client": [
     "MinecraftAccessor",

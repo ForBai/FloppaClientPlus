@@ -1,14 +1,15 @@
 [
   {
-    "modid": "fc",
-    "name": "Floppa Client",
-    "description": "MILF (Man i love Floppa).",
+    "modid": "examplemod",
+    "name": "OringoOnCrack",
+    "description": "Why you do me like that",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "",
     "updateUrl": "",
     "authorList": [
-      "Aton"
+      "Aton",
+      "Anemoi/ForBai"
     ]
   }
 ]

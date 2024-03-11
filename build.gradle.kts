@@ -47,8 +47,11 @@ dependencies {
     packageLib("gg.essential:loader-launchwrapper:1.1.3")
     implementation("gg.essential:essential-1.8.9-forge:3662")
 
+    implementation("net.bytebuddy:byte-buddy:1.12.17")
+
     // For scanning self registering modules packaged within the mod. -- Removed!
 //    packageLib("org.reflections:reflections:0.10.2")
+    // add 
 }
 
 sourceSets {
