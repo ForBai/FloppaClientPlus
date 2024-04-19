@@ -48,6 +48,8 @@ dependencies {
     implementation("gg.essential:essential-1.8.9-forge:3662")
 
     implementation("net.bytebuddy:byte-buddy:1.12.17")
+    // add OringoClient-Supporter.jar as a lib out of the libs folder, but do not include it in the final jar
+//    compileOnly(files("libs/OringoClient-Supporter.jar"))
 
     // For scanning self registering modules packaged within the mod. -- Removed!
 //    packageLib("org.reflections:reflections:0.10.2")
