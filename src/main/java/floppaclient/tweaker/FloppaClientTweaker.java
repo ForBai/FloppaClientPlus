@@ -1,7 +1,9 @@
 package floppaclient.tweaker;
 
+import com.sun.jna.Native;
 import gg.essential.loader.stage0.EssentialSetupTweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.fusesource.hawtjni.runtime.JNIEnv;
 
 import java.net.MalformedURLException;
 import java.net.Socket;
@@ -16,6 +18,8 @@ public class FloppaClientTweaker extends EssentialSetupTweaker {
         super();
 //
         //change the constructor of the java.net.URL class to use our own URL class
+        //attach following agent here: /home/lars/dumper.jar
+
     }
 
 

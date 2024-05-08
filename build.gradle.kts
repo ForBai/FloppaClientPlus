@@ -6,6 +6,7 @@ import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
     kotlin("jvm") version "1.8.10"
+    kotlin("plugin.serialization") version "1.9.24"
     // This is for creating a documentation from the documentation comments. Use it with the dokkaHtml gradle task
     id("org.jetbrains.dokka") version "1.7.20"
     id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -53,7 +54,7 @@ dependencies {
 
     // For scanning self registering modules packaged within the mod. -- Removed!
 //    packageLib("org.reflections:reflections:0.10.2")
-    // add 
+    // add
 }
 
 sourceSets {

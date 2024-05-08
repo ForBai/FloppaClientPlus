@@ -7,6 +7,7 @@ import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 
 /**
  * # A collection of methods for finding items in inventories.
