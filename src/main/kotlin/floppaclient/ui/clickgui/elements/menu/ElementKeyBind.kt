@@ -2,6 +2,7 @@ package floppaclient.ui.clickgui.elements.menu
 
 import floppaclient.module.Module
 import floppaclient.module.settings.impl.DummySetting
+import floppaclient.module.settings.impl.KeybindSetting
 import floppaclient.ui.clickgui.elements.Element
 import floppaclient.ui.clickgui.elements.ElementType
 import floppaclient.ui.clickgui.elements.ModuleButton
@@ -14,17 +15,17 @@ import org.lwjgl.input.Mouse
  *
  * @author Aton
  */
-class ElementKeyBind(parent: ModuleButton, val mod: Module) :
-    Element<DummySetting>(parent, DummySetting("Key Bind"), ElementType.KEY_BIND) {
+class ElementKeyBind(parent: ModuleButton, setting: KeybindSetting) :
+    Element<KeybindSetting>(parent, setting, ElementType.KEY_BIND) {
 
     private val keyBlackList = intArrayOf()
 
 
     override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
-        val keyName = if (mod.keyCode > 0)
-            Keyboard.getKeyName(mod.keyCode) ?: "Err"
-        else if (mod.keyCode < 0)
-            Mouse.getButtonName(mod.keyCode + 100)
+        val keyName = if (setting.value.key > 0)
+            Keyboard.getKeyName(setting.value.key ) ?: "Err"
+        else if (setting.value.key  < 0)
+            Mouse.getButtonName(setting.value.key  + 100)
         else
             ".."
         val displayValue = "[$keyName]"
@@ -44,7 +45,7 @@ class ElementKeyBind(parent: ModuleButton, val mod: Module) :
             listening = !listening
             return true
         } else if (listening) {
-            mod.keyCode = -100 + mouseButton
+            setting.value.key  = -100 + mouseButton
             listening = false
         }
         return super.mouseClicked(mouseX, mouseY, mouseButton)
@@ -56,12 +57,12 @@ class ElementKeyBind(parent: ModuleButton, val mod: Module) :
     override fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
         if (listening) {
             if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_BACK) {
-                mod.keyCode = Keyboard.KEY_NONE
+                setting.value.key  = Keyboard.KEY_NONE
                 listening = false
             } else if (keyCode == Keyboard.KEY_NUMPADENTER || keyCode == Keyboard.KEY_RETURN) {
                 listening = false
             } else if (!keyBlackList.contains(keyCode)) {
-                mod.keyCode = keyCode
+                setting.value.key  = keyCode
                 listening = false
             }
             return true

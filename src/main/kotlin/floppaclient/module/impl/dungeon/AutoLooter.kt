@@ -2,8 +2,9 @@ package floppaclient.module.impl.dungeon
 
 import floppaclient.module.Category
 import floppaclient.module.Module
-import floppaclient.module.impl.keybinds.KeyBind
 import floppaclient.module.settings.impl.BooleanSetting
+import floppaclient.module.settings.impl.KeybindSetting
+import floppaclient.module.settings.impl.Keybinding
 import floppaclient.util.PriceUtils
 import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.lore
@@ -25,10 +26,27 @@ object AutoLooter : Module(
     private val isBedrockAllowed = BooleanSetting("Bedrock Chests", true, description = "Allow Bedrock Chests")
 
     private val isAutoBuyEnabled = BooleanSetting("Auto Buy", true, description = "Automatically buy the best chest")
-    private val onlyAutoBuyOnKeyBind: BooleanSetting = BooleanSetting("Only Buy on Keybind", false, description = "Only buy the best chest when the keybind is pressed")
-//    private val keybind:
+    private val onlyAutoBuyOnKeyBind: BooleanSetting = BooleanSetting(
+        "Only Buy on Keybind",
+        false,
+        description = "Only buy the best chest when the keybind is pressed"
+    )
+    private val keyBind: KeybindSetting =
+        KeybindSetting("Keybind", Keybinding(0), description = "Keybind to buy the best chest")
 
-
+    init {
+        this.addSettings(
+            isWoodAllowed,
+            isGoldAllowed,
+            isDiamondAllowed,
+            isEmeraldAllowed,
+            isObsidianAllowed,
+            isBedrockAllowed,
+            isAutoBuyEnabled,
+            onlyAutoBuyOnKeyBind,
+            keyBind
+        )
+    }
 
     private var idsToBuyAlways: Set<String> = setOf(
         "NECRON_HANDLE",
@@ -142,7 +160,7 @@ object AutoLooter : Module(
                 value = 0
                 return
             }
-            value = floor(((PriceUtils.getSellPrice(this.itemID)[0] ?: 0).toInt() *  this.quantity).toFloat()).toInt()
+            value = floor(((PriceUtils.getSellPrice(this.itemID)[0] ?: 0).toInt() * this.quantity).toFloat()).toInt()
         }
 
         fun getPriceStr(): String {

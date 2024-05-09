@@ -88,6 +88,7 @@ class ModuleConfig(path: File) {
                             is StringSelectorSetting -> setting.selected = (configSetting as StringSetting).text
                             is SelectorSetting -> setting.selected = (configSetting as StringSetting).text
                             is StringSetting -> setting.text = (configSetting as StringSetting).text
+                            is KeybindSetting -> setting.value = (configSetting as KeybindSetting).value
                         }
                     }
                 }

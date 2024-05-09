@@ -11,6 +11,7 @@ import floppaclient.module.impl.misc.*
 import floppaclient.module.impl.player.*
 import floppaclient.module.impl.render.*
 import floppaclient.module.settings.Setting
+import floppaclient.module.settings.impl.KeybindSetting
 import floppaclient.tweaker.FloppaClientTweaker
 import floppaclient.ui.clickgui.ClickGUI
 import floppaclient.ui.hud.EditHudGUI
@@ -70,6 +71,7 @@ object ModuleManager {
 //        CancelChestOpen,
         PartyTracker,
         M7P5,
+        AutoLooter,
 
         //RENDER
         ClickGui,
@@ -186,6 +188,13 @@ object ModuleManager {
     @SubscribeEvent
     fun activateModuleKeyBinds(event: PreKeyInputEvent) {
         modules.stream().filter { module -> module.keyCode == event.key }.forEach { module -> module.onKeyBind() }
+        for (module in modules) {
+            for (setting in module.settings) {
+                if (setting is KeybindSetting && setting.value.key == event.key) {
+                    setting.value.onPress?.invoke()
+                }
+            }
+        }
     }
 
     /**
@@ -197,6 +206,13 @@ object ModuleManager {
     fun activateModuleMouseBinds(event: PreMouseInputEvent) {
         modules.stream().filter { module -> module.keyCode + 100 == event.button }
             .forEach { module -> module.onKeyBind() }
+        for (module in modules) {
+            for (setting in module.settings) {
+                if (setting is KeybindSetting && setting.value.key + 100 == event.button) {
+                    setting.value.onPress?.invoke()
+                }
+            }
+        }
     }
 
     fun getModuleByName(name: String): Module? {

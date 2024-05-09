@@ -41,7 +41,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
     init {
         /** Register the corresponding gui element for all non-hidden settings in the module */
         updateElements()
-        menuElements.add(ElementKeyBind(this, module))
+        menuElements.add(ElementKeyBind(this, KeybindSetting("Key Bind", Keybinding(module.keyCode), "The key bind to toggle the module.")))
     }
 
     /**
@@ -65,6 +65,7 @@ class ModuleButton(val module: Module, val panel: Panel) {
                     is StringSetting -> ElementTextField(this, setting)
                     is ColorSetting -> ElementColor(this, setting)
                     is ActionSetting -> ElementAction(this, setting)
+                    is KeybindSetting -> ElementKeyBind(this, setting)
                     else -> return@addElement
                 }
                 menuElements.add(position, newElement)

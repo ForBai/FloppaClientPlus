@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import floppaclient.FloppaClient
 import floppaclient.module.settings.Setting
+import floppaclient.module.settings.impl.Keybinding
 import floppaclient.ui.hud.HudElement
 import floppaclient.utils.ChatUtils
 import net.minecraftforge.common.MinecraftForge
