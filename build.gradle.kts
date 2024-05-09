@@ -54,7 +54,8 @@ dependencies {
 
     // For scanning self registering modules packaged within the mod. -- Removed!
 //    packageLib("org.reflections:reflections:0.10.2")
-    // add
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 sourceSets {

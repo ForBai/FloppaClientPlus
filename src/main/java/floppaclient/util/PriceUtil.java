@@ -1,28 +1,21 @@
 package floppaclient.util;
 
 
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.item.Item;
+import floppaclient.utils.ChatUtils;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.util.Constants;
-import org.apache.http.HttpRequest;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
-import scala.util.parsing.json.JSONObject;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,45 +85,62 @@ public class PriceUtils {
          */
         public void update() {
             // Update Bazaar Prices
-            HttpClientBuilder client = HttpClientBuilder.create();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.hypixel.net/skyblock/bazaar"))
-                    .GET()
+            OkHttpClient client = new OkHttpClient();
+            Request bzRequest = new Request.Builder()
+                    .url("https://api.hypixel.net/skyblock/bazaar")
                     .build();
-            client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .thenApply(HttpResponse::body)
-                    .thenAccept(body -> {
-                        JsonElement json = new JsonParser().parse(body);
-                        JsonObject obj = json.getAsJsonObject();
-                        if (!obj.has("success") ||!obj.get("success").getAsBoolean()) return;
-                        JsonObject products = obj.getAsJsonObject("products");
-                        Map<String, Double> prices = new HashMap<>();
-                        for (Map.Entry<String, JsonElement> entry : products.entrySet()) {
-                            String key = entry.getKey();
-                            JsonObject product = entry.getValue().getAsJsonObject();
-                            prices.put(key, product.get("quick_status").getAsJsonObject().get("buyPrice").getAsDouble());
-                        }
-                        FileLib.write("BloomCore", "data/bz.json", new Gson().toJson(prices));
-                        loadFromBZFile();
-                    });
+            client.newCall(bzRequest).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    e.printStackTrace();
+                }
 
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if (!response.isSuccessful()) return;
+                    if (response.body() == null) return;
+                    JsonElement json = new JsonParser().parse(response.body().string());
+                    JsonObject obj = json.getAsJsonObject();
+                    if (!obj.has("success") || !obj.get("success").getAsBoolean()) return;
+                    JsonObject products = obj.getAsJsonObject("products");
+                    Map<String, Double> prices = new HashMap<>();
+                    for (Map.Entry<String, JsonElement> entry : products.entrySet()) {
+                        String key = entry.getKey();
+                        JsonObject product = entry.getValue().getAsJsonObject();
+                        prices.put(key, product.get("quick_status").getAsJsonObject().get("buyPrice").getAsDouble());
+                    }
+                    FileLib.write("BloomCore", "data/bz.json", new Gson().toJson(prices));
+                    loadFromBZFile();
+                }
+            });
             // Update BINs
-            request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://moulberry.codes/lowestbin.json"))
-                    .GET()
+            Request binRequest = new Request.Builder()
+                    .url("https://moulberry.codes/lowestbin.json")
                     .build();
-            client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .thenApply(HttpResponse::body)
-                    .thenAccept(body -> {
-                        JsonElement json = new JsonParser().parse(body);
-                        FileLib.write("BloomCore", "data/bins.json", json.toString());
-                        loadFromBinFile();
-                    });
+            client.newCall(binRequest).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    ChatComponentText chatComponentText = new ChatComponentText("Failed to update BINs. Click [here] to copy error to clipboard.");
+                    chatComponentText.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,""));
+                    ChatUtils.INSTANCE.modMessage("Failed to update BINs");
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if (!response.isSuccessful()) return;
+                    if (response.body() == null) return;
+                    JsonElement json = new JsonParser().parse(response.body().string());
+                    FileLib.write("BloomCore", "data/bins.json", json.toString());
+                    loadFromBinFile();
+                }
+            });
         }
 
         /**
          * Gets the buy price or BIN of a Skyblock item.
          * If includeLocation is true, it will return something like [ITEM_PRICE, PriceUtils.locations.BAZAAR] or null if no price is found
+         *
          * @param skyblockID
          * @param includeLocation
          * @returns {Number | [Number, Integer] | null}
@@ -150,6 +160,7 @@ public class PriceUtils {
         /**
          * Gets the sell price or lowest BIN of a Skyblock item.
          * If includeLocation is true, it will return something like [ITEM_PRICE, PriceUtils.locations.BAZAAR] or null if no price is found
+         *
          * @param skyblockID
          * @param includeLocation
          * @returns {Number | [Number, Integer] | null}
@@ -168,6 +179,7 @@ public class PriceUtils {
 
         /**
          * Gets the coins required to upgrade by the given requirements (Using the hypixel Skyblock items API data).
+         *
          * @param requirements
          * @returns
          */
@@ -186,6 +198,7 @@ public class PriceUtils {
 
         /**
          * Returns the value of an item taking into account gemstones, recombs, enchants etc.
+         *
          * @param itemStack
          * @param returnBreakdown
          * @returns {Number | [Number, Object]}
@@ -254,7 +267,7 @@ public class PriceUtils {
             if (extraAttributes.hasKey("reforge")) {
                 String reforge = extraAttributes.getString("reforge");
                 if (!values.containsKey("reforge")) values.put("reforge", 0.0);
-                values.put("reforge", values.get("reforge") + getPrice("REFORGE_"+reforge.toUpperCase()));
+                values.put("reforge", values.get("reforge") + getPrice("REFORGE_" + reforge.toUpperCase()));
             }
 
             // Talisman Upgrades
@@ -262,7 +275,7 @@ public class PriceUtils {
                 String talismanType = itemID.substring(0, itemID.indexOf("_"));
                 if (extraAttributes.hasKey("gems")) {
                     int talismanUpgrades = extraAttributes.getInteger("gems");
-                    values.put("gems", talismanUpgrades * getPrice("TALISMAN_UPGRADE_"+talismanType.toUpperCase()));
+                    values.put("gems", talismanUpgrades * getPrice("TALISMAN_UPGRADE_" + talismanType.toUpperCase()));
                 }
             }
 
@@ -289,15 +302,15 @@ public class PriceUtils {
         }
 
         public Object getReforgePrice(String reforge) {
-            if (reforgePrices.containsKey("REFORGE_"+reforge.toUpperCase())) {
-                return reforgePrices.get("REFORGE_"+reforge.toUpperCase());
+            if (reforgePrices.containsKey("REFORGE_" + reforge.toUpperCase())) {
+                return reforgePrices.get("REFORGE_" + reforge.toUpperCase());
             }
             return null;
         }
 
         public Object getTalismanUpgradePrice(String talismanType, int level) {
-            if (talismanUpgradePrices.containsKey("TALISMAN_UPGRADE_"+talismanType.toUpperCase()+"_"+level)) {
-                return talismanUpgradePrices.get("TALISMAN_UPGRADE_"+talismanType.toUpperCase()+"_"+level);
+            if (talismanUpgradePrices.containsKey("TALISMAN_UPGRADE_" + talismanType.toUpperCase() + "_" + level)) {
+                return talismanUpgradePrices.get("TALISMAN_UPGRADE_" + talismanType.toUpperCase() + "_" + level);
             }
             return null;
         }
@@ -308,7 +321,7 @@ public class PriceUtils {
 
         public Object getModifierPrice(String modifier, int modifierValue) {
             if (modifierPrices.containsKey(modifier + ";" + modifierValue)) {
-                return modifierPrices.get(modifier + ";"+ modifierValue);
+                return modifierPrices.get(modifier + ";" + modifierValue);
             }
             return null;
         }

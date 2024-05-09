@@ -18,11 +18,13 @@ import net.minecraft.inventory.Container
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.util.*
 import net.minecraft.util.Timer
+import java.awt.Toolkit
+import java.awt.datatransfer.Clipboard
+import java.awt.datatransfer.StringSelection
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.round
 import kotlin.math.roundToInt
-
 /**
  * ## A general collection of utility functions.
  *
@@ -285,4 +287,12 @@ object Utils {
     fun isInt(string: String): Boolean {
         return string.toIntOrNull() != null
     }
+
+    fun saveToClipoard(string: String) {
+        val selection = StringSelection(string)
+        val clipboard: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        clipboard.setContents(selection, selection)
+    }
+
 }
+

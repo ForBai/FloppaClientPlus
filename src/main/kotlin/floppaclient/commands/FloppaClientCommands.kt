@@ -20,6 +20,7 @@ import floppaclient.utils.ChatUtils.chatMessage
 import floppaclient.utils.ChatUtils.modMessage
 import floppaclient.utils.DataHandler
 import floppaclient.utils.HypixelApiUtils
+import floppaclient.utils.Utils.saveToClipoard
 import floppaclient.utils.fakeactions.FakeActionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -227,6 +228,15 @@ class FloppaClientCommands : CommandBase() {
                 modMessage("${if (ForgeModContainer.forgeLightPipelineEnabled) "enabled" else "disabled"} the forge block rendering pipeline.")
             }
 
+            "setclipboard", "copy" -> {
+                val stringBuilder = StringBuilder()
+                for (arg in args.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
+                    stringBuilder.append(arg).append(" ")
+                }
+                stringBuilder.deleteCharAt(stringBuilder.length - 1)
+                saveToClipoard(stringBuilder.toString())
+            }
+
             else -> {
                 modMessage("Command not recognized!")
             }
@@ -253,7 +263,8 @@ class FloppaClientCommands : CommandBase() {
                     "freecamwalk",
                     "clickentity",
                     "armorstands",
-                    "entities"
+                    "entities",
+                    "setclipboard",
                 )
             )
         }
