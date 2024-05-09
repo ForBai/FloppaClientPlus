@@ -229,8 +229,9 @@ class FloppaClientCommands : CommandBase() {
             }
 
             "setclipboard", "copy" -> {
+                if (args.size < 2) return modMessage("Specify what to copy.")
                 val stringBuilder = StringBuilder()
-                for (arg in args.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
+                for (arg in args.drop(2)) {
                     stringBuilder.append(arg).append(" ")
                 }
                 stringBuilder.deleteCharAt(stringBuilder.length - 1)
