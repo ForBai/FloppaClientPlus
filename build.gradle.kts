@@ -24,7 +24,7 @@ buildscript {
 }
 
 // This variable determine the filename of the produced jar file.
-version = "1.0.4"
+version = "1.0.5"
 group = "floppaclient"
 
 repositories {
@@ -106,11 +106,11 @@ tasks {
         enabled = false
     }
     named<RemapJarTask>("remapJar") {
-        archiveBaseName.set("FloppaClient")
+        archiveBaseName.set("FloppaClientPlus")
         input.set(shadowJar.get().archiveFile)
     }
     named<ShadowJar>("shadowJar") {
-        archiveBaseName.set("FloppaClient")
+        archiveBaseName.set("FloppaClientPlus")
         archiveClassifier.set("dev")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         configurations = listOf(packageLib)
