@@ -1,5 +1,7 @@
 package floppaclient.module.impl.dungeon
 
+import floppaclient.FloppaClient
+import floppaclient.FloppaClient.Companion.mc
 import floppaclient.module.Category
 import floppaclient.module.Module
 import floppaclient.module.settings.impl.BooleanSetting
@@ -9,6 +11,11 @@ import floppaclient.util.PriceUtils
 import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.lore
 import net.minecraft.item.ItemStack
+import net.minecraft.util.StringUtils
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
 import kotlin.math.floor
 
@@ -17,7 +24,11 @@ object AutoLooter : Module(
     category = Category.DUNGEON,
     description = "Automatically finds the best chest at the end of a dungeon and buys it."
 ) {
+    var isScanned = false
+    var dungeonChests: Array<DungeonChest> = arrayOf()
+    var currentPhase: CheckPhase = CheckPhase.NONE
 
+    //settings
     private val isWoodAllowed = BooleanSetting("Wood Chests", true, description = "Allow Wood Chests")
     private val isGoldAllowed = BooleanSetting("Gold Chests", true, description = "Allow Gold Chests")
     private val isDiamondAllowed = BooleanSetting("Diamond Chests", true, description = "Allow Diamond Chests")
@@ -25,14 +36,23 @@ object AutoLooter : Module(
     private val isObsidianAllowed = BooleanSetting("Obsidian Chests", true, description = "Allow Obsidian Chests")
     private val isBedrockAllowed = BooleanSetting("Bedrock Chests", true, description = "Allow Bedrock Chests")
 
+    private val isAutoScanEnabled = BooleanSetting("Auto Scan", true, description = "Automatically scan the chests")
+    private val onlyAutoScanOnKeyBind = BooleanSetting(
+        "Only Scan on Keybind",
+        false,
+        description = "Only scan the chests when the keybind is pressed"
+    )
+    private val scanKeyBind =
+        KeybindSetting("Scan Bind", Keybinding(0), description = "Keybind to scan the chests")
+
     private val isAutoBuyEnabled = BooleanSetting("Auto Buy", true, description = "Automatically buy the best chest")
-    private val onlyAutoBuyOnKeyBind: BooleanSetting = BooleanSetting(
+    private val onlyAutoBuyOnKeyBind = BooleanSetting(
         "Only Buy on Keybind",
         false,
         description = "Only buy the best chest when the keybind is pressed"
     )
-    private val keyBind: KeybindSetting =
-        KeybindSetting("Keybind", Keybinding(0), description = "Keybind to buy the best chest")
+    private val keyBind =
+        KeybindSetting("Buy Bind", Keybinding(0), description = "Keybind to buy the best chest")
 
     init {
         this.addSettings(
@@ -46,6 +66,51 @@ object AutoLooter : Module(
             onlyAutoBuyOnKeyBind,
             keyBind
         )
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    fun onChat(event: ClientChatReceivedEvent) {
+        if (!FloppaClient.inDungeons || event.type.toInt() == 2) return
+        if (StringUtils.stripControlCodes(event.message.unformattedText) == "                             > EXTRA STATS <") {
+            if (isAutoScanEnabled.enabled) {
+                if (onlyAutoScanOnKeyBind.enabled) {
+                    currentPhase = CheckPhase.WAIT_FOR_SCAN_KEY
+                } else if (!onlyAutoScanOnKeyBind.enabled) {
+                    currentPhase = CheckPhase.SCAN_WOOD
+                }
+            }
+            return
+        }
+    }
+
+    @SubscribeEvent
+    fun onTickEvent(event: TickEvent.ClientTickEvent) {
+        if (mc.currentScreen != null) return
+        when(currentPhase){
+            CheckPhase.SCAN_WOOD -> TODO()
+            CheckPhase.SCAN_GOLD -> TODO()
+            CheckPhase.SCAN_DIAMOND -> TODO()
+            CheckPhase.SCAN_EMERALD -> TODO()
+            CheckPhase.SCAN_OBSIDIAN -> TODO()
+            CheckPhase.SCAN_BEDROCK -> TODO()
+            CheckPhase.BUY -> TODO()
+            CheckPhase.WAIT_FOR_SCAN_KEY -> TODO()
+            CheckPhase.WAIT_FOR_BUY_KEY -> TODO()
+            CheckPhase.NONE -> TODO()
+        }
+    }
+
+    enum class CheckPhase {
+        SCAN_WOOD,
+        SCAN_GOLD,
+        SCAN_DIAMOND,
+        SCAN_EMERALD,
+        SCAN_OBSIDIAN,
+        SCAN_BEDROCK,
+        BUY,
+        WAIT_FOR_SCAN_KEY,
+        WAIT_FOR_BUY_KEY,
+        NONE
     }
 
     private var idsToBuyAlways: Set<String> = setOf(
@@ -69,7 +134,7 @@ object AutoLooter : Module(
         "STORM_THE_FISH"
     )
 
-    private enum class ChestType(val textureID: String, val color: String) {
+    enum class ChestType(val textureID: String, val color: String) {
         WOOD(
             "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWE3MzZlYjFhN2NlNWE1ZjVkNWIxNjg5MzFmYTMxMzk2Mzg2YzE2MDU2OGI0MTk2NGJhODZjZGI5ZWQ2YmUifX19",
             "&f"
@@ -104,7 +169,7 @@ object AutoLooter : Module(
         }
     }
 
-    private data class DungeonChest(
+    data class DungeonChest(
         val type: ChestType,
         val items: Array<DungeonItemDrop>,
         var value: Float,
@@ -131,7 +196,7 @@ object AutoLooter : Module(
         }
     }
 
-    private data class DungeonItemDrop(val item: ItemStack, var name: String, var quantity: Int, var itemID: String) {
+    data class DungeonItemDrop(val item: ItemStack, var name: String, var quantity: Int, var itemID: String) {
         var value = 0
 
         init {
