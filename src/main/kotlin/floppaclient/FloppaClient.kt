@@ -110,7 +110,7 @@ class FloppaClient {
         ModuleManager.initializeModules()
 
         clickGUI = ClickGUI()
-        println("Price test of Jungel Pickaxe is: "+PriceUtils.getPrice("JUNGLE_PICKAXE"))
+//        println("Price test of Jungel Pickaxe is: "+PriceUtils.getPrice("JUNGLE_PICKAXE")[0])
     }
 
     @SubscribeEvent
