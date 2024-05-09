@@ -81,7 +81,7 @@ import kotlin.reflect.full.hasAnnotation
  * @author Aton
  * @see ModuleManager
  * @param name The name of the Module. **This has to be unique!** This name is shown in the GUI and used to identify the module in the config.
- * @param keyCode Key code for the Modules key-bind.
+ * @param key Key code for the Modules key-bind.
  * @param category Determines in which category Panel the module will appear in the GUI.
  * @param description A description of the module and its usage that is shown in the [Advanced GUI][floppaclient.ui.clickgui.advanced.AdvancedMenu].
  * @sample floppaclient.module.impl.misc.AutoClicker.maxCps
@@ -89,7 +89,7 @@ import kotlin.reflect.full.hasAnnotation
  */
 abstract class Module(
     name: String,
-    keyCode: Int = Keyboard.KEY_NONE,
+    key: Int? = Keyboard.KEY_NONE,
     category: Category = Category.MISC,
     toggled: Boolean = false,
     settings: ArrayList<Setting<*>> = ArrayList(),
@@ -104,9 +104,10 @@ abstract class Module(
      * Mouse binds will be negative: -100 + mouse button.
      * This is the same way as minecraft treats mouse binds.
      */
-    @Expose
-    @SerializedName("key")
-    var keyCode: Int
+//    @Expose
+//    @SerializedName("key")
+//    var keyCode: Int
+    val keybinding: Keybinding? = key?.let { Keybinding(it).apply { onPress = ::onKeyBind } }
     val category: Category
 
     /**
@@ -130,7 +131,6 @@ abstract class Module(
 
     init {
         this.name = name
-        this.keyCode = keyCode
         this.category = category
         this.settings = settings
         this.description = description

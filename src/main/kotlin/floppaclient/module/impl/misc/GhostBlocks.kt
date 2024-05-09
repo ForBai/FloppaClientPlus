@@ -56,8 +56,8 @@ object GhostBlocks : Module(
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || display != null) return
-        if (this.keyCode > 0 && !Keyboard.isKeyDown(this.keyCode)) return
-        if (this.keyCode < 0 && !Mouse.isButtonDown(this.keyCode + 100)) return
+        if (this.keybinding!!.key > 0 && !Keyboard.isKeyDown(this.keybinding.key)) return
+        if (this.keybinding.key < 0 && !Mouse.isButtonDown(this.keybinding.key + 100)) return
         if (!mc.inGameHasFocus) return
 
         val lookingAt = mc.thePlayer?.rayTrace(gbRange.value, 1f)

@@ -71,7 +71,6 @@ class ModuleConfig(path: File) {
                             return@updateModule
                         }
                     if (module.enabled != configModule.enabled) module.toggle()
-                    module.keyCode = configModule.keyCode
                     for (configSetting in configModule.settings) {
                         // It seems like when the config parsing failed it can result in this being null. The compiler does not know this.
                         // This check ensures that the rest of the config will still get processed in that case, avoiding the loss of data.

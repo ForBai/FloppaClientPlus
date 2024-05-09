@@ -14,16 +14,6 @@ class KeybindSetting(
 
     override var value: Keybinding = default
 
-//    override fun write(): JsonElement {
-//        return JsonPrimitive(value.key)
-//    }
-//
-//    override fun read(element: JsonElement?) {
-//        element?.asInt?.let {
-//            value.key = it
-//        }
-//    }
-
     /**
      * Action to do, when keybinding is pressed
      *

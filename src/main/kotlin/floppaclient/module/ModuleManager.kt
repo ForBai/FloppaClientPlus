@@ -180,6 +180,10 @@ object ModuleManager {
         ClickGUI.panels.find { it.category === Category.KEY_BIND }?.moduleButtons?.removeIf { it.module === bind }
     }
 
+    init {
+        modules.stream().forEach { m -> m.keybinding?.let { m.register(KeybindSetting("Key Bind", it, "Toggles the module on and off!")) }}
+    }
+
     /**
      * Handles the key binds for the modules.
      * Note that the custom event fired in the minecraft mixin is used here and not the forge event.
@@ -187,7 +191,7 @@ object ModuleManager {
      */
     @SubscribeEvent
     fun activateModuleKeyBinds(event: PreKeyInputEvent) {
-        modules.stream().filter { module -> module.keyCode == event.key }.forEach { module -> module.onKeyBind() }
+//        modules.stream().filter { module -> module.keyCode == event.key }.forEach { module -> module.onKeyBind() }
         for (module in modules) {
             for (setting in module.settings) {
                 if (setting is KeybindSetting && setting.value.key == event.key) {
@@ -204,8 +208,8 @@ object ModuleManager {
      */
     @SubscribeEvent
     fun activateModuleMouseBinds(event: PreMouseInputEvent) {
-        modules.stream().filter { module -> module.keyCode + 100 == event.button }
-            .forEach { module -> module.onKeyBind() }
+//        modules.stream().filter { module -> module.keyCode + 100 == event.button }
+//            .forEach { module -> module.onKeyBind() }
         for (module in modules) {
             for (setting in module.settings) {
                 if (setting is KeybindSetting && setting.value.key + 100 == event.button) {

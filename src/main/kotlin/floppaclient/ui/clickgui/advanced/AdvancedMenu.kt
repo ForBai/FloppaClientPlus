@@ -67,9 +67,9 @@ class AdvancedMenu(val module: Module) {
                 is StringSetting -> elements.add(AdvancedElementTextField(this, module, setting))
                 is ColorSetting -> elements.add(AdvancedElementColor(this, module, setting))
                 is ActionSetting -> elements.add(AdvancedElementAction(this, module, setting))
+                is KeybindSetting -> elements.add(AdvancedElementKeyBind(this, module, setting))
             }
         }
-        elements.add(AdvancedElementKeyBind(this, module))
     }
 
     /**

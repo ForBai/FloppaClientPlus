@@ -1,7 +1,7 @@
 package floppaclient.ui.clickgui.advanced.elements.menu
 
 import floppaclient.module.Module
-import floppaclient.module.settings.impl.DummySetting
+import floppaclient.module.settings.impl.KeybindSetting
 import floppaclient.ui.clickgui.advanced.AdvancedMenu
 import floppaclient.ui.clickgui.advanced.elements.AdvancedElement
 import floppaclient.ui.clickgui.advanced.elements.AdvancedElementType
@@ -14,8 +14,8 @@ import org.lwjgl.input.Mouse
  *
  * @author Aton
  */
-class AdvancedElementKeyBind(parent: AdvancedMenu, module: Module) :
-    AdvancedElement<DummySetting>(parent, module, DummySetting("KeyBind"), AdvancedElementType.KEY_BIND) {
+class AdvancedElementKeyBind(parent: AdvancedMenu, module: Module, setting: KeybindSetting) :
+    AdvancedElement<KeybindSetting>(parent, module, setting, AdvancedElementType.KEY_BIND) {
 
     private val keyBlackList = intArrayOf()
 
@@ -23,12 +23,12 @@ class AdvancedElementKeyBind(parent: AdvancedMenu, module: Module) :
      * Render the element
      */
     override fun renderElement(mouseX: Int, mouseY: Int, partialTicks: Float): Int {
-        val displayName = "Key Bind"
+        val displayName = setting.name
 
-        val keyName = if (module.keyCode > 0)
-            Keyboard.getKeyName(module.keyCode) ?: "Err"
-        else if (module.keyCode < 0)
-            Mouse.getButtonName(module.keyCode + 100)
+        val keyName = if (module.keybinding!!.key > 0)
+            Keyboard.getKeyName(module.keybinding.key) ?: "Err"
+        else if (module.keybinding.key < 0)
+            Mouse.getButtonName(module.keybinding.key + 100)
         else
             ".."
         val displayValue = "[$keyName]"
@@ -48,7 +48,7 @@ class AdvancedElementKeyBind(parent: AdvancedMenu, module: Module) :
             listening = !listening
             return true
         } else if (listening) {
-            module.keyCode = -100 + mouseButton
+            module.keybinding!!.key = -100 + mouseButton
             listening = false
         }
         return super.mouseClicked(mouseX, mouseY, mouseButton)
@@ -60,12 +60,12 @@ class AdvancedElementKeyBind(parent: AdvancedMenu, module: Module) :
     override fun keyTyped(typedChar: Char, keyCode: Int): Boolean {
         if (listening) {
             if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_BACK) {
-                module.keyCode = Keyboard.KEY_NONE
+                module.keybinding!!.key = Keyboard.KEY_NONE
                 listening = false
             } else if (keyCode == Keyboard.KEY_NUMPADENTER || keyCode == Keyboard.KEY_RETURN) {
                 listening = false
             } else if (!keyBlackList.contains(keyCode)) {
-                module.keyCode = keyCode
+                module.keybinding!!.key = keyCode
                 listening = false
             }
             return true
