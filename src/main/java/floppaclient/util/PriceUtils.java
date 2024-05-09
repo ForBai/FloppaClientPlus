@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import floppaclient.FloppaClient;
 import floppaclient.utils.ChatUtils;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.util.ChatComponentText;
@@ -17,13 +18,14 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static floppaclient.FloppaClient.mc;
 
 public class PriceUtils {
-    private Map<String, Float> bzBuyPrices = new HashMap<>();
-    private Map<String, Float> bzSellPrices = new HashMap<>();
-    private Map<String, Float> bins = new HashMap<>();
+    private static Map<String, Float> bzBuyPrices = new HashMap<>();
+    private static Map<String, Float> bzSellPrices = new HashMap<>();
+    private static Map<String, Float> bins = new HashMap<>();
     public static final int AUCTION = 0;
     public static final int BAZAAR = 1;
     private File bzFile;
@@ -31,8 +33,8 @@ public class PriceUtils {
     private long lastUpdated = System.currentTimeMillis();
 
     public PriceUtils() {
-        bzFile = new File(mc.mcDataDir, "config/data/bz.json");
-        binFile = new File(mc.mcDataDir, "config/data/bins.json");
+        bzFile = new File(mc.mcDataDir, "config/" + FloppaClient.CONFIG_DOMAIN + "/data/bz.json");
+        binFile = new File(mc.mcDataDir, "config/" + FloppaClient.CONFIG_DOMAIN + "/data/bins.json");
 
         if (!bzFile.exists()) {
             try {
@@ -51,8 +53,7 @@ public class PriceUtils {
             }
         }
 
-        loadFromBZFile();
-        loadFromBinFile();
+        update();
     }
 
     /**
@@ -62,7 +63,7 @@ public class PriceUtils {
         if (bzFile == null || !bzFile.exists()) return;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(bzFile));
-            String bzData = reader.lines().toString();
+            String bzData = reader.lines().collect(Collectors.joining());
             JsonElement json = new JsonParser().parse(bzData);
             JsonObject obj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
@@ -83,7 +84,7 @@ public class PriceUtils {
         if (binFile == null || !binFile.exists()) return;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(binFile));
-            String binData = reader.lines().toString();
+            String binData = reader.lines().collect(Collectors.joining());
             JsonElement json = new JsonParser().parse(binData);
             JsonObject obj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
@@ -108,7 +109,9 @@ public class PriceUtils {
         client.newCall(bzRequest).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
+                ChatComponentText chatComponentText = new ChatComponentText("Failed to update Bazaar. Click [here] to copy error to clipboard.");
+                chatComponentText.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/floppaclient copy " + e.getMessage()));
+                ChatUtils.INSTANCE.modMessage(chatComponentText);
             }
 
             @Override
@@ -118,15 +121,25 @@ public class PriceUtils {
                 JsonElement json = new JsonParser().parse(response.body().string());
                 JsonObject obj = json.getAsJsonObject();
                 if (!obj.has("success") || !obj.get("success").getAsBoolean()) return;
+                /* it should look like this in the file:
+                "INK_SACK:3": {
+        "buy": 6,
+        "sell": 2.271489560510375
+    },
+                 */
                 JsonObject products = obj.getAsJsonObject("products");
-                Map<String, Double> prices = new HashMap<>();
+                Map<String, JsonObject> prices = new HashMap<>();
                 for (Map.Entry<String, JsonElement> entry : products.entrySet()) {
                     String key = entry.getKey();
                     JsonObject product = entry.getValue().getAsJsonObject();
-                    prices.put(key, product.get("quick_status").getAsJsonObject().get("buyPrice").getAsDouble());
+                    JsonObject price = new JsonObject();
+                    price.addProperty("buy", product.get("quick_status").getAsJsonObject().get("buyPrice").getAsDouble());
+                    price.addProperty("sell", product.get("quick_status").getAsJsonObject().get("sellPrice").getAsDouble());
+                    prices.put(key, price);
                 }
                 BufferedWriter writer = new BufferedWriter(new FileWriter(bzFile));
                 writer.write(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(prices));
+                writer.close();
                 loadFromBZFile();
             }
         });
@@ -149,6 +162,7 @@ public class PriceUtils {
                 JsonElement json = new JsonParser().parse(response.body().string());
                 BufferedWriter writer = new BufferedWriter(new FileWriter(binFile));
                 writer.write(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(json));
+                writer.close();
                 loadFromBinFile();
             }
         });
@@ -159,9 +173,9 @@ public class PriceUtils {
      * If includeLocation is true, it will return something like [ITEM_PRICE, PriceUtils.locations.BAZAAR] or null if no price is found
      *
      * @param skyblockID
-     * @returns {Number | [Number, Integer] | null}
+     * @return {Number | [Number, Integer] | null}
      */
-    public Float[] getPrice(String skyblockID) {
+    public static Float[] getPrice(String skyblockID) {
         if (bzBuyPrices.containsKey(skyblockID)) {
             return new Float[]{bzBuyPrices.get(skyblockID), (float) BAZAAR};
         }
@@ -176,9 +190,9 @@ public class PriceUtils {
      * If includeLocation is true, it will return something like [ITEM_PRICE, PriceUtils.locations.BAZAAR] or null if no price is found
      *
      * @param skyblockID
-     * @returns {Number | [Number, Integer] | null}
+     * @return {Number | [Number, Integer] | null}
      */
-    public Float[] getSellPrice(String skyblockID) {
+    public static Float[] getSellPrice(String skyblockID) {
         if (bzSellPrices.containsKey(skyblockID)) {
             return new Float[]{bzSellPrices.get(skyblockID), (float) BAZAAR};
         }
@@ -189,7 +203,7 @@ public class PriceUtils {
     }
 
 
-    public int getUpgradeCost(List<JsonObject> requirements) {
+    public static int getUpgradeCost(List<JsonObject> requirements) {
         int cost = 0;
         for (JsonObject requirement : requirements) {
             String type = requirement.get("type").getAsString();
@@ -371,7 +385,7 @@ public class PriceUtils {
 //        return totalValue;
 //    }
 
-    public int getBINPriceAfterTax(int initialPrice) {
+    public static int getBINPriceAfterTax(int initialPrice) {
         if (initialPrice < 10000000) return initialPrice * 99 / 100;
         if (initialPrice < 100000000) return initialPrice * 98 / 100;
         return initialPrice * 975 / 1000;

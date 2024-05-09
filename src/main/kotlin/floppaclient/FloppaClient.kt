@@ -10,6 +10,7 @@ import floppaclient.floppamap.extras.EditMode
 import floppaclient.floppamap.extras.Extras
 import floppaclient.module.ModuleManager
 import floppaclient.ui.clickgui.ClickGUI
+import floppaclient.util.PriceUtils
 import floppaclient.utils.LocationManager
 import floppaclient.utils.fakeactions.FakeInventoryActionManager
 import kotlinx.coroutines.CoroutineScope
@@ -94,6 +95,7 @@ class FloppaClient {
             ModuleManager,
             FakeInventoryActionManager,
             LocationManager,
+            PriceUtils()
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
@@ -108,6 +110,7 @@ class FloppaClient {
         ModuleManager.initializeModules()
 
         clickGUI = ClickGUI()
+        println("Price test of Jungel Pickaxe is: "+PriceUtils.getPrice("JUNGLE_PICKAXE"))
     }
 
     @SubscribeEvent

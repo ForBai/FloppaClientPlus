@@ -69,10 +69,6 @@ object AutoLooter : Module(
         fun getName(): String {
             return this.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         }
-
-        fun getColor(): String {
-            return this.color
-        }
     }
 
     private data class DungeonChest(
@@ -93,7 +89,7 @@ object AutoLooter : Module(
         }
 
         fun getFormattedName(): String {
-            return "${type.getColor()}&l${type.getName()} Chest&r"
+            return "${type.color}&l${type.getName()} Chest&r"
         }
 
         fun calcValueAndProfit() {
@@ -131,7 +127,7 @@ object AutoLooter : Module(
                 value = 0
                 return
             }
-            value = floor((PriceUtils.getSellPrice(this.itemID) ?: 0) *  this.quantity)
+            value = floor(((PriceUtils.getSellPrice(this.itemID)[0] ?: 0).toInt() *  this.quantity).toFloat()).toInt()
         }
 
         fun getPriceStr(): String {

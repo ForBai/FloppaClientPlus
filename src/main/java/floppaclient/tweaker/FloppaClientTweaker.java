@@ -79,3 +79,8 @@ os.name
 "-DproxyHost=127.0.0.1"
 "-DproxyPort=8080"
  */
+
+/*
+"-javaagent:/home/lars/dumper.jar=bypass"
+"-noverify"
+ */
