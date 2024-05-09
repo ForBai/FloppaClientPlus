@@ -2,6 +2,8 @@ package floppaclient.module.impl.dungeon
 
 import floppaclient.module.Category
 import floppaclient.module.Module
+import floppaclient.module.impl.keybinds.KeyBind
+import floppaclient.module.settings.impl.BooleanSetting
 import floppaclient.util.PriceUtils
 import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.lore
@@ -14,6 +16,19 @@ object AutoLooter : Module(
     category = Category.DUNGEON,
     description = "Automatically finds the best chest at the end of a dungeon and buys it."
 ) {
+
+    private val isWoodAllowed = BooleanSetting("Wood Chests", true, description = "Allow Wood Chests")
+    private val isGoldAllowed = BooleanSetting("Gold Chests", true, description = "Allow Gold Chests")
+    private val isDiamondAllowed = BooleanSetting("Diamond Chests", true, description = "Allow Diamond Chests")
+    private val isEmeraldAllowed = BooleanSetting("Emerald Chests", true, description = "Allow Emerald Chests")
+    private val isObsidianAllowed = BooleanSetting("Obsidian Chests", true, description = "Allow Obsidian Chests")
+    private val isBedrockAllowed = BooleanSetting("Bedrock Chests", true, description = "Allow Bedrock Chests")
+
+    private val isAutoBuyEnabled = BooleanSetting("Auto Buy", true, description = "Automatically buy the best chest")
+    private val onlyAutoBuyOnKeyBind: BooleanSetting = BooleanSetting("Only Buy on Keybind", false, description = "Only buy the best chest when the keybind is pressed")
+//    private val keybind:
+
+
 
     private var idsToBuyAlways: Set<String> = setOf(
         "NECRON_HANDLE",
