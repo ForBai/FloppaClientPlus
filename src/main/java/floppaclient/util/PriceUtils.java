@@ -226,7 +226,9 @@ public class PriceUtils {
         }
         return cost;
     }
+
 //TODO: implement getSbApiItemData
+
 //    public int getItemValue(ItemStack itemStack, boolean returnBreakdown) {
 //        NBTTagCompound nbt = itemStack.getTagCompound();
 //        if (nbt == null || !nbt.hasKey("ExtraAttributes")) return 0;

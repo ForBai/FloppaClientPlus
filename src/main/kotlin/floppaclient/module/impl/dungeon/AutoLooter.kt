@@ -8,11 +8,20 @@ import floppaclient.module.settings.impl.BooleanSetting
 import floppaclient.module.settings.impl.KeybindSetting
 import floppaclient.module.settings.impl.Keybinding
 import floppaclient.util.PriceUtils
+import floppaclient.utils.ChatUtils.modMessage
+import floppaclient.utils.ChatUtils.stripControlCodes
 import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.lore
+import net.minecraft.entity.Entity
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.inventory.Container
+import net.minecraft.inventory.IInventory
+import net.minecraft.item.ItemSkull
 import net.minecraft.item.ItemStack
+import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.util.StringUtils
 import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.common.util.Constants
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -26,6 +35,7 @@ object AutoLooter : Module(
 ) {
     var isScanned = false
     var dungeonChests: Array<DungeonChest> = arrayOf()
+    var bestChest: DungeonChest? = null
     var currentPhase: CheckPhase = CheckPhase.NONE
 
     //settings
@@ -71,33 +81,137 @@ object AutoLooter : Module(
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!FloppaClient.inDungeons || event.type.toInt() == 2) return
-        if (StringUtils.stripControlCodes(event.message.unformattedText) == "                             > EXTRA STATS <") {
-            if (isAutoScanEnabled.enabled) {
-                if (onlyAutoScanOnKeyBind.enabled) {
-                    currentPhase = CheckPhase.WAIT_FOR_SCAN_KEY
-                } else if (!onlyAutoScanOnKeyBind.enabled) {
-                    currentPhase = CheckPhase.SCAN_WOOD
-                }
-            }
+        if (StringUtils.stripControlCodes(event.message.unformattedText)
+                .startsWith("                       ☠ Defeated")
+        ) {
+            modMessage("Scanning chests... (End of Dungeon)")
+//            if (isAutoScanEnabled.enabled) {
+//                if (onlyAutoScanOnKeyBind.enabled) {
+//                    currentPhase = CheckPhase.WAIT_FOR_SCAN_KEY
+//                } else if (!onlyAutoScanOnKeyBind.enabled) {
+//                    currentPhase = CheckPhase.SCAN_WOOD
+//                }
+//            }
             return
         }
     }
 
     @SubscribeEvent
     fun onTickEvent(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.END) return
         if (mc.currentScreen != null) return
-        when(currentPhase){
-            CheckPhase.SCAN_WOOD -> TODO()
-            CheckPhase.SCAN_GOLD -> TODO()
-            CheckPhase.SCAN_DIAMOND -> TODO()
-            CheckPhase.SCAN_EMERALD -> TODO()
-            CheckPhase.SCAN_OBSIDIAN -> TODO()
-            CheckPhase.SCAN_BEDROCK -> TODO()
+        when (currentPhase) {
+            CheckPhase.SCAN_WOOD -> {
+                if (getChestEntity(ChestType.WOOD) == null) {
+                    currentPhase = CheckPhase.SCAN_GOLD
+                } else {
+                    openChest(ChestType.WOOD)
+                }
+            }
+
+            CheckPhase.SCAN_GOLD ->
+                if (getChestEntity(ChestType.GOLD) == null) {
+                    currentPhase = CheckPhase.SCAN_DIAMOND
+                } else {
+                    openChest(ChestType.GOLD)
+                }
+
+            CheckPhase.SCAN_DIAMOND ->
+                if (getChestEntity(ChestType.DIAMOND) == null) {
+                    currentPhase = CheckPhase.SCAN_EMERALD
+                } else {
+                    openChest(ChestType.DIAMOND)
+                }
+
+            CheckPhase.SCAN_EMERALD ->
+                if (getChestEntity(ChestType.EMERALD) == null) {
+                    currentPhase = CheckPhase.SCAN_OBSIDIAN
+                } else {
+                    openChest(ChestType.EMERALD)
+                }
+
+            CheckPhase.SCAN_OBSIDIAN ->
+                if (getChestEntity(ChestType.OBSIDIAN) == null) {
+                    currentPhase = CheckPhase.SCAN_BEDROCK
+                } else {
+                    openChest(ChestType.OBSIDIAN)
+                }
+
+            CheckPhase.SCAN_BEDROCK ->
+                if (getChestEntity(ChestType.BEDROCK) == null) {
+                    currentPhase = if (onlyAutoBuyOnKeyBind.enabled) CheckPhase.WAIT_FOR_BUY_KEY else CheckPhase.BUY
+                } else {
+                    openChest(ChestType.BEDROCK)
+                }
+
             CheckPhase.BUY -> TODO()
             CheckPhase.WAIT_FOR_SCAN_KEY -> TODO()
             CheckPhase.WAIT_FOR_BUY_KEY -> TODO()
             CheckPhase.NONE -> TODO()
         }
+    }
+
+    @SubscribeEvent
+    fun chestTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase != TickEvent.Phase.START) return
+        val inv = mc.thePlayer.openContainer!! as IInventory
+        val match = inv.displayName.unformattedText.matches(Regex("/^(\\w+) Chest\$/"))
+        if (!match) return
+
+        val costItem = inv.getStackInSlot(31)
+        val lootItems =
+            (inv as Container).inventoryItemStacks.slice(IntRange(9, 18)).filter { it?.itemID != "stained_glass_pane" }
+
+        if (costItem == null) return
+        val lore = costItem.lore
+        Regex("/^(\\w+) Chest\$/")
+        var chest: DungeonChest = DungeonChest(inv.displayName.unformattedText.)
+
+        if (lore.isNotEmpty() && lore.size >= 7) {
+            println(lore[6])
+            println(lore[7])
+            val isCoinsCheck = lore[6].stripControlCodes().matches(Regex("/^([\\d,]+) Coins\$/"))
+            if (isCoinsCheck) chest.cost
+        }
+    }
+
+
+    fun openChest(chestType: ChestType) {
+        mc.thePlayer.sendQueue.addToSendQueue(
+            C02PacketUseEntity(
+                getChestEntity(chestType),
+                C02PacketUseEntity.Action.INTERACT
+            )
+        )
+    }
+
+    fun getChestEntity(chestType: ChestType): Entity? {
+        return mc.theWorld.loadedEntityList.stream().filter { entity -> entity is EntityArmorStand }
+            .filter { entity ->
+                matchSkullTexture(
+                    entity as EntityArmorStand,
+                    chestType.getTexture()
+                )
+            }.findFirst().orElseGet { null }
+    }
+
+    fun matchSkullTexture(entity: EntityArmorStand, vararg skullTextures: String): Boolean {
+        val helmetItemStack = entity.getCurrentArmor(3)
+        if (helmetItemStack != null && helmetItemStack.item is ItemSkull) {
+            val textures = helmetItemStack.serializeNBT().getCompoundTag("tag").getCompoundTag("SkullOwner")
+                .getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
+            for (i in 0 until textures.tagCount()) {
+                if (Arrays.stream(skullTextures).anyMatch { s: String ->
+                        textures.getCompoundTagAt(
+                            i
+                        ).getString("Value") == s
+                    }) {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     enum class CheckPhase {
