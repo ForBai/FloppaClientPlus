@@ -53,9 +53,6 @@ public class PriceUtils {
             }
         }
 
-        loadFromBinFile();
-        loadFromBZFile();
-
         update();
     }
 
