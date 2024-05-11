@@ -22,6 +22,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.util.StringUtils
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.util.Constants
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -139,6 +140,7 @@ object AutoLooter : Module(
 
             CheckPhase.SCAN_BEDROCK ->
                 if (getChestEntity(ChestType.BEDROCK) == null) {
+                    isScanned = true
                     currentPhase = if (onlyAutoBuyOnKeyBind.enabled) CheckPhase.WAIT_FOR_BUY_KEY else CheckPhase.BUY
                 } else {
                     openChest(ChestType.BEDROCK)
@@ -164,15 +166,40 @@ object AutoLooter : Module(
 
         if (costItem == null) return
         val lore = costItem.lore
-        Regex("/^(\\w+) Chest\$/")
-        var chest: DungeonChest = DungeonChest(inv.displayName.unformattedText.)
+
+        val chestTypeMatcher = Regex("/^(?<type>\\w+) Chest\$/").find(inv.displayName.unformattedText)
+        val chestTypeString = chestTypeMatcher?.groups?.get("type")?.value
+        var loot: Array<DungeonItemDrop> = arrayOf()
+        var chest = DungeonChest(ChestType.valueOf(chestTypeString!!), loot, 0f, 0f, 0f)
 
         if (lore.isNotEmpty() && lore.size >= 7) {
             println(lore[6])
             println(lore[7])
-            val isCoinsCheck = lore[6].stripControlCodes().matches(Regex("/^([\\d,]+) Coins\$/"))
-            if (isCoinsCheck) chest.cost
+            val coinCheckRegex = Regex("/^([\\d,]+) Coins\$/")
+            val isCoinsCheck = lore[6].stripControlCodes().matches(coinCheckRegex)
+            if (isCoinsCheck) chest.cost =
+                coinCheckRegex.find(lore[6].stripControlCodes())?.groups?.get(1)?.value?.replace(
+                    ",",
+                    ""
+                )?.toFloat() ?: 0f
         }
+
+        chest.items = lootItems.map { DungeonItemDrop(it, "", 0, "") }.toTypedArray()
+        chest.calcValueAndProfit()
+
+        var exisingInd = dungeonChests.indexOfFirst { it.type == chest.type }
+        if (exisingInd != -1) dungeonChests.sliceArray(IntRange(exisingInd, 1))
+
+        dungeonChests += chest
+        modMessage("Scanned ${chest.getFormattedName()} | ${chest.cost} | ${chest.value} | ${chest.profit}")
+    }
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload){
+        isScanned = false
+        dungeonChests = arrayOf()
+        bestChest = null
+        currentPhase = CheckPhase.NONE
     }
 
 
@@ -284,10 +311,10 @@ object AutoLooter : Module(
     }
 
     data class DungeonChest(
-        val type: ChestType,
-        val items: Array<DungeonItemDrop>,
+        var type: ChestType,
+        var items: Array<DungeonItemDrop>,
         var value: Float,
-        val cost: Float,
+        var cost: Float,
         var profit: Float
     ) {
         fun getChestProfitStr(): String {
