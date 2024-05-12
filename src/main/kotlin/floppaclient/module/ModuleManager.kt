@@ -91,6 +91,8 @@ object ModuleManager {
         ItemAnimations,
         Camera,
         RunOverview,
+        InventoryHud,
+        KeyBinds,
 
         //PLAYER
         HotbarSwapper,
@@ -125,6 +127,7 @@ object ModuleManager {
         CancelInteract,
         FastMine,
         ChatCleaner,
+        AbilitySwapper,
 
 //        DevModule,
 

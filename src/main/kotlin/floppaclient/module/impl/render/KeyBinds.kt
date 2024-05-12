@@ -12,8 +12,6 @@ import floppaclient.module.settings.impl.NumberSetting
 import floppaclient.ui.clickgui.util.FontUtil
 import floppaclient.ui.hud.EditHudGUI
 import floppaclient.ui.hud.HudElement
-import me.anemoi.sbultimate.utils.RenderUtils
-import me.anemoi.sbultimate.utils.RoundedShader
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -22,7 +20,6 @@ import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 
-@SelfRegisterModule
 object KeyBinds : Module(
     "KeyBinds",
     Category.RENDER,
@@ -63,10 +60,10 @@ object KeyBinds : Module(
             var y_offset1 = 0
             var longest = 100
             for (feature in ModuleManager.modules) {
-                val keyString = if (feature.keyCode > 0)
-                    Keyboard.getKeyName(feature.keyCode) ?: "Err"
-                else if (feature.keyCode < 0)
-                    Mouse.getButtonName(feature.keyCode + 100)
+                val keyString = if (feature.keybinding!!.key > 0)
+                    Keyboard.getKeyName(feature.keybinding.key) ?: "Err"
+                else if (feature.keybinding.key < 0)
+                    Mouse.getButtonName(feature.keybinding.key + 100)
                 else
                     ".."
 
@@ -85,21 +82,21 @@ object KeyBinds : Module(
             GlStateManager.pushMatrix()
             size(x1 + 50.0, y1 + (20 + y_offset1) / 2.0, psize)
 
-            RenderUtils.drawBlurredShadow(
-                x1.toFloat(), y1.toFloat(),
-                longest.toFloat(), (20 + y_offset1).toFloat(), 20, shadowColor
-            )
-
-            RoundedShader.drawRound(
-                x1.toFloat(),
-                y1.toFloat(),
-                longest.toFloat(),
-                (20 + y_offset1).toFloat(),
-                7f,
-                color2
-            )
+//            RenderUtils.drawBlurredShadow(
+//                x1.toFloat(), y1.toFloat(),
+//                longest.toFloat(), (20 + y_offset1).toFloat(), 20, shadowColor
+//            )
+//
+//            RoundedShader.drawRound(
+//                x1.toFloat(),
+//                y1.toFloat(),
+//                longest.toFloat(),
+//                (20 + y_offset1).toFloat(),
+//                7f,
+//                color2
+//            )
             FontUtil.drawString(if (actAsArrayList) "Modules" else "KeyBinds", x1 + 25.0, y1 + 5.0, textColor.rgb)
-            RoundedShader.drawRound((x1 + 2).toFloat(), (y1 + 13).toFloat(), longest.toFloat() - 4, 1F, 0.5f, color3)
+//            RoundedShader.drawRound((x1 + 2).toFloat(), (y1 + 13).toFloat(), longest.toFloat() - 4, 1F, 0.5f, color3)
 
             val sortedListOfFeatures: List<Module> = if (actAsArrayList) {
                 ModuleManager.modules.sortedBy { it.name.length }.reversed()
@@ -123,13 +120,13 @@ object KeyBinds : Module(
                         GlStateManager.popMatrix()
                         y_offset += 10
                     }
-                } else if (feature.keyCode != 0 && feature.name.lowercase() != "clickgui" && feature.name.lowercase() != "skyblock ultimate" && feature.name.lowercase() != "add new key bind") {
+                } else if (feature.keybinding!!.key != 0 && feature.name.lowercase() != "clickgui" && feature.name.lowercase() != "skyblock ultimate" && feature.name.lowercase() != "add new key bind") {
                     GlStateManager.pushMatrix()
                     GlStateManager.resetColor()
-                    val keyString = if (feature.keyCode > 0)
-                        Keyboard.getKeyName(feature.keyCode) ?: "Err"
-                    else if (feature.keyCode < 0)
-                        Mouse.getButtonName(feature.keyCode + 100)
+                    val keyString = if (feature.keybinding.key > 0)
+                        Keyboard.getKeyName(feature.keybinding.key ) ?: "Err"
+                    else if (feature.keybinding.key  < 0)
+                        Mouse.getButtonName(feature.keybinding.key  + 100)
                     else
                         ".."
                     FontUtil.drawString(

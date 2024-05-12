@@ -6,13 +6,14 @@ import floppaclient.module.Module
 import floppaclient.module.RegisterHudElement
 import floppaclient.module.SelfRegisterModule
 import floppaclient.module.settings.impl.ColorSetting
+import floppaclient.ui.clickgui.util.FontUtil
 import floppaclient.ui.hud.HudElement
 import floppaclient.utils.render.HUDRenderUtils
 import net.minecraft.item.ItemStack
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 
-@SelfRegisterModule
 object InventoryHud : Module(
     "Inventory Hud",
     category = Category.RENDER,
@@ -45,6 +46,12 @@ object InventoryHud : Module(
                         continue@loop
                     } else {
                         currentItem = FloppaClient.mc.thePlayer.inventory.getStackInSlot(slot)
+//                        FontUtil.drawString(
+//                            currentItem.stackSize.toString(),
+//                            itemX + 16 - FontUtil.getStringWidth(currentItem.stackSize.toString()),
+//                            itemY + 16 - FontUtil.fontHeight,
+//                            Color.WHITE.rgb
+//                        )
                         HUDRenderUtils.renderRect(itemX.toDouble(), itemY.toDouble(), 16.0, 16.0, itemBGColor)
                         FloppaClient.mc.renderItem.renderItemAndEffectIntoGUI(currentItem, itemX, itemY)
                         itemX += 16 + 2
@@ -57,4 +64,6 @@ object InventoryHud : Module(
             }
         }
     }
+
+
 }

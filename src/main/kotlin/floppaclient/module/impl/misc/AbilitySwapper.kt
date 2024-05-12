@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack
 import java.util.*
 
 
-@SelfRegisterModule
 object AbilitySwapper : Module(
     name = "AbilitySwapper",
     description = "Swap your hotm abilities",
@@ -63,19 +62,20 @@ object AbilitySwapper : Module(
                                 slot33 != null
                             ) {
                                 if (slot29.stack.isItemEnchanted) {
+
                                     mc.playerController.windowClick(
                                         mc.thePlayer.openContainer.windowId,
                                         33,
-                                        0,
-                                        0,
+                                        1,
+                                        1,
                                         mc.thePlayer
                                     )
                                 } else if (slot33.stack.isItemEnchanted) {
                                     mc.playerController.windowClick(
                                         mc.thePlayer.openContainer.windowId,
                                         29,
-                                        0,
-                                        0,
+                                        1,
+                                        1,
                                         mc.thePlayer
                                     )
                                 }
