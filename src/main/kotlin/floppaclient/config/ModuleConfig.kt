@@ -78,16 +78,24 @@ class ModuleConfig(path: File) {
                         @Suppress("SENSELESS_COMPARISON")
                         if (configSetting == null) continue
                         val setting = module.getSettingByName(configSetting.name) ?: continue
-                        when (setting) {
-                            is BooleanSetting -> setting.enabled = (configSetting as BooleanSetting).enabled
-                            is NumberSetting -> setting.value = (configSetting as NumberSetting).value
-                            is ColorSetting -> setting.value =
-                                Color((configSetting as NumberSetting).value.toInt(), true)
+                        try {
+                            when (setting) {
+                                is BooleanSetting -> setting.enabled = (configSetting as BooleanSetting).enabled
+                                is NumberSetting -> setting.value = (configSetting as NumberSetting).value
+                                is ColorSetting -> setting.value =
+                                    Color((configSetting as NumberSetting).value.toInt(), true)
 
-                            is StringSelectorSetting -> setting.selected = (configSetting as StringSetting).text
-                            is SelectorSetting -> setting.selected = (configSetting as StringSetting).text
-                            is StringSetting -> setting.text = (configSetting as StringSetting).text
-                            is KeybindSetting -> setting.value = (configSetting as KeybindSetting).value
+                                is StringSelectorSetting -> setting.selected = (configSetting as StringSetting).text
+                                is SelectorSetting -> setting.selected = (configSetting as StringSetting).text
+                                is StringSetting -> setting.text = (configSetting as StringSetting).text
+                                is KeybindSetting -> setting.value =
+                                    Keybinding((configSetting as NumberSetting).value.toInt())
+                            }
+                        } catch (e: ClassCastException) {
+                            println("Error duplicate setting name in $MOD_NAME config.")
+                            println("Setting name in config ${configSetting.name}")
+                            println("Module name ${module.name}")
+                            e.printStackTrace()
                         }
                     }
                 }

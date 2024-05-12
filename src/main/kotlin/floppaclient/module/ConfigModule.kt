@@ -10,9 +10,9 @@ import floppaclient.module.settings.Setting
  */
 class ConfigModule(
     name: String,
-    keyCode: Int = 0,
+    key: Int? = 0,
     category: Category = Category.MISC,
     toggled: Boolean = false,
     settings: ArrayList<Setting<*>> = ArrayList(),
     description: String = ""
-) : Module(name, keyCode, category, toggled, settings, description)
+) : Module(name, key, category, toggled, settings, description)
