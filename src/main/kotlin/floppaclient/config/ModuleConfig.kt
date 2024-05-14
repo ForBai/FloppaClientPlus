@@ -88,8 +88,13 @@ class ModuleConfig(path: File) {
                                 is StringSelectorSetting -> setting.selected = (configSetting as StringSetting).text
                                 is SelectorSetting -> setting.selected = (configSetting as StringSetting).text
                                 is StringSetting -> setting.text = (configSetting as StringSetting).text
-                                is KeybindSetting -> setting.value =
-                                    Keybinding((configSetting as NumberSetting).value.toInt())
+                                is KeybindSetting -> {
+                                    if (setting.name == "Key Bind") {
+                                        module.keybinding?.key = (configSetting as NumberSetting).value.toInt()
+                                    }
+                                    setting.value.key =
+                                        (configSetting as NumberSetting).value.toInt()
+                                }
                             }
                         } catch (e: ClassCastException) {
                             println("Error duplicate setting name in $MOD_NAME config.")

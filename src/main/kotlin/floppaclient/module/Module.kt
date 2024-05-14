@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import floppaclient.FloppaClient
 import floppaclient.module.settings.Setting
+import floppaclient.module.settings.impl.KeybindSetting
 import floppaclient.module.settings.impl.Keybinding
 import floppaclient.ui.hud.HudElement
 import floppaclient.utils.ChatUtils
@@ -104,10 +105,7 @@ abstract class Module(
      * Mouse binds will be negative: -100 + mouse button.
      * This is the same way as minecraft treats mouse binds.
      */
-//    @Expose
-//    @SerializedName("key")
-//    var keyCode: Int
-    val keybinding: Keybinding? = key?.let { Keybinding(it).apply { onPress = ::onKeyBind } }
+    var keybinding: Keybinding? = key?.let { Keybinding(it).apply { onPress = ::onKeyBind } }
     val category: Category
 
     /**
@@ -162,6 +160,7 @@ abstract class Module(
      * Loads self registering elements of the module such as hud elements.
      */
     fun loadModule() {
+        this.keybinding?.let { this.register(KeybindSetting("Key Bind", it, "Toggles the module on and off!")) }
         this::class.nestedClasses.filter { it.hasAnnotation<RegisterHudElement>() }
             .mapNotNull { it.objectInstance }.filterIsInstance<HudElement>().forEach {
                 hudElements.add(it)

@@ -61,9 +61,9 @@ object KeyBinds : Module(
             var longest = 100
             for (feature in ModuleManager.modules) {
                 val keyString = if (feature.keybinding!!.key > 0)
-                    Keyboard.getKeyName(feature.keybinding.key) ?: "Err"
-                else if (feature.keybinding.key < 0)
-                    Mouse.getButtonName(feature.keybinding.key + 100)
+                    Keyboard.getKeyName(feature.keybinding!!.key) ?: "Err"
+                else if (feature.keybinding!!.key < 0)
+                    Mouse.getButtonName(feature.keybinding!!.key + 100)
                 else
                     ".."
 
@@ -123,10 +123,10 @@ object KeyBinds : Module(
                 } else if (feature.keybinding!!.key != 0 && feature.name.lowercase() != "clickgui" && feature.name.lowercase() != "skyblock ultimate" && feature.name.lowercase() != "add new key bind") {
                     GlStateManager.pushMatrix()
                     GlStateManager.resetColor()
-                    val keyString = if (feature.keybinding.key > 0)
-                        Keyboard.getKeyName(feature.keybinding.key ) ?: "Err"
-                    else if (feature.keybinding.key  < 0)
-                        Mouse.getButtonName(feature.keybinding.key  + 100)
+                    val keyString = if (feature.keybinding!!.key > 0)
+                        Keyboard.getKeyName(feature.keybinding!!.key ) ?: "Err"
+                    else if (feature.keybinding!!.key  < 0)
+                        Mouse.getButtonName(feature.keybinding!!.key  + 100)
                     else
                         ".."
                     FontUtil.drawString(

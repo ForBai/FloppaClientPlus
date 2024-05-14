@@ -26,9 +26,9 @@ class AdvancedElementKeyBind(parent: AdvancedMenu, module: Module, setting: Keyb
         val displayName = setting.name
 
         val keyName = if (module.keybinding!!.key > 0)
-            Keyboard.getKeyName(module.keybinding.key) ?: "Err"
-        else if (module.keybinding.key < 0)
-            Mouse.getButtonName(module.keybinding.key + 100)
+            Keyboard.getKeyName(module.keybinding!!.key) ?: "Err"
+        else if (module.keybinding!!.key < 0)
+            Mouse.getButtonName(module.keybinding!!.key + 100)
         else
             ".."
         val displayValue = "[$keyName]"
