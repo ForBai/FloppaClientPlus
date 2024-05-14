@@ -2,7 +2,6 @@ package floppaclient.module.impl.dungeon
 
 import floppaclient.FloppaClient
 import floppaclient.FloppaClient.Companion.mc
-import floppaclient.floppamap.dungeon.RunInformation
 import floppaclient.module.Category
 import floppaclient.module.Module
 import floppaclient.module.settings.impl.BooleanSetting
@@ -11,6 +10,7 @@ import floppaclient.module.settings.impl.Keybinding
 import floppaclient.util.PriceUtils
 import floppaclient.utils.ChatUtils.modMessage
 import floppaclient.utils.ChatUtils.stripControlCodes
+import floppaclient.utils.LocationManager
 import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.lore
 import net.minecraft.client.gui.inventory.GuiChest
@@ -22,7 +22,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.util.StringUtils
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -56,7 +56,11 @@ object AutoLooter : Module(
         description = "Only scan the chests when the keybind is pressed"
     )
     private val scanKeyBind =
-        KeybindSetting("Scan Bind", Keybinding(0), description = "Keybind to scan the chests")
+        KeybindSetting("Scan Bind", Keybinding(0), description = "Keybind to scan the chests").onPress {
+            if (isAutoScanEnabled.enabled && onlyAutoScanOnKeyBind.enabled && currentPhase == CheckPhase.WAIT_FOR_SCAN_KEY) {
+                currentPhase = CheckPhase.SCAN_WOOD
+            }
+        }
 
     private val isAutoBuyEnabled = BooleanSetting("Auto Buy", true, description = "Automatically buy the best chest")
     private val onlyAutoBuyOnKeyBind = BooleanSetting(
@@ -65,7 +69,11 @@ object AutoLooter : Module(
         description = "Only buy the best chest when the keybind is pressed"
     )
     private val buyKeyBind =
-        KeybindSetting("Buy Bind", Keybinding(0), description = "Keybind to buy the best chest")
+        KeybindSetting("Buy Bind", Keybinding(0), description = "Keybind to buy the best chest").onPress {
+            if (isAutoBuyEnabled.enabled && onlyAutoBuyOnKeyBind.enabled && currentPhase == CheckPhase.WAIT_FOR_BUY_KEY) {
+                currentPhase = CheckPhase.BUY
+            }
+        }
 
     init {
         this.addSettings(
@@ -87,8 +95,7 @@ object AutoLooter : Module(
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!FloppaClient.inDungeons || event.type.toInt() == 2) return
-        if (StringUtils.stripControlCodes(event.message.unformattedText)
-                .startsWith("                       ☠ Defeated")
+        if (StringUtils.stripControlCodes(event.message.unformattedText).matches(Regex("^(\\s+) \\☠ Defeated (.*)\$"))
         ) {
             modMessage("Scanning chests... (End of Dungeon)")
 //            if (isAutoScanEnabled.enabled) {
@@ -105,7 +112,7 @@ object AutoLooter : Module(
     @SubscribeEvent
     fun onTickEvent(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.END) return
-        if (mc.currentScreen != null) return
+        if (mc.currentScreen != null || !LocationManager.inDungeons) return
         when (currentPhase) {
             CheckPhase.SCAN_WOOD -> {
                 if (getChestEntity(ChestType.WOOD) == null) {
@@ -150,8 +157,9 @@ object AutoLooter : Module(
                 } else {
                     openChest(ChestType.BEDROCK)
                 }
-
-            CheckPhase.BUY -> return
+            CheckPhase.BUY -> {
+                return
+            }
             CheckPhase.WAIT_FOR_SCAN_KEY -> return
             CheckPhase.WAIT_FOR_BUY_KEY -> return
             CheckPhase.NONE -> return
@@ -161,30 +169,33 @@ object AutoLooter : Module(
     //    @SubscribeEvent
 //    fun chestTick(event: TickEvent.ClientTickEvent) {
     @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
-        if (event.gui !is GuiChest || AutoTerms.currentTerminal != AutoTerms.TerminalType.NONE || !RunInformation.inF7Boss()) return
+    fun onGuiOpen(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!LocationManager.inDungeons) return
+        if (event.gui !is GuiChest) return
         val container = (event.gui as GuiChest).inventorySlots
         if (container is ContainerChest) {
-            val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("/^(\\w+) Chest\$/"))
+            val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("^(\\w+) Chest(.*)\$"))
             if (!match) return
-
             val costItem = container.lowerChestInventory.getStackInSlot(31)
-            val lootItems =
-                container.inventoryItemStacks.slice(IntRange(9, 18)).filter { it?.itemID != "stained_glass_pane" }
-
+            val lootItems: Array<ItemStack> =
+                container.inventoryItemStacks.slice(IntRange(9, 18)).filter { it?.itemID != "stained_glass_pane" }.toTypedArray()
+            if (lootItems.isEmpty()) return
             if (costItem == null) return
             val lore = costItem.lore
 
             val chestTypeMatcher =
-                Regex("/^(?<type>\\w+) Chest\$/").find(container.lowerChestInventory.displayName.unformattedText)
-            val chestTypeString = chestTypeMatcher?.groups?.get("type")?.value
+                Regex("^(?<type>\\w+) Chest(.*)\$").find(container.lowerChestInventory.displayName.unformattedText)
+            val chestTypeString = chestTypeMatcher?.groups?.get("type")?.value ?: return
             val loot: Array<DungeonItemDrop> = arrayOf()
-            val chest = DungeonChest(ChestType.valueOf(chestTypeString!!), loot, 0f, 0f, 0f)
+            dungeonChests.forEach { chest ->
+                if (chest.type.name == chestTypeString.uppercase()) {
+                    return
+                }
+            }
+            val chest = DungeonChest(ChestType.valueOf(chestTypeString.uppercase()), loot, 0f, 0f, 0f)
 
-            if (lore.isNotEmpty() && lore.size >= 7) {
-                println(lore[6])
-                println(lore[7])
-                val coinCheckRegex = Regex("/^([\\d,]+) Coins\$/")
+            if (lore.isNotEmpty() && lore.size >= 6) {
+                val coinCheckRegex = Regex("^([\\d,]+) Coins\$")
                 val isCoinsCheck = lore[6].stripControlCodes().matches(coinCheckRegex)
                 if (isCoinsCheck) chest.cost =
                     coinCheckRegex.find(lore[6].stripControlCodes())?.groups?.get(1)?.value?.replace(
@@ -193,7 +204,13 @@ object AutoLooter : Module(
                     )?.toFloat() ?: 0f
             }
 
-            chest.items = lootItems.map { DungeonItemDrop(it, "", 0, "") }.toTypedArray()
+
+            lootItems.forEach { item ->
+                item ?: return
+                val drop = DungeonItemDrop(item, "", 0, "")
+                chest.items += drop
+            }
+//            chest.items = lootItems.map { DungeonItemDrop(it ?: return, "", 0, "") }.toTypedArray()
             chest.calcValueAndProfit()
 
             val exisingInd = dungeonChests.indexOfFirst { it.type == chest.type }
