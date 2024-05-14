@@ -2,6 +2,7 @@ package floppaclient.module.impl.dungeon
 
 import floppaclient.FloppaClient
 import floppaclient.FloppaClient.Companion.mc
+import floppaclient.floppamap.dungeon.RunInformation
 import floppaclient.module.Category
 import floppaclient.module.Module
 import floppaclient.module.settings.impl.BooleanSetting
@@ -12,15 +13,16 @@ import floppaclient.utils.ChatUtils.modMessage
 import floppaclient.utils.ChatUtils.stripControlCodes
 import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.lore
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.inventory.Container
-import net.minecraft.inventory.IInventory
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemSkull
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.util.StringUtils
 import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -62,7 +64,7 @@ object AutoLooter : Module(
         false,
         description = "Only buy the best chest when the keybind is pressed"
     )
-    private val keyBind =
+    private val buyKeyBind =
         KeybindSetting("Buy Bind", Keybinding(0), description = "Keybind to buy the best chest")
 
     init {
@@ -73,9 +75,12 @@ object AutoLooter : Module(
             isEmeraldAllowed,
             isObsidianAllowed,
             isBedrockAllowed,
+            isAutoScanEnabled,
+            onlyAutoScanOnKeyBind,
+            scanKeyBind,
             isAutoBuyEnabled,
             onlyAutoBuyOnKeyBind,
-            keyBind
+            buyKeyBind
         )
     }
 
@@ -146,62 +151,66 @@ object AutoLooter : Module(
                     openChest(ChestType.BEDROCK)
                 }
 
-            CheckPhase.BUY -> TODO()
-            CheckPhase.WAIT_FOR_SCAN_KEY -> TODO()
-            CheckPhase.WAIT_FOR_BUY_KEY -> TODO()
-            CheckPhase.NONE -> TODO()
+            CheckPhase.BUY -> return
+            CheckPhase.WAIT_FOR_SCAN_KEY -> return
+            CheckPhase.WAIT_FOR_BUY_KEY -> return
+            CheckPhase.NONE -> return
+        }
+    }
+
+    //    @SubscribeEvent
+//    fun chestTick(event: TickEvent.ClientTickEvent) {
+    @SubscribeEvent
+    fun onGuiOpen(event: GuiOpenEvent) {
+        if (event.gui !is GuiChest || AutoTerms.currentTerminal != AutoTerms.TerminalType.NONE || !RunInformation.inF7Boss()) return
+        val container = (event.gui as GuiChest).inventorySlots
+        if (container is ContainerChest) {
+            val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("/^(\\w+) Chest\$/"))
+            if (!match) return
+
+            val costItem = container.lowerChestInventory.getStackInSlot(31)
+            val lootItems =
+                container.inventoryItemStacks.slice(IntRange(9, 18)).filter { it?.itemID != "stained_glass_pane" }
+
+            if (costItem == null) return
+            val lore = costItem.lore
+
+            val chestTypeMatcher =
+                Regex("/^(?<type>\\w+) Chest\$/").find(container.lowerChestInventory.displayName.unformattedText)
+            val chestTypeString = chestTypeMatcher?.groups?.get("type")?.value
+            val loot: Array<DungeonItemDrop> = arrayOf()
+            val chest = DungeonChest(ChestType.valueOf(chestTypeString!!), loot, 0f, 0f, 0f)
+
+            if (lore.isNotEmpty() && lore.size >= 7) {
+                println(lore[6])
+                println(lore[7])
+                val coinCheckRegex = Regex("/^([\\d,]+) Coins\$/")
+                val isCoinsCheck = lore[6].stripControlCodes().matches(coinCheckRegex)
+                if (isCoinsCheck) chest.cost =
+                    coinCheckRegex.find(lore[6].stripControlCodes())?.groups?.get(1)?.value?.replace(
+                        ",",
+                        ""
+                    )?.toFloat() ?: 0f
+            }
+
+            chest.items = lootItems.map { DungeonItemDrop(it, "", 0, "") }.toTypedArray()
+            chest.calcValueAndProfit()
+
+            val exisingInd = dungeonChests.indexOfFirst { it.type == chest.type }
+            if (exisingInd != -1) dungeonChests.sliceArray(IntRange(exisingInd, 1))
+
+            dungeonChests += chest
+            modMessage("Scanned ${chest.getFormattedName()} | ${chest.cost} | ${chest.value} | ${chest.profit}")
         }
     }
 
     @SubscribeEvent
-    fun chestTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-        val inv = mc.thePlayer.openContainer!! as IInventory
-        val match = inv.displayName.unformattedText.matches(Regex("/^(\\w+) Chest\$/"))
-        if (!match) return
-
-        val costItem = inv.getStackInSlot(31)
-        val lootItems =
-            (inv as Container).inventoryItemStacks.slice(IntRange(9, 18)).filter { it?.itemID != "stained_glass_pane" }
-
-        if (costItem == null) return
-        val lore = costItem.lore
-
-        val chestTypeMatcher = Regex("/^(?<type>\\w+) Chest\$/").find(inv.displayName.unformattedText)
-        val chestTypeString = chestTypeMatcher?.groups?.get("type")?.value
-        var loot: Array<DungeonItemDrop> = arrayOf()
-        var chest = DungeonChest(ChestType.valueOf(chestTypeString!!), loot, 0f, 0f, 0f)
-
-        if (lore.isNotEmpty() && lore.size >= 7) {
-            println(lore[6])
-            println(lore[7])
-            val coinCheckRegex = Regex("/^([\\d,]+) Coins\$/")
-            val isCoinsCheck = lore[6].stripControlCodes().matches(coinCheckRegex)
-            if (isCoinsCheck) chest.cost =
-                coinCheckRegex.find(lore[6].stripControlCodes())?.groups?.get(1)?.value?.replace(
-                    ",",
-                    ""
-                )?.toFloat() ?: 0f
-        }
-
-        chest.items = lootItems.map { DungeonItemDrop(it, "", 0, "") }.toTypedArray()
-        chest.calcValueAndProfit()
-
-        var exisingInd = dungeonChests.indexOfFirst { it.type == chest.type }
-        if (exisingInd != -1) dungeonChests.sliceArray(IntRange(exisingInd, 1))
-
-        dungeonChests += chest
-        modMessage("Scanned ${chest.getFormattedName()} | ${chest.cost} | ${chest.value} | ${chest.profit}")
-    }
-
-    @SubscribeEvent
-    fun onWorldUnload(event: WorldEvent.Unload){
+    fun onWorldUnload(event: WorldEvent.Unload) {
         isScanned = false
         dungeonChests = arrayOf()
         bestChest = null
         currentPhase = CheckPhase.NONE
     }
-
 
     fun openChest(chestType: ChestType) {
         mc.thePlayer.sendQueue.addToSendQueue(
