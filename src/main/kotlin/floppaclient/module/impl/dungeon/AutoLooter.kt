@@ -157,9 +157,11 @@ object AutoLooter : Module(
                 } else {
                     openChest(ChestType.BEDROCK)
                 }
+
             CheckPhase.BUY -> {
                 return
             }
+
             CheckPhase.WAIT_FOR_SCAN_KEY -> return
             CheckPhase.WAIT_FOR_BUY_KEY -> return
             CheckPhase.NONE -> return
@@ -177,8 +179,14 @@ object AutoLooter : Module(
             val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("^(\\w+) Chest(.*)\$"))
             if (!match) return
             val costItem = container.lowerChestInventory.getStackInSlot(31)
-            val lootItems: Array<ItemStack> =
-                container.inventoryItemStacks.slice(IntRange(9, 18)).filter { it?.itemID != "stained_glass_pane" }.toTypedArray()
+            modMessage(costItem?.itemID ?: "null")
+            container.inventoryItemStacks.stream().forEach { modMessage(it?.itemID ?: "null") }
+            val lootItems: Array<ItemStack> = arrayOf()
+            container.inventoryItemStacks
+                .slice(IntRange(9, 18))
+                .filter { it?.itemID != "stained_glass_pane" }
+                .forEachIndexed { index, itemStack -> lootItems[index] = itemStack ?: return }
+
             if (lootItems.isEmpty()) return
             if (costItem == null) return
             val lore = costItem.lore
@@ -206,7 +214,6 @@ object AutoLooter : Module(
 
 
             lootItems.forEach { item ->
-                item ?: return
                 val drop = DungeonItemDrop(item, "", 0, "")
                 chest.items += drop
             }
