@@ -179,7 +179,7 @@ object AutoLooter : Module(
             val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("^(\\w+) Chest(.*)\$"))
             if (!match) return
             val costItem = container.lowerChestInventory.getStackInSlot(31)
-            modMessage(costItem?.itemID ?: "null")
+            modMessage("cost item: " + (costItem?.itemID ?: "null"))
             container.inventoryItemStacks.stream().forEach { modMessage(it?.itemID ?: "null") }
             val lootItems: Array<ItemStack> = arrayOf()
             container.inventoryItemStacks
