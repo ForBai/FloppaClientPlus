@@ -29,7 +29,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.*
-import kotlin.math.floor
 
 object AutoLooter : Module(
     "Auto Looter",
@@ -178,17 +177,11 @@ object AutoLooter : Module(
         if (container is ContainerChest) {
             val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("^(\\w+) Chest(.*)\$"))
             if (!match) return
-            val costItem = container.lowerChestInventory.getStackInSlot(31)
-            modMessage("cost item: " + (costItem?.itemID ?: "null"))
-            container.inventoryItemStacks.stream().forEach { modMessage("slot: "+(it?.itemID ?: "null")) }
-            val lootItems: Array<ItemStack> = arrayOf()
-            container.inventoryItemStacks
+            val costItem = container.inventory[31] ?: return
+            val lootItems: List<ItemStack> = container.inventory
                 .slice(IntRange(9, 18))
-                .filter { it?.itemID != "stained_glass_pane" }
-                .forEachIndexed { index, itemStack -> lootItems[index] = itemStack ?: return }
-
+                .filter { (it?.item?.registryName ?: return) != "stained_glass_pane".uppercase() }
             if (lootItems.isEmpty()) return
-            if (costItem == null) return
             val lore = costItem.lore
 
             val chestTypeMatcher =
@@ -214,7 +207,7 @@ object AutoLooter : Module(
 
 
             lootItems.forEach { item ->
-                val drop = DungeonItemDrop(item, "", 0, "")
+                val drop = DungeonItemDrop(item, "", 1, "")
                 chest.items += drop
             }
 //            chest.items = lootItems.map { DungeonItemDrop(it ?: return, "", 0, "") }.toTypedArray()
@@ -375,8 +368,8 @@ object AutoLooter : Module(
 
         init {
             val name = item.displayName
-            val match = Regex("/^(\\w+) Essence x(\\d+)\$/").find(name)
-            itemID = item.itemID
+            val match = Regex("^(\\w+) Essence x(\\d+)\$").find(name)
+            itemID = item.itemID.uppercase()
             if (match != null) {
                 val (_, type, amt) = match.destructured
                 itemID = "ESSENCE_${type.uppercase()}"
@@ -390,7 +383,6 @@ object AutoLooter : Module(
                     this.name = lore[1]
                 }
             }
-
             calcValue()
         }
 
@@ -399,7 +391,13 @@ object AutoLooter : Module(
                 value = 0
                 return
             }
-            value = floor(((PriceUtils.getSellPrice(this.itemID)[0] ?: 0).toInt() * this.quantity).toFloat()).toInt()
+            modMessage("Calculating value for $itemID")
+            val sellPrice = PriceUtils.getSellPrice(itemID.uppercase())
+            value = if (sellPrice != null && sellPrice.isNotEmpty()) {
+                sellPrice[0]?.toInt() ?: 0
+            } else {
+                0
+            } * this.quantity
         }
 
         fun getPriceStr(): String {
