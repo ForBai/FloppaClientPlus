@@ -180,7 +180,7 @@ object AutoLooter : Module(
             if (!match) return
             val costItem = container.lowerChestInventory.getStackInSlot(31)
             modMessage("cost item: " + (costItem?.itemID ?: "null"))
-            container.inventoryItemStacks.stream().forEach { modMessage(it?.itemID ?: "null") }
+            container.inventoryItemStacks.stream().forEach { modMessage("slot: "+(it?.itemID ?: "null")) }
             val lootItems: Array<ItemStack> = arrayOf()
             container.inventoryItemStacks
                 .slice(IntRange(9, 18))
