@@ -11,7 +11,6 @@ import floppaclient.util.PriceUtils
 import floppaclient.utils.ChatUtils.modMessage
 import floppaclient.utils.ChatUtils.stripControlCodes
 import floppaclient.utils.LocationManager
-import floppaclient.utils.inventory.ItemUtils.itemID
 import floppaclient.utils.inventory.ItemUtils.lore
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.Entity
@@ -178,9 +177,15 @@ object AutoLooter : Module(
             val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("^(\\w+) Chest(.*)\$"))
             if (!match) return
             val costItem = container.inventory[31] ?: return
-            val lootItems: List<ItemStack> = container.inventory
-                .slice(IntRange(9, 18))
-                .filter { (it?.item?.registryName ?: return) != "stained_glass_pane".uppercase() }
+            val lootItems: MutableList<ItemStack> = mutableListOf()
+            for (i in 9..18) {
+                val item = container.inventory[i]
+                modMessage("Item: ${item.displayName} | ${item.item.registryName} | $i")
+                if (item != null) {
+                    lootItems += item
+                    break
+                }
+            }
             if (lootItems.isEmpty()) return
             val lore = costItem.lore
 
@@ -265,6 +270,18 @@ object AutoLooter : Module(
         }
 
         return false
+    }
+
+    fun getSkyblockItemID(item: ItemStack): String? {
+        val extraAttributes = item.getSubCompound("ExtraAttributes", false)
+        val itemID = extraAttributes?.getString("id")
+        if ((itemID != "ENCHANTED_BOOK") || !(item.displayName.contains("Essence"))) return itemID
+        val enchantments = extraAttributes.getCompoundTag("enchantments")
+        val enchants = enchantments.keySet
+        if (enchants.isEmpty() || enchants == null) return null
+        val enchantment = enchants.first()
+        val level = enchantments.getInteger(enchants.first())
+        return "ENCHANTMENT_" + enchantment.uppercase() + "_" + level
     }
 
     enum class CheckPhase {
@@ -369,7 +386,7 @@ object AutoLooter : Module(
         init {
             val name = item.displayName
             val match = Regex("^(\\w+) Essence x(\\d+)\$").find(name)
-            itemID = item.itemID.uppercase()
+            itemID = getSkyblockItemID(item) ?: ""
             if (match != null) {
                 val (_, type, amt) = match.destructured
                 itemID = "ESSENCE_${type.uppercase()}"
