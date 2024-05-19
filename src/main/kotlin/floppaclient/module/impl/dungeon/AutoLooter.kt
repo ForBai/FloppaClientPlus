@@ -93,7 +93,8 @@ object AutoLooter : Module(
             isAutoBuyEnabled,
             onlyAutoBuyOnKeyBind,
             buyKeyBind,
-            closeChest
+            closeChest,
+            closeLastChest
         )
     }
 
