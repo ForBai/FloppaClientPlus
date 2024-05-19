@@ -76,6 +76,9 @@ object AutoLooter : Module(
             }
         }
 
+    private val closeChest = BooleanSetting("Close Chest", false, description = "Close the chest after scanning it")
+    private val closeLastChest = BooleanSetting("Close Last Chest", true, description = "Close the last chest after scanning it")
+
     init {
         this.addSettings(
             isWoodAllowed,
@@ -89,7 +92,8 @@ object AutoLooter : Module(
             scanKeyBind,
             isAutoBuyEnabled,
             onlyAutoBuyOnKeyBind,
-            buyKeyBind
+            buyKeyBind,
+            closeChest
         )
     }
 
@@ -114,7 +118,7 @@ object AutoLooter : Module(
     @SubscribeEvent
     fun onTickEvent(event: TickEvent.ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
-        if (/*mc.currentScreen != null || */!LocationManager.inDungeons) return
+        if (!LocationManager.inDungeons) return
         when (currentPhase) {
             CheckPhase.SCAN_WOOD -> {
                 if (getChestEntity(ChestType.WOOD) == null) {
@@ -130,7 +134,7 @@ object AutoLooter : Module(
 
                     ScanPhase.SCAN_CHEST -> {
                         if (dungeonChests.indexOfFirst { it.type == ChestType.WOOD } != -1) {
-
+                            if (closeChest.enabled)  mc.thePlayer.closeScreen()
                             currentScanPhase = ScanPhase.NEXT_CHEST
                         }
                     }
@@ -156,7 +160,7 @@ object AutoLooter : Module(
 
                     ScanPhase.SCAN_CHEST -> {
                         if (dungeonChests.indexOfFirst { it.type == ChestType.GOLD } != -1) {
-                            mc.thePlayer.closeScreen()
+                          if (closeChest.enabled) mc.thePlayer.closeScreen()
                             currentScanPhase = ScanPhase.NEXT_CHEST
                         }
                     }
@@ -182,7 +186,7 @@ object AutoLooter : Module(
 
                     ScanPhase.SCAN_CHEST -> {
                         if (dungeonChests.indexOfFirst { it.type == ChestType.DIAMOND } != -1) {
-                            mc.thePlayer.closeScreen()
+                            if (closeChest.enabled) mc.thePlayer.closeScreen()
                             currentScanPhase = ScanPhase.NEXT_CHEST
                         }
                     }
@@ -208,7 +212,7 @@ object AutoLooter : Module(
 
                     ScanPhase.SCAN_CHEST -> {
                         if (dungeonChests.indexOfFirst { it.type == ChestType.EMERALD } != -1) {
-                            mc.thePlayer.closeScreen()
+                            if (closeChest.enabled) mc.thePlayer.closeScreen()
                             currentScanPhase = ScanPhase.NEXT_CHEST
                         }
                     }
@@ -234,7 +238,7 @@ object AutoLooter : Module(
 
                     ScanPhase.SCAN_CHEST -> {
                         if (dungeonChests.indexOfFirst { it.type == ChestType.OBSIDIAN } != -1) {
-                            mc.thePlayer.closeScreen()
+                            if (closeChest.enabled) mc.thePlayer.closeScreen()
                             currentScanPhase = ScanPhase.NEXT_CHEST
                         }
                     }
@@ -261,7 +265,7 @@ object AutoLooter : Module(
 
                     ScanPhase.SCAN_CHEST -> {
                         if (dungeonChests.indexOfFirst { it.type == ChestType.BEDROCK } != -1) {
-                            mc.thePlayer.closeScreen()
+                            if (closeChest.enabled) mc.thePlayer.closeScreen()
                             currentScanPhase = ScanPhase.NEXT_CHEST
                         }
                     }
@@ -269,6 +273,7 @@ object AutoLooter : Module(
                     ScanPhase.NEXT_CHEST -> {
                         currentScanPhase = ScanPhase.OPEN_CHEST
                         isScanned = true
+                        if (!closeChest.enabled && closeLastChest.enabled) mc.thePlayer.closeScreen()
                         if (isAutoBuyEnabled.enabled) {
                             if (onlyAutoBuyOnKeyBind.enabled) {
                                 modMessage("Press ${Keyboard.getKeyName(buyKeyBind.value.key) ?: "Err"} to buy the best chest (" + bestChest?.getFormattedName() + ") for a profit of §l§2${bestChest?.profit}§r that cost §l§6${bestChest?.cost}§r")
