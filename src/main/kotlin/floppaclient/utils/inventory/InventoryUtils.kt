@@ -6,8 +6,8 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.player.InventoryPlayer
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 
 /**
  * # A collection of methods for finding items in inventories.
@@ -192,6 +192,62 @@ object InventoryUtils {
         if (this == null) return false
         return predicate(this.heldItem)
     }
+
     //</editor-folding>
+    sealed class ClickType {
+        data object Left : ClickType()
+        data object Right : ClickType()
+        data object Middle : ClickType()
+        data object Shift : ClickType()
+    }
+
+    private data class WindowClick(val slotId: Int, val button: Int, val mode: Int)
+
+    private val windowClickQueue = mutableListOf<WindowClick>()
+
+    /*init {
+        // Used to clear the click queue every 500ms, to make sure it isn't getting filled up.
+        Executor(delay = 500) { windowClickQueue.clear() }.register()
+    }*/
+
+    fun windowClick(slotId: Int, button: Int, mode: Int /*instant: Boolean = false*/) {
+        /* if (instant)*/ sendWindowClick(slotId, button, mode)
+//        else windowClickQueue.add(WindowClick(slotId, button, mode))
+    }
+
+    /*fun handleWindowClickQueue() {
+        if (mc.thePlayer?.openContainer == null) return windowClickQueue.clear()
+        if (windowClickQueue.isEmpty()) return
+        windowClickQueue.first().apply {
+            try {
+                sendWindowClick(slotId, button, mode)
+            } catch (e: Exception) {
+                println("Error sending window click: $this")
+                e.printStackTrace()
+                windowClickQueue.clear()
+            }
+        }
+        windowClickQueue.removeFirstOrNull()
+    }*/
+
+    private fun sendWindowClick(slotId: Int, button: Int, mode: Int) {
+        mc.thePlayer.openContainer?.let {
+            if (it !is ContainerChest) return@let
+            mc.playerController.windowClick(it.windowId, slotId, button, mode, mc.thePlayer)
+        }
+    }
+
+    /**private fun middleClickWindow(slot: Int) {
+    windowClick(slot, 2, 2)
+    }*/
+
+    fun windowClick(slotId: Int, clickType: ClickType, /*instant: Boolean = false*/) {
+        when (clickType) {
+            is ClickType.Left -> windowClick(slotId, 0, 0 /*instant*/)
+            is ClickType.Right -> windowClick(slotId, 1, 0 /*instant*/)
+            is ClickType.Middle -> windowClick(slotId, 2, 3 /*instant*/)
+            is ClickType.Shift -> windowClick(slotId, 0, 1 /*instant*/)
+        }
+    }
 
 }

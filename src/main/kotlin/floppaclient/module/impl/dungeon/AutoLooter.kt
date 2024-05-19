@@ -11,6 +11,7 @@ import floppaclient.util.PriceUtils
 import floppaclient.utils.ChatUtils.modMessage
 import floppaclient.utils.ChatUtils.stripControlCodes
 import floppaclient.utils.LocationManager
+import floppaclient.utils.inventory.InventoryUtils
 import floppaclient.utils.inventory.ItemUtils.lore
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.Entity
@@ -27,6 +28,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import org.lwjgl.input.Keyboard
 import java.util.*
 
 object AutoLooter : Module(
@@ -38,6 +40,7 @@ object AutoLooter : Module(
     var dungeonChests: Array<DungeonChest> = arrayOf()
     var bestChest: DungeonChest? = null
     var currentPhase: CheckPhase = CheckPhase.NONE
+    var currentScanPhase: ScanPhase = ScanPhase.OPEN_CHEST
 
     //settings
     private val isWoodAllowed = BooleanSetting("Wood Chests", true, description = "Allow Wood Chests")
@@ -96,68 +99,210 @@ object AutoLooter : Module(
         if (StringUtils.stripControlCodes(event.message.unformattedText).matches(Regex("^(\\s+) \\☠ Defeated (.*)\$"))
         ) {
             modMessage("Scanning chests... (End of Dungeon)")
-//            if (isAutoScanEnabled.enabled) {
-//                if (onlyAutoScanOnKeyBind.enabled) {
-//                    currentPhase = CheckPhase.WAIT_FOR_SCAN_KEY
-//                } else if (!onlyAutoScanOnKeyBind.enabled) {
-//                    currentPhase = CheckPhase.SCAN_WOOD
-//                }
-//            }
+            if (isAutoScanEnabled.enabled) {
+                if (onlyAutoScanOnKeyBind.enabled) {
+                    modMessage("Press ${Keyboard.getKeyName(scanKeyBind.value.key) ?: "Err"} to scan chests")
+                    currentPhase = CheckPhase.WAIT_FOR_SCAN_KEY
+                } else if (!onlyAutoScanOnKeyBind.enabled) {
+                    currentPhase = CheckPhase.SCAN_WOOD
+                }
+            }
             return
         }
     }
 
     @SubscribeEvent
     fun onTickEvent(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.END) return
-        if (mc.currentScreen != null || !LocationManager.inDungeons) return
+        if (event.phase != TickEvent.Phase.START) return
+        if (/*mc.currentScreen != null || */!LocationManager.inDungeons) return
         when (currentPhase) {
             CheckPhase.SCAN_WOOD -> {
                 if (getChestEntity(ChestType.WOOD) == null) {
-                    currentPhase = CheckPhase.SCAN_GOLD
-                } else {
-                    openChest(ChestType.WOOD)
+                    currentScanPhase = ScanPhase.NEXT_CHEST
+                }
+                when (currentScanPhase) {
+                    ScanPhase.OPEN_CHEST -> {
+                        if (isWoodAllowed.enabled && dungeonChests.indexOfFirst { it.type == ChestType.WOOD } == -1) {
+                            openChest(ChestType.WOOD)
+                            currentScanPhase = ScanPhase.SCAN_CHEST
+                        }
+                    }
+
+                    ScanPhase.SCAN_CHEST -> {
+                        if (dungeonChests.indexOfFirst { it.type == ChestType.WOOD } != -1) {
+
+                            currentScanPhase = ScanPhase.NEXT_CHEST
+                        }
+                    }
+
+                    ScanPhase.NEXT_CHEST -> {
+                        currentPhase = CheckPhase.SCAN_GOLD
+                        currentScanPhase = ScanPhase.OPEN_CHEST
+                    }
                 }
             }
 
-            CheckPhase.SCAN_GOLD ->
+            CheckPhase.SCAN_GOLD -> {
                 if (getChestEntity(ChestType.GOLD) == null) {
-                    currentPhase = CheckPhase.SCAN_DIAMOND
-                } else {
-                    openChest(ChestType.GOLD)
+                    currentScanPhase = ScanPhase.NEXT_CHEST
                 }
+                when (currentScanPhase) {
+                    ScanPhase.OPEN_CHEST -> {
+                        if (isGoldAllowed.enabled && dungeonChests.indexOfFirst { it.type == ChestType.GOLD } == -1) {
+                            openChest(ChestType.GOLD)
+                            currentScanPhase = ScanPhase.SCAN_CHEST
+                        }
+                    }
 
-            CheckPhase.SCAN_DIAMOND ->
+                    ScanPhase.SCAN_CHEST -> {
+                        if (dungeonChests.indexOfFirst { it.type == ChestType.GOLD } != -1) {
+                            mc.thePlayer.closeScreen()
+                            currentScanPhase = ScanPhase.NEXT_CHEST
+                        }
+                    }
+
+                    ScanPhase.NEXT_CHEST -> {
+                        currentPhase = CheckPhase.SCAN_DIAMOND
+                        currentScanPhase = ScanPhase.OPEN_CHEST
+                    }
+                }
+            }
+
+            CheckPhase.SCAN_DIAMOND -> {
                 if (getChestEntity(ChestType.DIAMOND) == null) {
-                    currentPhase = CheckPhase.SCAN_EMERALD
-                } else {
-                    openChest(ChestType.DIAMOND)
+                    currentScanPhase = ScanPhase.NEXT_CHEST
                 }
+                when (currentScanPhase) {
+                    ScanPhase.OPEN_CHEST -> {
+                        if (isDiamondAllowed.enabled && dungeonChests.indexOfFirst { it.type == ChestType.DIAMOND } == -1) {
+                            openChest(ChestType.DIAMOND)
+                            currentScanPhase = ScanPhase.SCAN_CHEST
+                        }
+                    }
 
-            CheckPhase.SCAN_EMERALD ->
+                    ScanPhase.SCAN_CHEST -> {
+                        if (dungeonChests.indexOfFirst { it.type == ChestType.DIAMOND } != -1) {
+                            mc.thePlayer.closeScreen()
+                            currentScanPhase = ScanPhase.NEXT_CHEST
+                        }
+                    }
+
+                    ScanPhase.NEXT_CHEST -> {
+                        currentPhase = CheckPhase.SCAN_EMERALD
+                        currentScanPhase = ScanPhase.OPEN_CHEST
+                    }
+                }
+            }
+
+            CheckPhase.SCAN_EMERALD -> {
                 if (getChestEntity(ChestType.EMERALD) == null) {
-                    currentPhase = CheckPhase.SCAN_OBSIDIAN
-                } else {
-                    openChest(ChestType.EMERALD)
+                    currentScanPhase = ScanPhase.NEXT_CHEST
                 }
+                when (currentScanPhase) {
+                    ScanPhase.OPEN_CHEST -> {
+                        if (isEmeraldAllowed.enabled && dungeonChests.indexOfFirst { it.type == ChestType.EMERALD } == -1) {
+                            openChest(ChestType.EMERALD)
+                            currentScanPhase = ScanPhase.SCAN_CHEST
+                        }
+                    }
 
-            CheckPhase.SCAN_OBSIDIAN ->
+                    ScanPhase.SCAN_CHEST -> {
+                        if (dungeonChests.indexOfFirst { it.type == ChestType.EMERALD } != -1) {
+                            mc.thePlayer.closeScreen()
+                            currentScanPhase = ScanPhase.NEXT_CHEST
+                        }
+                    }
+
+                    ScanPhase.NEXT_CHEST -> {
+                        currentPhase = CheckPhase.SCAN_OBSIDIAN
+                        currentScanPhase = ScanPhase.OPEN_CHEST
+                    }
+                }
+            }
+
+            CheckPhase.SCAN_OBSIDIAN -> {
                 if (getChestEntity(ChestType.OBSIDIAN) == null) {
-                    currentPhase = CheckPhase.SCAN_BEDROCK
-                } else {
-                    openChest(ChestType.OBSIDIAN)
+                    currentScanPhase = ScanPhase.NEXT_CHEST
+                }
+                when (currentScanPhase) {
+                    ScanPhase.OPEN_CHEST -> {
+                        if (isObsidianAllowed.enabled && dungeonChests.indexOfFirst { it.type == ChestType.OBSIDIAN } == -1) {
+                            openChest(ChestType.OBSIDIAN)
+                            currentScanPhase = ScanPhase.SCAN_CHEST
+                        }
+                    }
+
+                    ScanPhase.SCAN_CHEST -> {
+                        if (dungeonChests.indexOfFirst { it.type == ChestType.OBSIDIAN } != -1) {
+                            mc.thePlayer.closeScreen()
+                            currentScanPhase = ScanPhase.NEXT_CHEST
+                        }
+                    }
+
+                    ScanPhase.NEXT_CHEST -> {
+                        currentPhase = CheckPhase.SCAN_BEDROCK
+                        currentScanPhase = ScanPhase.OPEN_CHEST
+                    }
+                }
+            }
+
+            CheckPhase.SCAN_BEDROCK -> {
+                if (getChestEntity(ChestType.BEDROCK) == null) {
+                    currentScanPhase = ScanPhase.NEXT_CHEST
                 }
 
-            CheckPhase.SCAN_BEDROCK ->
-                if (getChestEntity(ChestType.BEDROCK) == null) {
-                    isScanned = true
-                    currentPhase = if (onlyAutoBuyOnKeyBind.enabled) CheckPhase.WAIT_FOR_BUY_KEY else CheckPhase.BUY
-                } else {
-                    openChest(ChestType.BEDROCK)
+                when (currentScanPhase) {
+                    ScanPhase.OPEN_CHEST -> {
+                        if (isBedrockAllowed.enabled && dungeonChests.indexOfFirst { it.type == ChestType.BEDROCK } == -1) {
+                            openChest(ChestType.BEDROCK)
+                            currentScanPhase = ScanPhase.SCAN_CHEST
+                        }
+                    }
+
+                    ScanPhase.SCAN_CHEST -> {
+                        if (dungeonChests.indexOfFirst { it.type == ChestType.BEDROCK } != -1) {
+                            mc.thePlayer.closeScreen()
+                            currentScanPhase = ScanPhase.NEXT_CHEST
+                        }
+                    }
+
+                    ScanPhase.NEXT_CHEST -> {
+                        currentScanPhase = ScanPhase.OPEN_CHEST
+                        isScanned = true
+                        if (isAutoBuyEnabled.enabled) {
+                            if (onlyAutoBuyOnKeyBind.enabled) {
+                                modMessage("Press ${Keyboard.getKeyName(buyKeyBind.value.key) ?: "Err"} to buy the best chest (" + bestChest?.getFormattedName() + ") for a profit of §l§2${bestChest?.profit}§r that cost §l§6${bestChest?.cost}§r")
+                                currentPhase = CheckPhase.WAIT_FOR_BUY_KEY
+                            } else if (!onlyAutoBuyOnKeyBind.enabled) {
+                                currentPhase = CheckPhase.BUY
+                            }
+                        }
+                    }
                 }
+            }
 
             CheckPhase.BUY -> {
-                return
+                if (bestChest != null) {
+                    openChest(bestChest?.type ?: return)
+                    currentPhase = CheckPhase.BUY_CLICK
+                } else {
+                    modMessage("No chest to buy")
+                    currentPhase = CheckPhase.NONE
+                }
+            }
+
+            CheckPhase.BUY_CLICK -> {
+                val openContainer = mc.thePlayer.openContainer ?: return
+                if (openContainer is ContainerChest
+                    && openContainer.lowerChestInventory.displayName.unformattedText.matches(Regex("^(\\w+) Chest(.*)\$"))
+                ) {
+                    val costItem = openContainer.inventory[31] ?: return
+//                    if (costItem.item.registryName == "minecraft:chest") {
+                    InventoryUtils.windowClick(31, InventoryUtils.ClickType.Left)
+                    modMessage("Bought ${bestChest?.getFormattedName()} for a profit of §l§2${bestChest?.profit}§r that cost §l§6${bestChest?.cost}§r thanks to AutoLooter")
+                    currentPhase = CheckPhase.NONE
+//                    }
+                }
             }
 
             CheckPhase.WAIT_FOR_SCAN_KEY -> return
@@ -225,6 +370,7 @@ object AutoLooter : Module(
             if (exisingInd != -1) dungeonChests.sliceArray(IntRange(exisingInd, 1))
 
             dungeonChests += chest
+            bestChest = dungeonChests.maxByOrNull { it.profit }
             modMessage("Scanned ${chest.getFormattedName()} | ${chest.cost} | ${chest.value} | ${chest.profit}")
         }
     }
@@ -235,6 +381,7 @@ object AutoLooter : Module(
         dungeonChests = arrayOf()
         bestChest = null
         currentPhase = CheckPhase.NONE
+        currentScanPhase = ScanPhase.OPEN_CHEST
     }
 
     fun openChest(chestType: ChestType) {
@@ -295,9 +442,17 @@ object AutoLooter : Module(
         SCAN_OBSIDIAN,
         SCAN_BEDROCK,
         BUY,
+        BUY_CLICK,
         WAIT_FOR_SCAN_KEY,
         WAIT_FOR_BUY_KEY,
         NONE
+    }
+
+    enum class ScanPhase {
+        OPEN_CHEST,
+        SCAN_CHEST,
+        NEXT_CHEST,
+//        NONE
     }
 
     private var idsToBuyAlways: Set<String> = setOf(
