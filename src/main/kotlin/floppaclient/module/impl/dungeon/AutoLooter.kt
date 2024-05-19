@@ -177,15 +177,18 @@ object AutoLooter : Module(
             val match = container.lowerChestInventory.displayName.unformattedText.matches(Regex("^(\\w+) Chest(.*)\$"))
             if (!match) return
             val costItem = container.inventory[31] ?: return
-            val lootItems: MutableList<ItemStack> = mutableListOf()
-            for (i in 9..18) {
-                val item = container.inventory[i]
-                modMessage("Item: ${item.displayName} | ${item.item.registryName} | $i")
-                if (item != null) {
-                    lootItems += item
-                    break
-                }
-            }
+            var lootItems: MutableList<ItemStack> = mutableListOf(
+                container.inventory[9],
+                container.inventory[10],
+                container.inventory[11],
+                container.inventory[12],
+                container.inventory[13],
+                container.inventory[14],
+                container.inventory[15],
+                container.inventory[16],
+                container.inventory[17]
+            )
+            lootItems = lootItems.filter { it.item.registryName != "minecraft:stained_glass_pane" }.toMutableList()
             if (lootItems.isEmpty()) return
             val lore = costItem.lore
 
@@ -275,7 +278,7 @@ object AutoLooter : Module(
     fun getSkyblockItemID(item: ItemStack): String? {
         val extraAttributes = item.getSubCompound("ExtraAttributes", false)
         val itemID = extraAttributes?.getString("id")
-        if ((itemID != "ENCHANTED_BOOK") || !(item.displayName.contains("Essence"))) return itemID
+        if (itemID != "ENCHANTED_BOOK") return itemID
         val enchantments = extraAttributes.getCompoundTag("enchantments")
         val enchants = enchantments.keySet
         if (enchants.isEmpty() || enchants == null) return null
@@ -385,10 +388,10 @@ object AutoLooter : Module(
 
         init {
             val name = item.displayName
-            val match = Regex("^(\\w+) Essence x(\\d+)\$").find(name)
+            val match = Regex("^(\\w+) Essence x(\\d+)\$").find(name.stripControlCodes())
             itemID = getSkyblockItemID(item) ?: ""
             if (match != null) {
-                val (_, type, amt) = match.destructured
+                val (type, amt) = match.destructured
                 itemID = "ESSENCE_${type.uppercase()}"
                 quantity = amt.toInt()
             }
@@ -408,7 +411,7 @@ object AutoLooter : Module(
                 value = 0
                 return
             }
-            modMessage("Calculating value for $itemID")
+//            modMessage("Calculating value for $itemID")
             val sellPrice = PriceUtils.getSellPrice(itemID.uppercase())
             value = if (sellPrice != null && sellPrice.isNotEmpty()) {
                 sellPrice[0]?.toInt() ?: 0
