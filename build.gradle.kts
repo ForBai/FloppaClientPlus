@@ -24,7 +24,7 @@ buildscript {
 }
 
 // This variable determine the filename of the produced jar file.
-version = "1.0.5"
+version = "1.0.5-beta1"
 group = "floppaclient"
 
 repositories {
@@ -56,6 +56,7 @@ dependencies {
 //    packageLib("org.reflections:reflections:0.10.2")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+//    packageLib("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 sourceSets {

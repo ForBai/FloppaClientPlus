@@ -102,7 +102,7 @@ object ModuleManager {
         AutoCmd,
         FreeCam,
 //        Clip,
-//        HClip,
+        HClip,
 //        BarPhase,
 //        NoRotate,
 //        JerryRocket,
