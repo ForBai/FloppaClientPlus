@@ -31,6 +31,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * It offers a lot of customization for which items are to be salvaged.
  *
  * @author Aton
+ *
+ * TODO: Fix
  */
 object Salvage : Module(
     "Auto Salvage",
