@@ -31,6 +31,10 @@ object CancelChestOpen : Module(
         description = "The mode to use, auto will automatically close the chest, any key will make any key input close the chest."
     )
 
+    init {
+        this.addSettings(mode)
+    }
+
     @SubscribeEvent
     fun onOpenWindow(event: ReceivePacketEvent) {
         if (!inDungeons || event.packet !is S2DPacketOpenWindow || !event.packet.windowTitle.unformattedText.equalsOneOf(
