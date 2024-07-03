@@ -68,7 +68,7 @@ object ModuleManager {
         AutoDevices,
         DungeonKillAura,
         IceSprayAura,
-//        CancelChestOpen,
+        CancelChestOpen,
         PartyTracker,
         M7P5,
         AutoLooter,
