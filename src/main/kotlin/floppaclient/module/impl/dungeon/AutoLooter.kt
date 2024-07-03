@@ -109,6 +109,8 @@ object AutoLooter : Module(
                     modMessage("Press ${Keyboard.getKeyName(scanKeyBind.value.key) ?: "Err"} to scan chests")
                     currentPhase = CheckPhase.WAIT_FOR_SCAN_KEY
                 } else if (!onlyAutoScanOnKeyBind.enabled) {
+                    dungeonChests = arrayOf()
+                    bestChest = null
                     currentPhase = CheckPhase.SCAN_WOOD
                 }
             }
