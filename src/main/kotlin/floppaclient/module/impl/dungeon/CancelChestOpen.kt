@@ -50,7 +50,7 @@ object CancelChestOpen : Module(
 
     @SubscribeEvent
     fun onInput(event: GuiScreenEvent.KeyboardInputEvent) {
-        if (!inDungeons || !mode.enabled || event.gui !is GuiChest) return
+        if (!inDungeons || mode.enabled || event.gui !is GuiChest) return
         if (((event.gui as? GuiChest)?.inventorySlots as? ContainerChest)?.lowerChestInventory?.name.equalsOneOf(
                 "Chest",
                 "Large Chest"
@@ -62,7 +62,7 @@ object CancelChestOpen : Module(
 
     @SubscribeEvent
     fun onMouse(event: GuiScreenEvent.MouseInputEvent) {
-        if (!inDungeons || !mode.enabled || event.gui !is GuiChest) return
+        if (!inDungeons || mode.enabled || event.gui !is GuiChest) return
         if (((event.gui as? GuiChest)?.inventorySlots as? ContainerChest)?.lowerChestInventory?.name.equalsOneOf(
                 "Chest",
                 "Large Chest"
