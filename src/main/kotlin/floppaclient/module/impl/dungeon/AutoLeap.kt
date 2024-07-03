@@ -13,6 +13,7 @@ import floppaclient.module.settings.impl.StringSetting
 import floppaclient.utils.ChatUtils.modMessage
 import floppaclient.utils.Utils
 import floppaclient.utils.Utils.rightClick
+import floppaclient.utils.inventory.InventoryUtils
 import floppaclient.utils.inventory.InventoryUtils.isHolding
 import floppaclient.utils.inventory.SkyblockItem
 import net.minecraft.entity.player.EntityPlayer
@@ -145,13 +146,14 @@ object AutoLeap : Module(
                             invSlots.subList(10, 19).find {
                                 it.stack?.displayName?.contains(name) == true
                             }?.let {
-                                mc.playerController.windowClick(
-                                    mc.thePlayer.openContainer.windowId,
-                                    it.slotNumber,
-                                    2,
-                                    3,
-                                    mc.thePlayer
-                                )
+                                InventoryUtils.windowClick(it.slotNumber, InventoryUtils.ClickType.Middle)
+//                                mc.playerController.windowClick(
+//                                    mc.thePlayer.openContainer.windowId,
+//                                    it.slotNumber,
+//                                    0,
+//                                    0,
+//                                    mc.thePlayer
+//                                )
                                 return@Thread
                             }
                         }
