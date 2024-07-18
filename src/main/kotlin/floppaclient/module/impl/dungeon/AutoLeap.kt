@@ -41,7 +41,6 @@ object AutoLeap : Module(
         description = "Name of the player you want to target in Boss. This is only active when Custom Boss is selected for Boss target."
     )
 
-
     private var doorOpener: String? = null
     private var bloodOpened = false
     private var thread: Thread? = null
